@@ -4821,15 +4821,7 @@
         // =========================================================
 
         OKRFarmingGame.prototype.openBugReport = function() {
-            // Capture screenshot from canvas
-            try {
-                var dataUrl = this.canvas.toDataURL('image/png');
-                document.getElementById('bugScreenshot').src = dataUrl;
-                this._bugScreenshotData = dataUrl;
-            } catch (e) {
-                document.getElementById('bugScreenshot').src = '';
-                this._bugScreenshotData = null;
-            }
+            var self = this;
 
             // Populate game state info
             var stateInfo = 'Milestones: ' + (this.state ? this.state.unlockedMilestones.length : '?');
@@ -4850,7 +4842,150 @@
             document.getElementById('bugContact').value = '';
             document.getElementById('bugType').value = 'bug';
 
-            document.getElementById('bugReportModal').style.display = 'block';
+            // Show modal with screenshot; called once the screenshot is ready
+            function showModal(dataUrl) {
+                document.getElementById('bugScreenshot').src = dataUrl || '';
+                self._bugScreenshotData = dataUrl || null;
+                document.getElementById('bugReportModal').style.display = 'block';
+            }
+
+            // Capture game canvas + HUD overlays into a single composite screenshot.
+            // Uses getBoundingClientRect to position each DOM panel and re-draws it
+            // onto a temporary canvas so the full HUD is included in the image.
+            try {
+                var vw = window.innerWidth, vh = window.innerHeight;
+                var comp = document.createElement('canvas');
+                comp.width = vw;
+                comp.height = vh;
+                var ctx = comp.getContext('2d');
+
+                // Draw game canvas scaled to viewport
+                ctx.drawImage(self.canvas, 0, 0, vw, vh);
+
+                // Draw a rounded-rect panel background + border from a DOM element's rect
+                function drawPanelBg(el, borderTopOnly) {
+                    if (!el || el.style.display === 'none') return null;
+                    var r = el.getBoundingClientRect();
+                    if (r.width <= 0 || r.height <= 0) return null;
+                    ctx.fillStyle = 'rgba(0,20,10,0.92)';
+                    ctx.strokeStyle = '#00ff88';
+                    ctx.lineWidth = 1;
+                    if (borderTopOnly) {
+                        ctx.fillRect(r.left, r.top, r.width, r.height);
+                        ctx.beginPath();
+                        ctx.moveTo(r.left, r.top);
+                        ctx.lineTo(r.left + r.width, r.top);
+                        ctx.stroke();
+                    } else {
+                        var rad = 8;
+                        ctx.beginPath();
+                        ctx.moveTo(r.left + rad, r.top);
+                        ctx.arcTo(r.left + r.width, r.top,    r.left + r.width, r.top + r.height, rad);
+                        ctx.arcTo(r.left + r.width, r.top + r.height, r.left, r.top + r.height, rad);
+                        ctx.arcTo(r.left,            r.top + r.height, r.left, r.top,             rad);
+                        ctx.arcTo(r.left,            r.top,            r.left + r.width, r.top,    rad);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                    return r;
+                }
+
+                // Render #ui stats panel
+                var uiEl = document.getElementById('ui');
+                var uiRect = drawPanelBg(uiEl, false);
+                if (uiRect) {
+                    var yPos = uiRect.top + 20;
+                    uiEl.querySelectorAll('.stat-row').forEach(function(row) {
+                        var lbl = row.querySelector('.stat-label');
+                        var val = row.querySelector('.stat-value');
+                        ctx.font = '13px "Segoe UI",sans-serif';
+                        ctx.textAlign = 'left';
+                        ctx.fillStyle = '#8cf';
+                        if (lbl) ctx.fillText(lbl.textContent, uiRect.left + 12, yPos);
+                        ctx.textAlign = 'right';
+                        ctx.fillStyle = (val && val.style.color) ? val.style.color : '#00ff88';
+                        if (val) ctx.fillText(val.textContent, uiRect.left + uiRect.width - 12, yPos);
+                        ctx.textAlign = 'left';
+                        yPos += 22;
+                    });
+                }
+
+                // Render #controls bottom bar
+                var ctrlEl = document.getElementById('controls');
+                var ctrlRect = drawPanelBg(ctrlEl, true);
+                if (ctrlRect) {
+                    var xPos = ctrlRect.left + 8;
+                    var bh = ctrlRect.height - 10, by = ctrlRect.top + 5;
+                    ctrlEl.querySelectorAll('button').forEach(function(btn) {
+                        ctx.font = '12px "Segoe UI",sans-serif';
+                        var tw = Math.max(ctx.measureText(btn.textContent).width + 16, 32);
+                        ctx.fillStyle = 'rgba(0,255,136,0.15)';
+                        ctx.strokeStyle = '#00ff88';
+                        ctx.lineWidth = 1;
+                        ctx.fillRect(xPos, by, tw, bh);
+                        ctx.strokeRect(xPos, by, tw, bh);
+                        ctx.fillStyle = '#00ff88';
+                        ctx.fillText(btn.textContent, xPos + 6, by + bh / 2 + 4);
+                        xPos += tw + 6;
+                    });
+                    var cd = document.getElementById('eventCountdown');
+                    if (cd) {
+                        ctx.font = '10px "Segoe UI",sans-serif';
+                        ctx.fillStyle = '#ff0';
+                        ctx.textAlign = 'right';
+                        ctx.fillText('⏱ ' + cd.textContent + 's', ctrlRect.left + ctrlRect.width - 10, ctrlRect.top + ctrlRect.height / 2 + 4);
+                        ctx.textAlign = 'left';
+                    }
+                }
+
+                // Render building buttons in #buildings panel
+                var bldEl = document.getElementById('buildings');
+                if (bldEl && bldEl.style.display !== 'none') {
+                    bldEl.querySelectorAll('.building-btn').forEach(function(btn) {
+                        var br = drawPanelBg(btn, false);
+                        if (!br) return;
+                        var yLine = br.top + 16;
+                        ['.b-name', '.b-cost', '.b-effect'].forEach(function(sel) {
+                            var div = btn.querySelector(sel);
+                            if (!div) return;
+                            ctx.font = sel === '.b-name' ? 'bold 13px "Segoe UI",sans-serif' : '11px "Segoe UI",sans-serif';
+                            ctx.fillStyle = div.style.color || '#00ff88';
+                            ctx.textAlign = 'left';
+                            ctx.fillText(div.textContent, br.left + 10, yLine);
+                            yLine += 16;
+                        });
+                    });
+                }
+
+                // Render repair bot panel if visible
+                var rbEl = document.getElementById('repairBotPanel');
+                if (rbEl && rbEl.style.display !== 'none') {
+                    var rbBtn = rbEl.querySelector('button');
+                    var rbRect = rbBtn ? drawPanelBg(rbBtn, false) : null;
+                    if (rbRect) {
+                        var rbLines = [
+                            { text: '🔧 Repair Bot', color: '#00ff88', bold: true },
+                            { text: (document.getElementById('repairBotCost') || {textContent: '?'}).textContent + ' AC', color: '#ff0', bold: false },
+                            { text: 'Bots: ' + (document.getElementById('repairBotCount') || {textContent: '0'}).textContent, color: '#8f8', bold: false }
+                        ];
+                        var yLine = rbRect.top + 16;
+                        rbLines.forEach(function(line) {
+                            ctx.font = line.bold ? 'bold 13px "Segoe UI",sans-serif' : '11px "Segoe UI",sans-serif';
+                            ctx.fillStyle = line.color;
+                            ctx.textAlign = 'left';
+                            ctx.fillText(line.text, rbRect.left + 10, yLine);
+                            yLine += 16;
+                        });
+                    }
+                }
+
+                showModal(comp.toDataURL('image/png'));
+            } catch (e) {
+                // Fallback to canvas-only screenshot
+                try { showModal(self.canvas.toDataURL('image/png')); }
+                catch (e2) { showModal(null); }
+            }
         };
 
         OKRFarmingGame.prototype.closeBugReport = function() {
