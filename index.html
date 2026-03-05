@@ -1527,7 +1527,7 @@
             this.playSound('click');
         };
 
-        OKRFarmingGame.prototype.saveGame = function() {
+        OKRFarmingGame.prototype.saveGame = function(silent) {
             if (!this.state) return;
             var data = {
                 state: this.state,
@@ -1536,16 +1536,18 @@
             };
             try {
                 localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-                // Show save code modal
-                var code = this.generateSaveCode(data);
-                document.getElementById('saveCodeTitle').textContent = '💾 Game Saved!';
-                document.getElementById('saveCodeDesc').textContent = 'Copy this code to resume on any device. Your game is also saved locally.';
-                document.getElementById('saveCodeText').value = code;
-                document.getElementById('saveCodeModal').style.display = 'block';
+                if (!silent) {
+                    // Show save code modal only on manual save
+                    var code = this.generateSaveCode(data);
+                    document.getElementById('saveCodeTitle').textContent = '💾 Game Saved!';
+                    document.getElementById('saveCodeDesc').textContent = 'Copy this code to resume on any device. Your game is also saved locally.';
+                    document.getElementById('saveCodeText').value = code;
+                    document.getElementById('saveCodeModal').style.display = 'block';
+                    this.playSound('click');
+                }
             } catch (e) {
-                this.addFloatingText(this.canvas.width / 2, 60, 'Save failed!', '#f44');
+                if (!silent) this.addFloatingText(this.canvas.width / 2, 60, 'Save failed!', '#f44');
             }
-            this.playSound('click');
         };
 
         OKRFarmingGame.prototype.generateSaveCode = function(data) {
@@ -1730,7 +1732,7 @@
 
             // Start autosave
             if (this.autosaveInterval) clearInterval(this.autosaveInterval);
-            this.autosaveInterval = setInterval(function() { self.saveGame(); }, 30000);
+            this.autosaveInterval = setInterval(function() { self.saveGame(true); }, 30000);
 
             // Start game loop
             this.lastTick = performance.now();
@@ -2563,7 +2565,7 @@
                     this.playSound('complete');
 
                     this.trackEvent('milestone', i);
-                    this.saveGame();
+                    this.saveGame(true);
 
                     // Check if ALL milestones unlocked — victory!
                     if (!this.infiniteMode && this.state.unlockedMilestones.length >= MILESTONES.length) {
@@ -2619,7 +2621,7 @@
             var btns = document.querySelectorAll('.building-btn');
             btns.forEach(function(b) { b.style.borderColor = t.panelBorder; });
 
-            this.saveGame();
+            this.saveGame(true);
         };
 
         OKRFarmingGame.prototype.cycleTheme = function() {
