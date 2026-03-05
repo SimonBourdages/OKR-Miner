@@ -527,6 +527,10 @@
             <span class="stat-label">EL/s</span>
             <span class="stat-value" id="elRate" style="color:#ff9800;">0</span>
         </div>
+        <div class="stat-row" style="margin-top:4px;border-top:1px solid #234;padding-top:4px;">
+            <span class="stat-label">🔍 Zoom</span>
+            <span class="stat-value" id="zoomDisplay" style="color:#8cf;">100%</span>
+        </div>
     </div>
 
     <div id="controls" style="display:none;">
@@ -536,6 +540,7 @@
         <button onclick="game.showAchievements()">🏆</button>
         <button onclick="game.showEventHistory()">📜</button>
         <button onclick="game.openBugReport()">🐛 Bug</button>
+        <button onclick="game.resetCamera()" title="Reset camera zoom and position">🎯 Reset View</button>
         <span style="color:#ff0;font-size:10px;margin-left:auto;">⏱ <span id="eventCountdown">--</span>s</span>
     </div>
 
@@ -999,6 +1004,14 @@
             // Screen shake
             this.screenShake = { x: 0, y: 0, intensity: 0 };
 
+            // Camera
+            this.camera = { zoom: 1, targetZoom: 1, offsetX: 0, offsetY: 0, targetOffsetX: 0, targetOffsetY: 0 };
+            this.isPanning = false;
+            this.panStartX = 0;
+            this.panStartY = 0;
+            this.panStartOffsetX = 0;
+            this.panStartOffsetY = 0;
+
             // Audio
             this.audioCtx = null;
             this.musicPlaying = false;
@@ -1035,10 +1048,74 @@
             this.canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
             this.mouseX = 0;
             this.mouseY = 0;
+            this.mouseScreenX = 0;
+            this.mouseScreenY = 0;
             this.canvas.addEventListener('mousemove', function(e) {
                 var rect = self.canvas.getBoundingClientRect();
-                self.mouseX = (e.clientX - rect.left) * (self.canvas.width / rect.width);
-                self.mouseY = (e.clientY - rect.top) * (self.canvas.height / rect.height);
+                var sx = (e.clientX - rect.left) * (self.canvas.width / rect.width);
+                var sy = (e.clientY - rect.top) * (self.canvas.height / rect.height);
+                self.mouseScreenX = sx;
+                self.mouseScreenY = sy;
+                // Convert screen → world coordinates
+                self.mouseX = (sx - self.camera.offsetX) / self.camera.zoom;
+                self.mouseY = (sy - self.camera.offsetY) / self.camera.zoom;
+                // Handle right-click drag panning (dx/dy in canvas pixels)
+                if (self.isPanning) {
+                    var dx = sx - self.panStartX;
+                    var dy = sy - self.panStartY;
+                    self.camera.offsetX = self.panStartOffsetX + dx;
+                    self.camera.offsetY = self.panStartOffsetY + dy;
+                    self.camera.targetOffsetX = self.camera.offsetX;
+                    self.camera.targetOffsetY = self.camera.offsetY;
+                }
+            });
+            // Right-click drag to pan
+            this.canvas.addEventListener('mousedown', function(e) {
+                if (e.button === 2) {
+                    var rect = self.canvas.getBoundingClientRect();
+                    var scaleX = self.canvas.width / rect.width;
+                    var scaleY = self.canvas.height / rect.height;
+                    self.isPanning = true;
+                    self.panStartX = (e.clientX - rect.left) * scaleX;
+                    self.panStartY = (e.clientY - rect.top) * scaleY;
+                    self.panStartOffsetX = self.camera.offsetX;
+                    self.panStartOffsetY = self.camera.offsetY;
+                    self.canvas.style.cursor = 'grabbing';
+                }
+            });
+            this.canvas.addEventListener('mouseup', function(e) {
+                if (e.button === 2 && self.isPanning) {
+                    self.isPanning = false;
+                    self.canvas.style.cursor = '';
+                }
+            });
+            this.canvas.addEventListener('mouseleave', function() {
+                if (self.isPanning) {
+                    self.isPanning = false;
+                    self.canvas.style.cursor = '';
+                }
+            });
+            // Mouse-wheel zoom toward cursor
+            this.canvas.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                var rect = self.canvas.getBoundingClientRect();
+                var sx = (e.clientX - rect.left) * (self.canvas.width / rect.width);
+                var sy = (e.clientY - rect.top) * (self.canvas.height / rect.height);
+                var factor = e.deltaY > 0 ? 0.9 : 1.1;
+                var newZoom = Math.min(3, Math.max(0.3, self.camera.targetZoom * factor));
+                // Keep the world point under the cursor fixed
+                var wx = (sx - self.camera.targetOffsetX) / self.camera.targetZoom;
+                var wy = (sy - self.camera.targetOffsetY) / self.camera.targetZoom;
+                self.camera.targetOffsetX = sx - wx * newZoom;
+                self.camera.targetOffsetY = sy - wy * newZoom;
+                self.camera.targetZoom = newZoom;
+            }, { passive: false });
+            // Keyboard shortcut: R or Home to reset camera view
+            window.addEventListener('keydown', function(e) {
+                if (!self.running) return;
+                if (e.key === 'r' || e.key === 'R' || e.key === 'Home') {
+                    self.resetCamera();
+                }
             });
 
             this.analytics = this.loadAnalytics();
@@ -1467,8 +1544,11 @@
             if (!this.running || !this.state) return;
 
             var rect = this.canvas.getBoundingClientRect();
-            var x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
-            var y = (e.clientY - rect.top) * (this.canvas.height / rect.height);
+            var sx = (e.clientX - rect.left) * (this.canvas.width / rect.width);
+            var sy = (e.clientY - rect.top) * (this.canvas.height / rect.height);
+            // Convert screen → world coordinates
+            var x = (sx - this.camera.offsetX) / this.camera.zoom;
+            var y = (sy - this.camera.offsetY) / this.camera.zoom;
 
             // Check if clicking on a thief ship — destroy it!
             for (var i = this.thiefShips.length - 1; i >= 0; i--) {
@@ -2346,6 +2426,10 @@
             // Event countdown
             var cd = document.getElementById('eventCountdown');
             if (cd) cd.textContent = Math.max(0, Math.ceil(this.eventTimer));
+
+            // Zoom level indicator
+            var zoomEl = document.getElementById('zoomDisplay');
+            if (zoomEl) zoomEl.textContent = Math.round(this.camera.zoom * 100) + '%';
         };
 
         OKRFarmingGame.prototype.formatNumber = function(n) {
@@ -2371,11 +2455,23 @@
             var w = this.canvas.width;
             var h = this.canvas.height;
 
+            // Smooth lerp camera toward target values
+            this.camera.zoom += (this.camera.targetZoom - this.camera.zoom) * 0.12;
+            this.camera.offsetX += (this.camera.targetOffsetX - this.camera.offsetX) * 0.12;
+            this.camera.offsetY += (this.camera.targetOffsetY - this.camera.offsetY) * 0.12;
+
             ctx.save();
             ctx.translate(this.screenShake.x, this.screenShake.y);
 
-            // Background
+            // Background always fills the screen (drawn before camera transform)
             this.drawBackground(ctx, w, h);
+
+            // Apply camera transform for all world-space elements
+            ctx.save();
+            ctx.translate(this.camera.offsetX, this.camera.offsetY);
+            ctx.scale(this.camera.zoom, this.camera.zoom);
+
+            // Grid scrolls with the world
             this.drawPixelGrid(ctx, w, h);
 
             // Connections: MST chain linking all nodes to factory
@@ -2411,18 +2507,22 @@
             // Placement ghost preview at mouse cursor
             this.drawPlacementPreview(ctx, fX, fY);
 
-            // Effects
+            // World-space effects
             this.drawParticles(ctx);
             this.drawShips(ctx);
-            // Draw repair bot drones
             this.drawRepairDrones(ctx);
             this.drawThiefShips(ctx);
-            this.drawComboDisplay(ctx, w, h);
+            // Floating texts are world-space (tied to node/click positions)
             this.drawFloatingTexts(ctx);
+
+            ctx.restore(); // end camera transform
+
+            // Screen-space UI elements (not affected by camera)
+            this.drawComboDisplay(ctx, w, h);
             this.drawEventBanner(ctx, w, h);
             this.drawScanlines(ctx, w, h);
 
-            ctx.restore();
+            ctx.restore(); // end screen shake
         };
 
         // =========================================================
@@ -2529,10 +2629,15 @@
             var boxX = x - boxW / 2;
             var boxY = y - 30 - boxH;
 
-            // Keep on screen
-            if (boxX < 5) boxX = 5;
-            if (boxX + boxW > this.canvas.width - 5) boxX = this.canvas.width - 5 - boxW;
-            if (boxY < 5) boxY = y + 35;
+            // Keep tooltip within the visible world bounds
+            var worldLeft = (0 - this.camera.offsetX) / this.camera.zoom;
+            var worldRight = (this.canvas.width - this.camera.offsetX) / this.camera.zoom;
+            var worldTop = (0 - this.camera.offsetY) / this.camera.zoom;
+            var worldBottom = (this.canvas.height - this.camera.offsetY) / this.camera.zoom;
+            if (boxX < worldLeft + 5) boxX = worldLeft + 5;
+            if (boxX + boxW > worldRight - 5) boxX = worldRight - 5 - boxW;
+            if (boxY < worldTop + 5) boxY = y + 35;
+            if (boxY + boxH > worldBottom - 5) boxY = worldBottom - 5 - boxH;
 
             // Background
             ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
@@ -2834,8 +2939,11 @@
             if (!this.running || !this.state) return;
             var mx = this.mouseX;
             var my = this.mouseY;
-            if (mx <= 0 && my <= 0) return;
-            if (mx < 1 || my < 1 || mx > this.canvas.width - 1 || my > this.canvas.height - 1) return;
+            // Use screen-space coordinates to check if mouse is on canvas
+            var sx = this.mouseScreenX;
+            var sy = this.mouseScreenY;
+            if (sx <= 0 && sy <= 0) return;
+            if (sx < 1 || sy < 1 || sx > this.canvas.width - 1 || sy > this.canvas.height - 1) return;
 
             var hitRadius = 25;
 
@@ -4471,6 +4579,12 @@
 
         OKRFarmingGame.prototype.triggerShake = function(intensity) {
             this.screenShake.intensity = Math.max(this.screenShake.intensity, intensity);
+        };
+
+        OKRFarmingGame.prototype.resetCamera = function() {
+            this.camera.targetZoom = 1;
+            this.camera.targetOffsetX = 0;
+            this.camera.targetOffsetY = 0;
         };
 
         // =========================================================
