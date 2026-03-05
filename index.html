@@ -2559,6 +2559,9 @@
             this.drawScanlines(ctx, w, h);
 
             } finally { ctx.restore(); } // end screen shake
+
+            // Minimap is drawn outside the screen-shake transform so it stays fixed
+            this.drawMinimap(ctx, w, h);
         };
 
         // =========================================================
@@ -4350,6 +4353,131 @@
             grad.addColorStop(1, 'rgba(0,0,0,0.3)');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, w, h);
+        };
+
+        // =========================================================
+        // DRAWING - MINIMAP (top-right corner)
+        // =========================================================
+
+        OKRFarmingGame.prototype.drawMinimap = function(ctx, w, h) {
+            if (!this.state) return;
+
+            var mmW   = 120;
+            var mmH   = 90;
+            var mmPad = 10;
+            var mmX   = w - mmW - mmPad; // top-right corner
+            var mmY   = mmPad;
+
+            // Factory sits at canvas centre in world space
+            var fX = w / 2;
+            var fY = h / 2;
+
+            // Gather all world-space points to determine map bounds
+            var margin = 80;
+            var minX = fX - margin, maxX = fX + margin;
+            var minY = fY - margin, maxY = fY + margin;
+
+            for (var i = 0; i < this.nodes.length; i++) {
+                minX = Math.min(minX, this.nodes[i].x - margin);
+                maxX = Math.max(maxX, this.nodes[i].x + margin);
+                minY = Math.min(minY, this.nodes[i].y - margin);
+                maxY = Math.max(maxY, this.nodes[i].y + margin);
+            }
+            for (var i = 0; i < this.ships.length; i++) {
+                if (!this.ships[i].exploding) {
+                    minX = Math.min(minX, this.ships[i].x);
+                    maxX = Math.max(maxX, this.ships[i].x);
+                    minY = Math.min(minY, this.ships[i].y);
+                    maxY = Math.max(maxY, this.ships[i].y);
+                }
+            }
+            for (var i = 0; i < this.thiefShips.length; i++) {
+                minX = Math.min(minX, this.thiefShips[i].x);
+                maxX = Math.max(maxX, this.thiefShips[i].x);
+                minY = Math.min(minY, this.thiefShips[i].y);
+                maxY = Math.max(maxY, this.thiefShips[i].y);
+            }
+
+            var worldW = maxX - minX;
+            var worldH = maxY - minY;
+
+            // Convert a world coordinate to a minimap pixel coordinate
+            var toMmX = function(wx) { return mmX + ((wx - minX) / worldW) * mmW; };
+            var toMmY = function(wy) { return mmY + ((wy - minY) / worldH) * mmH; };
+
+            ctx.save();
+
+            // Clip everything to the minimap rectangle
+            ctx.beginPath();
+            ctx.rect(mmX, mmY, mmW, mmH);
+            ctx.clip();
+
+            // Semi-transparent dark background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+            ctx.fillRect(mmX, mmY, mmW, mmH);
+
+            // MST connection lines (colour-coded by building type)
+            var edges = this.computeConnectionEdges();
+            ctx.lineWidth = 1;
+            for (var i = 0; i < edges.length; i++) {
+                var e = edges[i];
+                var nodeIdx = e.from.idx;
+                var color = (nodeIdx >= 0 && this.nodes[nodeIdx]) ? BUILDINGS[this.nodes[nodeIdx].type].color : '#0ff';
+                ctx.strokeStyle = color;
+                ctx.globalAlpha = 0.45;
+                ctx.beginPath();
+                ctx.moveTo(toMmX(e.from.x), toMmY(e.from.y));
+                ctx.lineTo(toMmX(e.to.x),   toMmY(e.to.y));
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+
+            // Building dots (colour-coded by type, 4×4 px squares)
+            for (var i = 0; i < this.nodes.length; i++) {
+                var n = this.nodes[i];
+                ctx.fillStyle = BUILDINGS[n.type].color;
+                ctx.fillRect(toMmX(n.x) - 2, toMmY(n.y) - 2, 4, 4);
+            }
+
+            // Factory — distinct cyan square (6×6 px)
+            ctx.fillStyle = '#0ff';
+            ctx.fillRect(toMmX(fX) - 3, toMmY(fY) - 3, 6, 6);
+
+            // Threats — pulsing red/magenta circles
+            var pulse = 0.6 + 0.4 * Math.sin(Date.now() * 0.006);
+            var pulseR = 1.5 + 1.5 * pulse;
+
+            ctx.globalAlpha = pulse;
+            for (var i = 0; i < this.ships.length; i++) {
+                var ship = this.ships[i];
+                if (ship.exploding) continue;
+                ctx.fillStyle = '#ff4400';
+                ctx.beginPath();
+                ctx.arc(toMmX(ship.x), toMmY(ship.y), pulseR, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            for (var i = 0; i < this.thiefShips.length; i++) {
+                var thief = this.thiefShips[i];
+                ctx.fillStyle = '#ff00aa';
+                ctx.beginPath();
+                ctx.arc(toMmX(thief.x), toMmY(thief.y), pulseR, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            // Border
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.55)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(mmX + 0.5, mmY + 0.5, mmW - 1, mmH - 1);
+
+            // "MAP" label in top-left of minimap
+            ctx.fillStyle = 'rgba(0, 255, 255, 0.7)';
+            ctx.font = 'bold 7px monospace';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('MAP', mmX + 3, mmY + 3);
+
+            ctx.restore();
         };
 
         // =========================================================
