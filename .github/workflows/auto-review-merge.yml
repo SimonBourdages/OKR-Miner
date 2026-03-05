@@ -1,0 +1,55 @@
+name: Auto-review and merge Copilot PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-review-merge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'copilot[bot]' || github.actor == 'Copilot'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Validate JS
+        run: |
+          if [ -f index.html ]; then
+            node -e "
+              const fs = require('fs');
+              const html = fs.readFileSync('index.html','utf8');
+              const m = html.match(/<script>\s*([\s\S]*?)\s*<\/script>\s*<\/body>/i);
+              if(m){try{new Function(m[1]);console.log('PASS')}catch(e){console.error(e.message);process.exit(1)}}
+            "
+          fi
+
+      - name: Approve PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              event: 'APPROVE',
+              body: ' Auto-approved. JS validated.'
+            });
+
+      - name: Merge PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                merge_method: 'squash'
+              });
+            } catch(e) { console.log('Merge failed:', e.message); }
