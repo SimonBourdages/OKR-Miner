@@ -185,6 +185,38 @@
             opacity: 1;
         }
 
+        .building-btn .b-metrics {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+            align-items: center;
+        }
+
+        .building-btn .b-metrics .metric-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            padding: 1px 4px;
+            font-size: 9px;
+        }
+
+        .building-btn .b-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            flex-shrink: 0;
+        }
+
+        .building-btn .b-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         #menu {
             position: fixed;
             top: 0;
@@ -544,9 +576,18 @@
     </div>
     <div id="repairBotPanel" style="display:none;position:fixed;right:10px;bottom:60px;z-index:10;">
         <button onclick="game.buyRepairBot()" style="background:rgba(0,20,10,0.9);border:2px solid #00ff88;border-radius:8px;padding:10px 14px;color:#00ff88;cursor:pointer;font-family:inherit;font-size:12px;text-align:left;min-width:160px;">
-            <div style="font-weight:bold;font-size:14px;">🔧 Repair Bot</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#00e5ff;display:inline-block;"></span>
+                <span style="font-weight:bold;font-size:14px;">Repair Bot</span>
+            </div>
             <div style="color:#ff0;"><span id="repairBotCost">200</span> AC</div>
-            <div style="color:#8f8;font-size:11px;">Bots: <span id="repairBotCount">0</span></div>
+            <div style="color:#8f8;font-size:11px;">Heals lowest HP</div>
+            <div style="display:flex;gap:4px;margin-top:4px;align-items:center;">
+                <span style="display:inline-flex;align-items:center;background:rgba(255,255,255,0.08);border-radius:3px;padding:1px 4px;">
+                    <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="5" width="12" height="4" rx="1" fill="#f44336"/><rect x="5" y="1" width="4" height="12" rx="1" fill="#f44336"/></svg>
+                </span>
+            </div>
+            <div style="color:#0ff;font-size:10px;">Bots: <span id="repairBotCount">0</span></div>
         </button>
     </div>
 
@@ -730,13 +771,22 @@
         var UPGRADE_POWER = { 1: 1.0, 2: 2.0, 3: 4.5 }; // multiplier on output
 
         var BUILDINGS = {
-            collector:   { name: 'Collector',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 AC/s',        symbol: '📥' },
-            processor:   { name: 'Processor',   cost: 150,  acPerSec: 0,   okrPerSec: 5,   elCost: 3,  color: '#2196f3', desc: '+5 OKR/s',       symbol: '💻' },
-            multiplier:  { name: 'Multiplier',  cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#9c27b0', desc: 'x1.5 all rates', symbol: '✖️', multiplier: 1.5 },
-            synthesizer: { name: 'Synthesizer', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 OKR/s',     symbol: '⚛️' },
-            generator:   { name: 'Generator',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 EL/s',           symbol: '⚡' },
-            bank:        { name: 'Bank',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% AC interest/s', symbol: '🏦', interestRate: 0.02 },
-            repairbot:   { name: 'Repair Bot',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Flying bot, heals lowest HP', symbol: '🔧', repairRate: 15 }
+            collector:   { name: 'Collector',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 AC/s',          symbol: '', metrics: ['ac'] },
+            processor:   { name: 'Processor',   cost: 150,  acPerSec: 0,   okrPerSec: 5,   elCost: 3,  color: '#2196f3', desc: '+5 OKR/s',         symbol: '', metrics: ['okr'] },
+            multiplier:  { name: 'Multiplier',  cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#9c27b0', desc: 'x1.5 all rates',   symbol: '', metrics: ['okr', 'ac', 'el', 'mult'], multiplier: 1.5 },
+            synthesizer: { name: 'Synthesizer', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 OKR/s',        symbol: '', metrics: ['okr'] },
+            generator:   { name: 'Generator',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 EL/s', symbol: '', metrics: ['el'] },
+            bank:        { name: 'Bank',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% AC interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
+            repairbot:   { name: 'Repair Bot',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Heals lowest HP',  symbol: '', metrics: ['hp'], repairRate: 15 }
+        };
+
+        // Metric icons as small inline SVGs (16x16)
+        var METRIC_ICONS = {
+            okr: '<svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,0 14,7 7,14 0,7" fill="#00e676"/></svg>',
+            ac: '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#ffd700" stroke="#b8860b" stroke-width="1"/><text x="7" y="11" text-anchor="middle" font-size="9" fill="#8b6914" font-weight="bold">$</text></svg>',
+            el: '<svg width="14" height="14" viewBox="0 0 14 14"><polygon points="8,0 4,6 7,6 5,14 11,6 8,6" fill="#ff9800"/></svg>',
+            hp: '<svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="5" width="12" height="4" rx="1" fill="#f44336"/><rect x="5" y="1" width="4" height="12" rx="1" fill="#f44336"/></svg>',
+            mult: '<svg width="14" height="14" viewBox="0 0 14 14"><line x1="2" y1="2" x2="12" y2="12" stroke="#ce93d8" stroke-width="2.5"/><line x1="12" y1="2" x2="2" y2="12" stroke="#ce93d8" stroke-width="2.5"/></svg>'
         };
 
         var ACHIEVEMENTS = {
@@ -1226,10 +1276,23 @@
                 var btn = document.createElement('div');
                 btn.className = 'building-btn' + (type === self.selectedBuilding ? ' selected' : '');
                 btn.setAttribute('data-type', type);
+                // Build metric icons HTML
+                var metricsHtml = '';
+                if (b.metrics) {
+                    metricsHtml = '<div class="b-metrics">';
+                    for (var mi = 0; mi < b.metrics.length; mi++) {
+                        var mkey = b.metrics[mi];
+                        var micon = METRIC_ICONS[mkey] || '';
+                        metricsHtml += '<span class="metric-icon">' + micon + '</span>';
+                    }
+                    metricsHtml += '</div>';
+                }
+
                 btn.innerHTML =
-                    '<div class="b-name">' + b.symbol + ' ' + b.name + '</div>' +
+                    '<div class="b-header"><span class="b-dot" style="background:' + b.color + '"></span><span class="b-name">' + b.name + '</span></div>' +
                     '<div class="b-cost">' + b.cost + ' AC</div>' +
                     '<div class="b-effect">' + b.desc + '</div>' +
+                    metricsHtml +
                     '<div class="b-preview" id="preview-' + type + '"></div>';
                 btn.addEventListener('click', function() { self.selectBuilding(type); });
                 btn.addEventListener('mouseenter', function() { self.updateBuildingPreview(type); });
@@ -1650,6 +1713,13 @@
                 return;
             }
 
+            // Block placement if building uses EL and we have no electricity
+            if (b.elCost && b.elCost > 0 && this.state.electricityEnabled && this.state.currencies.el <= 0 && this.currentElRate <= 0) {
+                this.addFloatingText(x, y, 'No electricity! Build a Generator first.', '#ff9800');
+                this.playSound('click');
+                return;
+            }
+
             this.state.currencies.ac -= b.cost;
             this.nodes.push({
                 type: type,
@@ -1961,9 +2031,10 @@
             }
             } // end shipsEnabled
 
-            // Standalone repair bots — fly to lowest-HP building and repair it
+            // Standalone repair bots — each targets a different damaged building
             var fX = this.canvas.width / 2;
             var fY = this.canvas.height / 2;
+            var claimedTargets = []; // track which buildings are already claimed by a bot
             for (var i = 0; i < this.repairBots.length; i++) {
                 var bot = this.repairBots[i];
                 bot.age += dt;
@@ -1971,20 +2042,33 @@
                 var repairTheme = THEMES[this.state.activeTheme];
                 if (repairTheme && repairTheme.bonus === 'repair') repairAmt *= repairTheme.bonusMult;
 
-                // Find lowest-HP building
+                // Find lowest-HP building NOT already claimed by another bot
                 var lowestIdx = -1;
                 var lowestHp = Infinity;
                 for (var j = 0; j < this.nodes.length; j++) {
                     var nd = this.nodes[j];
                     var hp = nd.hp !== undefined ? nd.hp : 100;
                     var maxHp = nd.maxHp || 100;
-                    if (hp < maxHp && hp < lowestHp) {
+                    if (hp < maxHp && hp < lowestHp && claimedTargets.indexOf(j) === -1) {
                         lowestHp = hp;
                         lowestIdx = j;
                     }
                 }
+                // If all damaged buildings are claimed, allow sharing
+                if (lowestIdx === -1) {
+                    for (var j = 0; j < this.nodes.length; j++) {
+                        var nd = this.nodes[j];
+                        var hp = nd.hp !== undefined ? nd.hp : 100;
+                        var maxHp = nd.maxHp || 100;
+                        if (hp < maxHp && hp < lowestHp) {
+                            lowestHp = hp;
+                            lowestIdx = j;
+                        }
+                    }
+                }
 
                 if (lowestIdx >= 0) {
+                    claimedTargets.push(lowestIdx);
                     var target = this.nodes[lowestIdx];
                     bot.targetIdx = lowestIdx;
                     var rdx = target.x - bot.x;
