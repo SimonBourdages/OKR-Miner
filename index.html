@@ -1556,7 +1556,8 @@
                 lastProduce: 0,
                 level: 1,
                 hp: 100,
-                maxHp: 100
+                maxHp: 100,
+                spawnTime: Date.now()
             });
 
             this.addFloatingText(x, y - 20, '-' + b.cost + ' AC', '#ff0');
@@ -3184,6 +3185,34 @@
             var age = node.age || 0;
             var pulse = Math.sin(age * 3) * 0.15 + 0.85;
 
+            // Spawn warp-in animation (500ms easeOutBack scale + 300ms radial flash)
+            var spawnElapsed = node.spawnTime ? (Date.now() - node.spawnTime) / 1000 : Infinity;
+            var isSpawning = spawnElapsed < 0.5;
+            var spawnScale = 1;
+            if (isSpawning) {
+                var t = spawnElapsed / 0.5;
+                var c1 = 1.70158;
+                var c3 = c1 + 1;
+                spawnScale = 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+                // Expanding, fading flash ring
+                if (spawnElapsed < 0.3) {
+                    var rt = spawnElapsed / 0.3;
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(255,255,255,' + (1 - rt).toFixed(2) + ')';
+                    ctx.lineWidth = 2 + (1 - rt) * 3;
+                    ctx.beginPath();
+                    ctx.arc(x, y, Math.max(rt * 30 * s, 1), 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.scale(spawnScale, spawnScale);
+                ctx.translate(-x, -y);
+            }
+
+            try {
+
             switch (node.type) {
                 case 'collector':
                     if (lvl === 1) {
@@ -4090,6 +4119,10 @@
                     ctx.fillStyle = '#ff0';
                     ctx.fillRect(sparkX, sparkY, 2, 2);
                 }
+            }
+
+            } finally {
+                if (isSpawning) { ctx.restore(); }
             }
         };
 
