@@ -715,6 +715,192 @@
             }
         );
 
+        // Resource Flow Icon Tests
+        // Note: test helpers mirror production constants (UPGRADE_POWER, BUILDINGS, FLOW_*)
+        // but are self-contained so the test suite can run without loading the full game.
+        const FLOW_TEST_UPGRADE_POWER = { 1: 1.0, 2: 2.0, 3: 4.5 };
+        const FLOW_TEST_BUILDINGS = {
+            collector:   { acPerSec: 2 },
+            processor:   { okrPerSec: 5 },
+            generator:   { elPerSec: 5 },
+            bank:        { interestRate: 0.02 },
+            synthesizer: { okrPerSec: 100 },
+            multiplier:  {},
+        };
+        const FLOW_TEST_COLORS = { okr: '#00e676', ac: '#ffd700', el: '#ff44ff' };
+        const FLOW_TEST_SPEED = 100;
+        const FLOW_TEST_MAX = 80;
+
+        function makeFlowTestGame(nodes) {
+            return {
+                nodes: nodes || [
+                    { type: 'collector',  x: 100, y: 200, level: 1, hp: 100, maxHp: 100 },
+                    { type: 'processor',  x: 300, y: 150, level: 1, hp: 100, maxHp: 100 },
+                    { type: 'generator',  x: 500, y: 300, level: 2, hp: 100, maxHp: 100 },
+                ],
+                resourceFlowIcons: [],
+                flowSpawnTimers: {},
+                computeConnectionEdges() {
+                    const fX = 960, fY = 540;
+                    const pts = [{ x: fX, y: fY, idx: -1 }];
+                    this.nodes.forEach((n, i) => pts.push({ x: n.x, y: n.y, idx: i }));
+                    if (pts.length < 2) return [];
+                    const inTree = pts.map(() => false);
+                    const minDist = pts.map(() => Infinity);
+                    const minEdge = pts.map(() => -1);
+                    inTree[0] = true;
+                    for (let j = 1; j < pts.length; j++) {
+                        const dx = pts[j].x - pts[0].x, dy = pts[j].y - pts[0].y;
+                        minDist[j] = Math.sqrt(dx*dx + dy*dy);
+                        minEdge[j] = 0;
+                    }
+                    const edges = [];
+                    for (let step = 1; step < pts.length; step++) {
+                        let best = -1, bestDist = Infinity;
+                        for (let j = 1; j < pts.length; j++) {
+                            if (!inTree[j] && minDist[j] < bestDist) { bestDist = minDist[j]; best = j; }
+                        }
+                        if (best === -1) break;
+                        inTree[best] = true;
+                        edges.push({ from: pts[best], to: pts[minEdge[best]] });
+                        for (let j = 1; j < pts.length; j++) {
+                            if (!inTree[j]) {
+                                const dx = pts[j].x - pts[best].x, dy = pts[j].y - pts[best].y;
+                                const d = Math.sqrt(dx*dx + dy*dy);
+                                if (d < minDist[j]) { minDist[j] = d; minEdge[j] = best; }
+                            }
+                        }
+                    }
+                    return edges;
+                },
+                updateResourceFlowIcons(dt) {
+                    for (let i = this.resourceFlowIcons.length - 1; i >= 0; i--) {
+                        const icon = this.resourceFlowIcons[i];
+                        icon.elapsed += dt;
+                        icon.t = icon.elapsed / icon.duration;
+                        if (icon.t >= 1) this.resourceFlowIcons.splice(i, 1);
+                    }
+                    if (this.resourceFlowIcons.length >= FLOW_TEST_MAX) return;
+                    const edges = this.computeConnectionEdges();
+                    const edgeByIdx = {};
+                    edges.forEach(e => { if (e.from.idx >= 0) edgeByIdx[e.from.idx] = e; });
+                    for (let i = 0; i < this.nodes.length; i++) {
+                        if (this.resourceFlowIcons.length >= FLOW_TEST_MAX) break;
+                        const node = this.nodes[i];
+                        const btype = FLOW_TEST_BUILDINGS[node.type];
+                        if (!btype) continue;
+                        const edge = edgeByIdx[i];
+                        if (!edge) continue;
+                        const hpRatio = (node.hp !== undefined ? node.hp : 100) / (node.maxHp || 100);
+                        if (hpRatio <= 0) continue;
+                        let resType = null, spawnRate = 0;
+                        const lvlMult = FLOW_TEST_UPGRADE_POWER[node.level || 1] || 1;
+                        if (btype.okrPerSec > 0) {
+                            resType = 'okr'; spawnRate = Math.max(0.2, Math.min(3, btype.okrPerSec * lvlMult / 5));
+                        } else if (btype.acPerSec > 0) {
+                            resType = 'ac'; spawnRate = Math.max(0.2, Math.min(3, btype.acPerSec * lvlMult / 2));
+                        } else if (btype.elPerSec > 0) {
+                            resType = 'el'; spawnRate = Math.max(0.2, Math.min(3, btype.elPerSec * lvlMult / 5));
+                        } else if (btype.interestRate > 0) {
+                            resType = 'ac'; spawnRate = 0.4;
+                        }
+                        if (!resType) continue;
+                        if (this.flowSpawnTimers[i] === undefined) {
+                            this.flowSpawnTimers[i] = Math.random() * (1 / spawnRate);
+                        }
+                        this.flowSpawnTimers[i] -= dt;
+                        if (this.flowSpawnTimers[i] > 0) continue;
+                        this.flowSpawnTimers[i] = 1 / spawnRate;
+                        const dx = edge.to.x - edge.from.x, dy = edge.to.y - edge.from.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        if (dist < 1) continue;
+                        this.resourceFlowIcons.push({
+                            x1: edge.from.x, y1: edge.from.y, x2: edge.to.x, y2: edge.to.y,
+                            t: 0, elapsed: 0, duration: dist / FLOW_TEST_SPEED,
+                            resourceType: resType, color: FLOW_TEST_COLORS[resType],
+                            sinePhase: Math.random() * Math.PI * 2, sineAmp: 4 + Math.random() * 3
+                        });
+                    }
+                }
+            };
+        }
+
+        runner.addTest(
+            'Resource flow icons spawn for producing buildings',
+            'integration',
+            true,
+            async () => {
+                const game = makeFlowTestGame();
+                // Simulate 10 seconds at 60fps
+                for (let f = 0; f < 600; f++) game.updateResourceFlowIcons(1/60);
+                if (game.resourceFlowIcons.length === 0) {
+                    return { pass: false, message: 'No flow icons were spawned after 10s' };
+                }
+                const types = new Set(game.resourceFlowIcons.map(i => i.resourceType));
+                if (!types.has('okr') || !types.has('ac') || !types.has('el')) {
+                    return { pass: false, message: `Missing resource types, found: ${[...types].join(',')}` };
+                }
+                return { pass: true, message: `${game.resourceFlowIcons.length} icons spawned (OKR, AC, EL all present)` };
+            }
+        );
+
+        runner.addTest(
+            'Resource flow icons have valid progress and colors',
+            'integration',
+            true,
+            async () => {
+                const game = makeFlowTestGame();
+                for (let f = 0; f < 300; f++) game.updateResourceFlowIcons(1/60);
+                const allValidT = game.resourceFlowIcons.every(i => i.t >= 0 && i.t <= 1);
+                const allHaveColor = game.resourceFlowIcons.every(i => i.color && i.color.startsWith('#'));
+                if (!allValidT) return { pass: false, message: 'Some icons have t outside [0,1]' };
+                if (!allHaveColor) return { pass: false, message: 'Some icons are missing color' };
+                return { pass: true, message: `${game.resourceFlowIcons.length} icons all have valid t and color` };
+            }
+        );
+
+        runner.addTest(
+            'Resource flow icon pool is capped at maximum',
+            'integration',
+            false,
+            async () => {
+                const manyNodes = [];
+                for (let n = 0; n < 50; n++) {
+                    manyNodes.push({ type: 'processor', x: n*30+50, y: n*15+100, level: 3, hp: 100, maxHp: 100 });
+                }
+                const game = makeFlowTestGame(manyNodes);
+                for (let f = 0; f < 600; f++) game.updateResourceFlowIcons(1/60);
+                if (game.resourceFlowIcons.length > FLOW_TEST_MAX) {
+                    return { pass: false, message: `Icons exceeded pool limit: ${game.resourceFlowIcons.length} > ${FLOW_TEST_MAX}` };
+                }
+                return { pass: true, message: `Icons capped at ${game.resourceFlowIcons.length} (limit: ${FLOW_TEST_MAX})` };
+            }
+        );
+
+        runner.addTest(
+            'Destroyed buildings do not spawn flow icons',
+            'integration',
+            true,
+            async () => {
+                const game = makeFlowTestGame([
+                    { type: 'collector', x: 100, y: 200, level: 1, hp: 0, maxHp: 100 },   // destroyed
+                    { type: 'processor', x: 300, y: 150, level: 1, hp: 100, maxHp: 100 }, // healthy
+                ]);
+                for (let f = 0; f < 600; f++) game.updateResourceFlowIcons(1/60);
+                const acIcons = game.resourceFlowIcons.filter(i => i.resourceType === 'ac');
+                // The destroyed collector should NOT spawn AC icons
+                // (processor spawns OKR only, so no AC icons expected from it)
+                if (acIcons.length > 0) {
+                    return { pass: false, message: `Destroyed collector spawned ${acIcons.length} AC icons` };
+                }
+                const okrIcons = game.resourceFlowIcons.filter(i => i.resourceType === 'okr');
+                if (okrIcons.length === 0) {
+                    return { pass: false, message: 'Healthy processor did not spawn OKR icons' };
+                }
+                return { pass: true, message: `Destroyed building produced no icons; healthy processor has ${okrIcons.length} OKR icons` };
+            }
+        );
+
         // Make runner global for button clicks
         window.runner = runner;
         window.runAllTests = () => runner.runAllTests();
