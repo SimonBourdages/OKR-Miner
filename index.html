@@ -4091,7 +4091,7 @@
         };
 
         // =========================================================
-        // DRAWING - PIXEL CONNECTION (animated dots)
+        // DRAWING - CONNECTION (flowing gradient energy streams)
         // =========================================================
 
         OKRFarmingGame.prototype.drawPixelConnection = function(ctx, x1, y1, x2, y2, type) {
@@ -4101,20 +4101,91 @@
             var dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < 1) return;
 
-            var steps = Math.floor(dist / 6);
-            var animOffset = (this.connectionAnim * 40) % dist;
-
-            for (var i = 0; i < steps; i++) {
-                var t = ((i * 6 + animOffset) % dist) / dist;
-                var px = x1 + dx * t;
-                var py = y1 + dy * t;
-                var alpha = 0.12 + Math.sin(t * Math.PI) * 0.28;
-
-                ctx.globalAlpha = alpha;
-                ctx.fillStyle = color;
-                ctx.fillRect(Math.floor(px) - 1, Math.floor(py) - 1, 2, 2);
+            // Convert hex color (#rgb or #rrggbb) to rgba() string.
+            // Falls back to a transparent cyan if the hex is malformed.
+            function rgba(hex, a) {
+                var c = (hex || '').replace('#', '');
+                if (c.length === 3) { c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2]; }
+                if (!/^[0-9a-fA-F]{6}$/.test(c)) { return 'rgba(0,255,255,'+a+')'; }
+                var r = parseInt(c.slice(0, 2), 16);
+                var g = parseInt(c.slice(2, 4), 16);
+                var b = parseInt(c.slice(4, 6), 16);
+                return 'rgba('+r+','+g+','+b+','+a+')';
             }
-            ctx.globalAlpha = 1;
+
+            // Add gradient stops in ascending order, skipping duplicate positions.
+            // Canvas requires stops to be in [0,1] and strictly non-decreasing.
+            var MIN_STOP = 0.001, MAX_STOP = 0.999;
+            function addStops(grad, stops) {
+                var prev = -1;
+                for (var i = 0; i < stops.length; i++) {
+                    var pos = stops[i][0];
+                    if (pos > prev) {
+                        grad.addColorStop(pos, stops[i][1]);
+                        prev = pos;
+                    }
+                }
+            }
+
+            // Flow position (0..1) cycling forward over time
+            var flow = (this.connectionAnim * 0.5) % 1;
+            // Pulse half-width as a fraction of the line length.
+            // 0.28 covers ~28% of the line per pulse, giving a soft, readable glow
+            // without the bright spot becoming too narrow or too wide to be visible.
+            var pw = 0.28;
+
+            ctx.save();
+            ctx.lineCap = 'round';
+
+            // --- Pass 1: Wide soft outer glow (static base) ---
+            var g1 = ctx.createLinearGradient(x1, y1, x2, y2);
+            g1.addColorStop(0,   rgba(color, 0.0));
+            g1.addColorStop(0.5, rgba(color, 0.18));
+            g1.addColorStop(1,   rgba(color, 0.0));
+            ctx.strokeStyle = g1;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            // --- Pass 2: Animated energy pulse (medium width) ---
+            var g2 = ctx.createLinearGradient(x1, y1, x2, y2);
+            addStops(g2, [
+                [0,                                        rgba(color, 0.1)],
+                [Math.max(MIN_STOP, flow - pw),            rgba(color, 0.08)],
+                [Math.max(MIN_STOP, flow - pw * 0.4),      rgba(color, 0.45)],
+                [flow,                                     rgba(color, 0.7)],
+                [Math.min(MAX_STOP, flow + pw * 0.4),      rgba(color, 0.45)],
+                [Math.min(MAX_STOP, flow + pw),            rgba(color, 0.08)],
+                [1,                                        rgba(color, 0.1)]
+            ]);
+            ctx.strokeStyle = g2;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            // --- Pass 3: Thin bright core (slightly offset pulse for depth) ---
+            var flow3 = (flow + 0.1) % 1;
+            var pw3 = 0.18;
+            var g3 = ctx.createLinearGradient(x1, y1, x2, y2);
+            addStops(g3, [
+                [0,                                         rgba(color, 0.2)],
+                [Math.max(MIN_STOP, flow3 - pw3),           rgba(color, 0.15)],
+                [flow3,                                     rgba(color, 1.0)],
+                [Math.min(MAX_STOP, flow3 + pw3),           rgba(color, 0.15)],
+                [1,                                         rgba(color, 0.2)]
+            ]);
+            ctx.strokeStyle = g3;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            ctx.restore();
         };
 
         // =========================================================
