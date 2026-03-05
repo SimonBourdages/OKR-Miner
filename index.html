@@ -1529,8 +1529,12 @@
             if (!this._looping) {
                 this._looping = true;
                 (function gameLoop(ts) {
-                    self.update(ts);
-                    self.draw();
+                    try {
+                        self.update(ts);
+                        self.draw();
+                    } catch(e) {
+                        console.error('Game loop error:', e);
+                    }
                     requestAnimationFrame(gameLoop);
                 })(performance.now());
             }
@@ -2979,23 +2983,22 @@
             this.drawPixelNode(ctx, ghostNode);
             ctx.globalAlpha = 1.0;
 
-            // Connection preview - show where this node would chain to
+            // Connection preview - simple line to nearest node or factory
             if (!blocked && canAfford) {
-                var ghostEdges = this.computeConnectionEdges({ x: mx, y: my });
-                ctx.setLineDash([6, 6]);
-                ctx.lineWidth = 1;
-                for (var gi = 0; gi < ghostEdges.length; gi++) {
-                    var ge = ghostEdges[gi];
-                    if (ge.from.idx === -2 || ge.to.idx === -2) {
-                        ctx.strokeStyle = 'rgba(0, 255, 255, 0.4)';
-                    } else {
-                        ctx.strokeStyle = 'rgba(0, 255, 255, 0.08)';
-                    }
-                    ctx.beginPath();
-                    ctx.moveTo(ge.from.x, ge.from.y);
-                    ctx.lineTo(ge.to.x, ge.to.y);
-                    ctx.stroke();
+                var nearX = factoryX, nearY = factoryY;
+                var nearDist = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
+                for (var ni = 0; ni < this.nodes.length; ni++) {
+                    var ndx = mx - this.nodes[ni].x, ndy = my - this.nodes[ni].y;
+                    var nd = Math.sqrt(ndx * ndx + ndy * ndy);
+                    if (nd < nearDist) { nearDist = nd; nearX = this.nodes[ni].x; nearY = this.nodes[ni].y; }
                 }
+                ctx.strokeStyle = 'rgba(0, 255, 136, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.moveTo(mx, my);
+                ctx.lineTo(nearX, nearY);
+                ctx.stroke();
                 ctx.setLineDash([]);
             }
 
@@ -4214,90 +4217,30 @@
             var dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < 1) return;
 
-            // Convert hex color (#rgb or #rrggbb) to rgba() string.
-            // Falls back to a transparent cyan if the hex is malformed.
-            function rgba(hex, a) {
-                var c = (hex || '').replace('#', '');
-                if (c.length === 3) { c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2]; }
-                if (!/^[0-9a-fA-F]{6}$/.test(c)) { return 'rgba(0,255,255,'+a+')'; }
-                var r = parseInt(c.slice(0, 2), 16);
-                var g = parseInt(c.slice(2, 4), 16);
-                var b = parseInt(c.slice(4, 6), 16);
-                return 'rgba('+r+','+g+','+b+','+a+')';
-            }
-
-            // Add gradient stops in ascending order, skipping duplicate positions.
-            // Canvas requires stops to be in [0,1] and strictly non-decreasing.
-            var MIN_STOP = 0.001, MAX_STOP = 0.999;
-            function addStops(grad, stops) {
-                var prev = -1;
-                for (var i = 0; i < stops.length; i++) {
-                    var pos = stops[i][0];
-                    if (pos > prev) {
-                        grad.addColorStop(pos, stops[i][1]);
-                        prev = pos;
-                    }
-                }
-            }
-
-            // Flow position (0..1) cycling forward over time
-            var flow = (this.connectionAnim * 0.5) % 1;
-            // Pulse half-width as a fraction of the line length.
-            // 0.28 covers ~28% of the line per pulse, giving a soft, readable glow
-            // without the bright spot becoming too narrow or too wide to be visible.
-            var pw = 0.28;
-
+            // Simple base line
             ctx.save();
-            ctx.lineCap = 'round';
-
-            // --- Pass 1: Wide soft outer glow (static base) ---
-            var g1 = ctx.createLinearGradient(x1, y1, x2, y2);
-            g1.addColorStop(0,   rgba(color, 0.0));
-            g1.addColorStop(0.5, rgba(color, 0.18));
-            g1.addColorStop(1,   rgba(color, 0.0));
-            ctx.strokeStyle = g1;
-            ctx.lineWidth = 8;
+            ctx.globalAlpha = 0.15;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
             ctx.stroke();
 
-            // --- Pass 2: Animated energy pulse (medium width) ---
-            var g2 = ctx.createLinearGradient(x1, y1, x2, y2);
-            addStops(g2, [
-                [0,                                        rgba(color, 0.1)],
-                [Math.max(MIN_STOP, flow - pw),            rgba(color, 0.08)],
-                [Math.max(MIN_STOP, flow - pw * 0.4),      rgba(color, 0.45)],
-                [flow,                                     rgba(color, 0.7)],
-                [Math.min(MAX_STOP, flow + pw * 0.4),      rgba(color, 0.45)],
-                [Math.min(MAX_STOP, flow + pw),            rgba(color, 0.08)],
-                [1,                                        rgba(color, 0.1)]
-            ]);
-            ctx.strokeStyle = g2;
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
-
-            // --- Pass 3: Thin bright core (slightly offset pulse for depth) ---
-            var flow3 = (flow + 0.1) % 1;
-            var pw3 = 0.18;
-            var g3 = ctx.createLinearGradient(x1, y1, x2, y2);
-            addStops(g3, [
-                [0,                                         rgba(color, 0.2)],
-                [Math.max(MIN_STOP, flow3 - pw3),           rgba(color, 0.15)],
-                [flow3,                                     rgba(color, 1.0)],
-                [Math.min(MAX_STOP, flow3 + pw3),           rgba(color, 0.15)],
-                [1,                                         rgba(color, 0.2)]
-            ]);
-            ctx.strokeStyle = g3;
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
-
+            // Animated dots flowing along the line
+            var steps = Math.floor(dist / 12);
+            var animOffset = (this.connectionAnim * 50) % dist;
+            ctx.globalAlpha = 1;
+            for (var i = 0; i < steps; i++) {
+                var t = ((i * 12 + animOffset) % dist) / dist;
+                var px = x1 + dx * t;
+                var py = y1 + dy * t;
+                var alpha = 0.1 + Math.sin(t * Math.PI) * 0.3;
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = color;
+                ctx.fillRect(Math.floor(px) - 1, Math.floor(py) - 1, 3, 3);
+            }
+            ctx.globalAlpha = 1;
             ctx.restore();
         };
 
@@ -4443,50 +4386,15 @@
 
         OKRFarmingGame.prototype.drawParticles = function(ctx) {
             ctx.save();
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-
             for (var i = 0; i < this.particles.length; i++) {
                 var p = this.particles[i];
-                var alpha = Math.max(0, p.life / p.maxLife);
+                var alpha = Math.max(0, p.life / (p.maxLife || 1));
                 if (alpha <= 0) continue;
-                var headSize = 2 + alpha * 2;
-
-                // Build full trail: history points + current position
-                var pts = p.history.concat([{ x: p.x, y: p.y }]);
-                var n = pts.length;
-
-                // Draw bezier-curve trail with decreasing alpha and width toward tail
-                if (n >= 2) {
-                    for (var t = 1; t < n; t++) {
-                        var frac = t / n;  // 0 near tail, 1 near head
-                        var segAlpha = frac * frac * alpha * 0.75;
-                        if (segAlpha < 0.01) continue;  // skip invisible segments
-                        ctx.globalAlpha = segAlpha;
-                        ctx.lineWidth = Math.max(0.5, frac * headSize * 0.7);
-                        ctx.strokeStyle = p.color;
-                        ctx.beginPath();
-                        ctx.moveTo(pts[t - 1].x, pts[t - 1].y);
-                        // Smooth bezier: use next point as control, land on its midpoint
-                        if (t + 1 < n) {
-                            ctx.quadraticCurveTo(
-                                pts[t].x, pts[t].y,
-                                (pts[t].x + pts[t + 1].x) * 0.5,
-                                (pts[t].y + pts[t + 1].y) * 0.5
-                            );
-                        } else {
-                            ctx.lineTo(pts[t].x, pts[t].y);
-                        }
-                        ctx.stroke();
-                    }
-                }
-
-                // Draw the particle head dot
                 ctx.globalAlpha = alpha;
                 ctx.fillStyle = p.color;
-                ctx.fillRect(p.x - headSize / 2, p.y - headSize / 2, headSize, headSize);
+                var sz = 2 + alpha * 2;
+                ctx.fillRect(p.x - sz / 2, p.y - sz / 2, sz, sz);
             }
-
             ctx.globalAlpha = 1;
             ctx.restore();
         };
