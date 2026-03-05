@@ -1693,6 +1693,9 @@
             // Update particles
             for (var i = this.particles.length - 1; i >= 0; i--) {
                 var p = this.particles[i];
+                // Store current position in history ring-buffer before moving
+                p.history.push({ x: p.x, y: p.y });
+                if (p.history.length > 15) p.history.shift();
                 p.x += p.vx * dt;
                 p.y += p.vy * dt;
                 p.vy += 40 * dt; // gravity
@@ -4126,15 +4129,53 @@
         // =========================================================
 
         OKRFarmingGame.prototype.drawParticles = function(ctx) {
+            ctx.save();
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
             for (var i = 0; i < this.particles.length; i++) {
                 var p = this.particles[i];
                 var alpha = Math.max(0, p.life / p.maxLife);
+                if (alpha <= 0) continue;
+                var headSize = 2 + alpha * 2;
+
+                // Build full trail: history points + current position
+                var pts = p.history.concat([{ x: p.x, y: p.y }]);
+                var n = pts.length;
+
+                // Draw bezier-curve trail with decreasing alpha and width toward tail
+                if (n >= 2) {
+                    for (var t = 1; t < n; t++) {
+                        var frac = t / n;  // 0 near tail, 1 near head
+                        var segAlpha = frac * frac * alpha * 0.75;
+                        if (segAlpha < 0.01) continue;  // skip invisible segments
+                        ctx.globalAlpha = segAlpha;
+                        ctx.lineWidth = Math.max(0.5, frac * headSize * 0.7);
+                        ctx.strokeStyle = p.color;
+                        ctx.beginPath();
+                        ctx.moveTo(pts[t - 1].x, pts[t - 1].y);
+                        // Smooth bezier: use next point as control, land on its midpoint
+                        if (t + 1 < n) {
+                            ctx.quadraticCurveTo(
+                                pts[t].x, pts[t].y,
+                                (pts[t].x + pts[t + 1].x) * 0.5,
+                                (pts[t].y + pts[t + 1].y) * 0.5
+                            );
+                        } else {
+                            ctx.lineTo(pts[t].x, pts[t].y);
+                        }
+                        ctx.stroke();
+                    }
+                }
+
+                // Draw the particle head dot
                 ctx.globalAlpha = alpha;
                 ctx.fillStyle = p.color;
-                var size = 2 + alpha * 2;
-                ctx.fillRect(p.x - size / 2, p.y - size / 2, size, size);
+                ctx.fillRect(p.x - headSize / 2, p.y - headSize / 2, headSize, headSize);
             }
+
             ctx.globalAlpha = 1;
+            ctx.restore();
         };
 
         // =========================================================
@@ -4186,7 +4227,8 @@
                     vy: Math.sin(angle) * speed - 20,
                     color: color,
                     life: 0.5 + Math.random() * 1.2,
-                    maxLife: 1.7
+                    maxLife: 1.7,
+                    history: []
                 });
             }
         };
