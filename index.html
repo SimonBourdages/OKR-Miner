@@ -863,6 +863,8 @@
 
         var SAVE_KEY = 'okrFarmingGame';
         var ANALYTICS_KEY = 'okrMinerAnalytics';
+        // Google Sheets analytics endpoint — replace with your Apps Script web app URL
+        var ANALYTICS_ENDPOINT = 'https://script.google.com/macros/s/PASTE_YOUR_SCRIPT_ID_HERE/exec';
 
         // =========================================================
         // SPACE EVENTS — 100 random events (40 negative, 40 positive, 20 neutral)
@@ -5566,6 +5568,44 @@
             this.analytics.sessions.push(s);
             this.analytics.currentSession = null;
             this.saveAnalytics();
+
+            // Send to Google Sheets (fire-and-forget)
+            this.sendToGoogleSheets(s);
+        };
+
+        OKRFarmingGame.prototype.sendToGoogleSheets = function(session) {
+            if (ANALYTICS_ENDPOINT.indexOf('PASTE_YOUR') >= 0) return; // not configured yet
+            try {
+                var payload = {
+                    sessionId: session.startTime + '_' + Math.random().toString(36).substr(2, 6),
+                    duration: Math.round(session.duration || 0),
+                    mode: session.mode || 'normal',
+                    milestones: session.finalMilestones || 0,
+                    totalOKRs: session.finalOKRs || 0,
+                    buildingsPlaced: session.buildingsPlaced || 0,
+                    upgradesDone: session.upgradesDone || 0,
+                    repairBotsBought: session.repairBotsBought || 0,
+                    shipsDestroyed: session.shipsDestroyed || 0,
+                    thievesDestroyed: session.thievesDestroyed || 0,
+                    eventsTriggered: session.eventsTriggered || 0,
+                    peakOKRRate: Math.round(session.peakOKRRate || 0),
+                    peakACRate: Math.round(session.peakACRate || 0),
+                    theme: this.state ? this.state.activeTheme : 'emerald',
+                    endReason: session.endReason || 'unknown',
+                    buildingTypes: JSON.stringify(session.buildingTypes || {}),
+                    browser: navigator.userAgent.split(' ').slice(-2).join(' '),
+                    screen: window.innerWidth + 'x' + window.innerHeight,
+                    version: GAME_VERSION
+                };
+                fetch(ANALYTICS_ENDPOINT, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+            } catch(e) {
+                // Silent fail — analytics should never break gameplay
+            }
         };
 
         // =========================================================
