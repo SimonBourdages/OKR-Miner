@@ -562,7 +562,7 @@
 
     <div id="controls" style="display:none;">
         <button onclick="game.saveGame()">💾 Save</button>
-        <button onclick="game.skipLevel()">⏩ Skip</button>
+        <button onclick="game.saveAndQuit()">🚪 Quit</button>
         <button id="soundToggleBtn" onclick="game.cycleSoundMode()">🔊 All Sound</button>
         <button onclick="game.showAchievements()">🏆</button>
         <button onclick="game.showEventHistory()">📜</button>
@@ -657,20 +657,17 @@
     <div class="hint-text" id="hintText"></div>
 
     <div id="victoryScreen">
-        <h1>🏆 DIGITAL TRANSFORMATION COMPLETE 🏆</h1>
-        <div class="vic-sub">You have achieved maximum OKR output.</div>
+        <h1>🏆 CONGRATULATIONS! 🏆</h1>
+        <div class="vic-sub">All executives have reviewed every OKR.<br>The business is thriving. You did it!</div>
+        <div style="color:#ffd700;font-size:18px;margin:20px 0;">🌟 All OKR Reviews Complete 🌟</div>
         <div class="endings">
-            <div class="ending-btn" onclick="game.endingRetire()">
-                <h3>🌅 Retire</h3>
-                <p>Walk away. You've earned it.</p>
+            <div class="ending-btn" onclick="game.continueAfterVictory()">
+                <h3>▶ Keep Playing</h3>
+                <p>Continue building your empire.</p>
             </div>
-            <div class="ending-btn" onclick="game.endingMerge()">
-                <h3>🤝 Merge</h3>
-                <p>Join forces with the megacorp.</p>
-            </div>
-            <div class="ending-btn" onclick="game.endingRestart()">
-                <h3>🔄 New Game+</h3>
-                <p>Start over with bonuses.</p>
+            <div class="ending-btn" onclick="game.saveAndQuit()">
+                <h3>💾 Save & Return</h3>
+                <p>Save your progress and return to menu.</p>
             </div>
         </div>
     </div>
@@ -2567,6 +2564,13 @@
 
                     this.trackEvent('milestone', i);
                     this.saveGame();
+
+                    // Check if ALL milestones unlocked — victory!
+                    if (!this.infiniteMode && this.state.unlockedMilestones.length >= MILESTONES.length) {
+                        var self = this;
+                        setTimeout(function() { self.showVictory(); }, 2000);
+                    }
+
                     break; // one milestone at a time
                 }
             }
@@ -5401,39 +5405,24 @@
             }
         };
 
-        OKRFarmingGame.prototype.endingRetire = function() {
+        OKRFarmingGame.prototype.continueAfterVictory = function() {
             document.getElementById('victoryScreen').style.display = 'none';
-            this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2, 'You retired peacefully. GG!', '#ffd700', 22);
-            var self = this;
-            setTimeout(function() { self.showMenu(); }, 3000);
+            this.running = true;
+            this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2, 'Keep building! No limits now.', '#ffd700', 18);
+            this.startMusic(1);
         };
 
-        OKRFarmingGame.prototype.endingMerge = function() {
+        OKRFarmingGame.prototype.saveAndQuit = function() {
+            if (this.state) {
+                var data = {
+                    state: this.state,
+                    nodes: this.nodes,
+                    achievements: this.unlockedAchievements
+                };
+                try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(e) {}
+            }
             document.getElementById('victoryScreen').style.display = 'none';
-            this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2, 'Merged with the megacorp! Synergy achieved.', '#0ff', 22);
-            var self = this;
-            setTimeout(function() { self.showMenu(); }, 3000);
-        };
-
-        OKRFarmingGame.prototype.endingRestart = function() {
-            document.getElementById('victoryScreen').style.display = 'none';
-            // New Game+ bonus
-            this.state.currencies.ac += 500;
-            this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2, 'New Game+! +500 AC bonus', '#0f0', 22);
-            var self = this;
-            setTimeout(function() {
-                self.state.unlockedMilestones = [0];
-                self.state.unlockedBuildings = ['collector', 'processor'];
-                self.state.totalOKRs = 0;
-                self.state.electricityEnabled = false;
-                self.state.shipsEnabled = false;
-                self.state.repairBotsEnabled = false;
-                self.state.thievesEnabled = false;
-                self.state.eventsEnabled = false;
-                self.state.upgradesEnabled = false;
-                self.nodes = [];
-                self.startGame();
-            }, 1500);
+            this.showMenu();
         };
 
         OKRFarmingGame.prototype.showMenu = function() {
