@@ -536,6 +536,7 @@
         <button onclick="game.showAchievements()">🏆</button>
         <button onclick="game.showEventHistory()">📜</button>
         <button onclick="game.openBugReport()">🐛 Bug</button>
+        <button id="animToggleBtn" onclick="game.toggleAnimations()">✨ Animations: ON</button>
         <span style="color:#ff0;font-size:10px;margin-left:auto;">⏱ <span id="eventCountdown">--</span>s</span>
     </div>
 
@@ -949,6 +950,18 @@
             this.connectionAnim = 0;
             this._looping = false;
 
+            // Performance monitor
+            this.perfMonitorVisible = false;
+            this.frameHistory = [];
+            this.lastFrameTime = performance.now();
+            this.drawCallCount = 0;
+            this.connectionCount = 0;
+            this.fpsSmooth = 60;
+
+            // Animation quality control (0=full, 1=no scanlines, 2=reduced, 3=minimal)
+            this.animationsEnabled = true;
+            this.animLevel = 0;
+
             // Rates display
             this.currentOkrRate = 0;
             this.currentAcRate = 0;
@@ -999,6 +1012,13 @@
                 var rect = self.canvas.getBoundingClientRect();
                 self.mouseX = (e.clientX - rect.left) * (self.canvas.width / rect.width);
                 self.mouseY = (e.clientY - rect.top) * (self.canvas.height / rect.height);
+            });
+
+            window.addEventListener('keydown', function(e) {
+                if (e.key === 'F3') {
+                    e.preventDefault();
+                    self.perfMonitorVisible = !self.perfMonitorVisible;
+                }
             });
 
             this.setupVideoIntro();
@@ -1396,6 +1416,34 @@
                 this._looping = true;
                 var self = this;
                 (function gameLoop(ts) {
+                    // Track frame performance
+                    var now = performance.now();
+                    var frameDt = now - self.lastFrameTime;
+                    self.lastFrameTime = now;
+                    self.frameHistory.push(frameDt);
+                    if (self.frameHistory.length > 90) self.frameHistory.shift();
+
+                    // Compute smoothed FPS from recent history
+                    var histLen = self.frameHistory.length;
+                    if (histLen > 0) {
+                        var ftSum = 0;
+                        for (var fi = 0; fi < histLen; fi++) ftSum += self.frameHistory[fi];
+                        self.fpsSmooth = ftSum > 0 ? 1000 / (ftSum / histLen) : 60;
+                    }
+
+                    // Determine animation degradation level based on FPS
+                    if (!self.animationsEnabled) {
+                        self.animLevel = 3;
+                    } else if (self.fpsSmooth >= 55) {
+                        self.animLevel = 0;
+                    } else if (self.fpsSmooth >= 45) {
+                        self.animLevel = 1;
+                    } else if (self.fpsSmooth >= 30) {
+                        self.animLevel = 2;
+                    } else {
+                        self.animLevel = 3;
+                    }
+
                     self.update(ts);
                     self.draw();
                     requestAnimationFrame(gameLoop);
@@ -2237,17 +2285,24 @@
             var w = this.canvas.width;
             var h = this.canvas.height;
 
+            this.drawCallCount = 0;
+
             ctx.save();
             ctx.translate(this.screenShake.x, this.screenShake.y);
 
             // Background
             this.drawBackground(ctx, w, h);
-            this.drawPixelGrid(ctx, w, h);
+            this.drawCallCount++;
+            if (this.animLevel < 3) {
+                this.drawPixelGrid(ctx, w, h);
+                this.drawCallCount++;
+            }
 
             // Connections: MST chain linking all nodes to factory
             var fX = w / 2;
             var fY = h / 2;
             var edges = this.computeConnectionEdges();
+            this.connectionCount = edges.length;
             for (var i = 0; i < edges.length; i++) {
                 var e = edges[i];
                 // Determine type from the "from" node for coloring
@@ -2255,14 +2310,17 @@
                 var edgeType = (nodeIdx >= 0 && this.nodes[nodeIdx]) ? this.nodes[nodeIdx].type : 'collector';
                 this.drawPixelConnection(ctx, e.from.x, e.from.y, e.to.x, e.to.y, edgeType);
             }
+            this.drawCallCount += edges.length;
 
             // Factory
             this.drawOKRFactory(ctx, fX, fY);
+            this.drawCallCount++;
 
             // Building nodes
             for (var i = 0; i < this.nodes.length; i++) {
                 this.drawPixelNode(ctx, this.nodes[i]);
             }
+            this.drawCallCount += this.nodes.length;
 
             // Draw info tooltip for hovered node
             for (var i = 0; i < this.nodes.length; i++) {
@@ -2279,16 +2337,24 @@
 
             // Effects
             this.drawParticles(ctx);
+            this.drawCallCount += this.particles.length;
             this.drawShips(ctx);
+            this.drawCallCount += this.ships.length;
             // Draw repair bot drones
             this.drawRepairDrones(ctx);
             this.drawThiefShips(ctx);
+            this.drawCallCount += this.thiefShips.length;
             this.drawComboDisplay(ctx, w, h);
             this.drawFloatingTexts(ctx);
             this.drawEventBanner(ctx, w, h);
-            this.drawScanlines(ctx, w, h);
+            if (this.animLevel < 1) this.drawScanlines(ctx, w, h);
 
             ctx.restore();
+
+            // Performance monitor overlay (always on top, outside save/restore)
+            if (this.perfMonitorVisible) {
+                this.drawPerformanceMonitor(ctx, w, h);
+            }
         };
 
         // =========================================================
@@ -2473,12 +2539,14 @@
                 var angle = Math.atan2(ship.vy, ship.vx);
 
                 // Engine trail
+                if (this.animLevel < 2) {
                 for (var t = 0; t < ship.trail.length; t++) {
                     var tp = ship.trail[t];
                     var ta = (t / ship.trail.length) * 0.4;
                     ctx.fillStyle = 'rgba(255, 100, 50, ' + ta.toFixed(2) + ')';
                     var ts = 2 - (t / ship.trail.length);
                     ctx.fillRect(Math.floor(tp.x) - ts/2, Math.floor(tp.y) - ts/2, ts, ts);
+                }
                 }
 
                 // Ship body (small triangle)
@@ -3971,6 +4039,19 @@
             var dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < 1) return;
 
+            if (this.animLevel >= 2) {
+                // Static line fallback for better performance
+                ctx.globalAlpha = 0.25;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+                return;
+            }
+
             var steps = Math.floor(dist / 6);
             var animOffset = (this.connectionAnim * 40) % dist;
 
@@ -4126,7 +4207,8 @@
         // =========================================================
 
         OKRFarmingGame.prototype.drawParticles = function(ctx) {
-            for (var i = 0; i < this.particles.length; i++) {
+            var limit = this.animLevel >= 2 ? Math.min(this.particles.length, 30) : this.particles.length;
+            for (var i = 0; i < limit; i++) {
                 var p = this.particles[i];
                 var alpha = Math.max(0, p.life / p.maxLife);
                 ctx.globalAlpha = alpha;
@@ -4157,6 +4239,144 @@
                 ctx.shadowBlur = 0;
             }
             ctx.globalAlpha = 1;
+        };
+
+        // =========================================================
+        // DRAWING - PERFORMANCE MONITOR OVERLAY
+        // =========================================================
+
+        OKRFarmingGame.prototype.drawPerformanceMonitor = function(ctx, w, h) {
+            var history = this.frameHistory;
+            var histLen = history.length;
+            if (histLen === 0) return;
+
+            // Compute stats
+            var sum = 0;
+            for (var i = 0; i < histLen; i++) sum += history[i];
+            var avgFt = sum / histLen;
+            var avgFps = avgFt > 0 ? 1000 / avgFt : 0;
+            var curFt = history[histLen - 1];
+            var curFps = curFt > 0 ? 1000 / curFt : 0;
+            var budgetPct = Math.min(200, (avgFt / 16.67) * 100);
+
+            var pw = 220, ph = 195;
+            var px = Math.round((w - pw) / 2), py = 10;
+
+            ctx.save();
+            ctx.globalAlpha = 1;
+
+            // Background panel
+            ctx.fillStyle = 'rgba(0, 8, 18, 0.92)';
+            ctx.fillRect(px, py, pw, ph);
+            ctx.strokeStyle = budgetPct > 85 ? '#f44' : '#0ff';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(px, py, pw, ph);
+
+            // Title
+            ctx.fillStyle = '#0ff';
+            ctx.font = 'bold 11px monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText('\u26A1 RENDER MONITOR  [F3]', px + 8, py + 15);
+
+            var lineH = 14;
+            var tx = px + 8;
+            var ty = py + 32;
+
+            // FPS row
+            var fpsColor = curFps >= 55 ? '#0f0' : curFps >= 30 ? '#ff0' : '#f44';
+            ctx.fillStyle = fpsColor;
+            ctx.font = '11px monospace';
+            ctx.fillText('FPS: ' + Math.round(curFps) + '   avg: ' + Math.round(avgFps), tx, ty);
+            ty += lineH;
+
+            // Frame time row
+            var ftColor = curFt <= 16.67 ? '#0f0' : curFt <= 22 ? '#ff0' : '#f44';
+            ctx.fillStyle = ftColor;
+            ctx.fillText('Frame: ' + curFt.toFixed(1) + 'ms  avg: ' + avgFt.toFixed(1) + 'ms', tx, ty);
+            ty += lineH;
+
+            // Budget bar + label
+            var budgetColor = budgetPct > 85 ? '#f44' : budgetPct > 60 ? '#ff0' : '#0f0';
+            var barW = pw - 16;
+            ctx.fillStyle = '#1a2a1a';
+            ctx.fillRect(tx, ty - 10, barW, 10);
+            ctx.fillStyle = budgetColor;
+            ctx.fillRect(tx, ty - 10, barW * Math.min(1, budgetPct / 100), 10);
+            // 85% threshold marker
+            ctx.fillStyle = 'rgba(255,100,100,0.7)';
+            ctx.fillRect(tx + barW * 0.85 - 1, ty - 10, 2, 10);
+            ty += 4;
+            ctx.fillStyle = budgetColor;
+            ctx.fillText('Budget: ' + Math.round(budgetPct) + '%  (16.67ms target)', tx, ty);
+            ty += lineH + 4;
+
+            // Counts
+            ctx.fillStyle = '#8cf';
+            ctx.fillText('Nodes: ' + this.nodes.length + '   Particles: ' + this.particles.length, tx, ty);
+            ty += lineH;
+            ctx.fillText('Connections: ' + this.connectionCount + '   Ships: ' + this.ships.length, tx, ty);
+            ty += lineH;
+            ctx.fillText('Draw calls: ~' + this.drawCallCount, tx, ty);
+            ty += lineH;
+
+            // Animation level indicator
+            var animLabels = ['Full', 'No scanlines', 'Reduced', 'Minimal'];
+            var animColor = this.animLevel === 0 ? '#0f0' : this.animLevel === 1 ? '#ff0' : '#f44';
+            ctx.fillStyle = animColor;
+            ctx.fillText('Anim: ' + animLabels[this.animLevel] + (!this.animationsEnabled ? ' [MANUAL OFF]' : ''), tx, ty);
+            ty += lineH + 6;
+
+            // Mini graph background
+            var gw = pw - 16, gh = 42;
+            var gx = px + 8, gy = ty;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(gx, gy, gw, gh);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(gx, gy, gw, gh);
+
+            // 16.67ms target line (yellow dashed)
+            var maxMs = 50;
+            var targetY = gy + gh - (16.67 / maxMs) * gh;
+            ctx.strokeStyle = 'rgba(255, 220, 0, 0.7)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(gx, targetY);
+            ctx.lineTo(gx + gw, targetY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Frame time line graph
+            if (histLen >= 2) {
+                var xDivisor = histLen - 1; // always >= 1 since histLen >= 2
+                ctx.beginPath();
+                for (var i = 0; i < histLen; i++) {
+                    var xp = gx + (i / xDivisor) * gw;
+                    var yp = gy + gh - Math.min(1, history[i] / maxMs) * gh;
+                    if (i === 0) ctx.moveTo(xp, yp);
+                    else ctx.lineTo(xp, yp);
+                }
+                ctx.strokeStyle = budgetColor;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        };
+
+        // =========================================================
+        // ANIMATIONS TOGGLE
+        // =========================================================
+
+        OKRFarmingGame.prototype.toggleAnimations = function() {
+            this.animationsEnabled = !this.animationsEnabled;
+            var btn = document.getElementById('animToggleBtn');
+            if (btn) {
+                btn.textContent = this.animationsEnabled ? '\u2728 Animations: ON' : '\uD83D\uDEAB Animations: OFF';
+                btn.style.borderColor = this.animationsEnabled ? '#0ff' : '#f84';
+                btn.style.color = this.animationsEnabled ? '#0ff' : '#f84';
+            }
         };
 
         // =========================================================
