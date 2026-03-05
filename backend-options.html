@@ -167,7 +167,7 @@
 <!-- ========== HEADER ========== -->
 <header>
   <h1><span>OKR Miner</span> — Analytics Backend Options</h1>
-  <p class="subtitle">Compare 6 approaches to collect analytics from all online players</p>
+  <p class="subtitle">Compare 9 approaches to collect analytics from all online players</p>
 </header>
 
 <!-- ========== QUICK COMPARISON SUMMARY ========== -->
@@ -184,6 +184,9 @@
           <th>Azure Functions + Cosmos</th>
           <th>Power Automate + SharePoint</th>
           <th>Cloudflare Workers + D1</th>
+          <th>JSONBin.io <span class="star">⭐</span></th>
+          <th>M365 Family + Excel</th>
+          <th>GitHub Issues</th>
         </tr>
       </thead>
       <tbody>
@@ -195,6 +198,9 @@
           <td><span class="badge badge-low">$5-25/mo</span></td>
           <td><span class="badge badge-paid">M365 License</span></td>
           <td><span class="badge badge-free">FREE</span></td>
+          <td><span class="badge badge-free">FREE</span></td>
+          <td><span class="badge badge-paid">M365 Family</span></td>
+          <td><span class="badge badge-free">FREE</span></td>
         </tr>
         <tr>
           <td>Setup Time</td>
@@ -204,6 +210,9 @@
           <td>~45 min</td>
           <td>~30 min</td>
           <td>~25 min</td>
+          <td>~5 min</td>
+          <td>~20 min</td>
+          <td>~10 min</td>
         </tr>
         <tr>
           <td>Request Limits</td>
@@ -213,6 +222,9 @@
           <td>1M/month (free tier)</td>
           <td>Varies by plan</td>
           <td>100K/day</td>
+          <td>10K/month</td>
+          <td>~6K runs/month</td>
+          <td>5K/hr</td>
         </tr>
         <tr>
           <td>Latency</td>
@@ -222,6 +234,9 @@
           <td>~150ms</td>
           <td>~3-5s</td>
           <td>~50ms</td>
+          <td>~300ms</td>
+          <td>~3-5s</td>
+          <td>~500ms</td>
         </tr>
         <tr>
           <td>SQL Queries</td>
@@ -231,6 +246,9 @@
           <td class="check">✓ Cosmos SQL</td>
           <td class="cross">✗ List views</td>
           <td class="check">✓ SQLite</td>
+          <td class="cross">✗ JSON only</td>
+          <td class="cross">✗ Excel formulas</td>
+          <td class="cross">✗ Issue search</td>
         </tr>
         <tr>
           <td>Real-time</td>
@@ -238,6 +256,9 @@
           <td class="check">✓</td>
           <td class="check">✓</td>
           <td class="check">✓</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
           <td class="cross">✗</td>
           <td class="cross">✗</td>
         </tr>
@@ -249,6 +270,9 @@
           <td>Power BI / Azure</td>
           <td>Power BI / SharePoint</td>
           <td>Cloudflare Dash</td>
+          <td>JSONBin Dashboard</td>
+          <td>Excel Online</td>
+          <td>GitHub Issues</td>
         </tr>
         <tr>
           <td>Best For</td>
@@ -258,6 +282,9 @@
           <td>Enterprise scale</td>
           <td><span class="badge badge-paid">Best M365</span></td>
           <td>Speed demons</td>
+          <td><span class="badge badge-rec">⭐ Simplest</span></td>
+          <td><span class="badge badge-paid">Best M365 Family</span></td>
+          <td>Creative hackers</td>
         </tr>
       </tbody>
     </table>
@@ -272,6 +299,9 @@
   <button class="tab-btn" data-tab="3">☁️ Azure<span class="tab-cost">$5-25/mo</span></button>
   <button class="tab-btn" data-tab="4">⚡ Power Automate<span class="tab-cost">M365</span></button>
   <button class="tab-btn" data-tab="5">🌐 Cloudflare<span class="tab-cost">FREE</span></button>
+  <button class="tab-btn" data-tab="6">📦 JSONBin.io<span class="tab-cost">FREE ⭐</span></button>
+  <button class="tab-btn" data-tab="7">🏠 M365 Family<span class="tab-cost">M365 Family</span></button>
+  <button class="tab-btn" data-tab="8">🔧 GitHub Issues<span class="tab-cost">FREE</span></button>
 </div>
 
 <!-- ==================== PANEL 0: Google Sheets ==================== -->
@@ -733,6 +763,227 @@
   <a class="choose-btn" href="https://developers.cloudflare.com/workers/" target="_blank" rel="noopener">Choose Cloudflare — View Docs</a>
 </div>
 
+<!-- ==================== PANEL 6: JSONBin.io ==================== -->
+<div class="tab-panel" data-panel="6">
+  <div class="panel-header">
+    <h3>📦 JSONBin.io</h3>
+    <div class="badges">
+      <span class="badge badge-free">FREE</span>
+      <span class="badge badge-rec">⭐ Simplest Setup</span>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:8px;font-size:.88rem;">Game POSTs JSON to JSONBin.io REST API, a free JSON storage service — no server code at all.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-node"><span class="arch-icon">🎮</span><span class="arch-label"><strong>Browser</strong>OKR Miner Game</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">📦</span><span class="arch-label"><strong>JSONBin.io</strong>REST API</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🗄️</span><span class="arch-label"><strong>JSON Storage</strong>Bins &amp; Collections</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">👁️</span><span class="arch-label"><strong>Dashboard</strong>JSONBin Dashboard</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <table class="detail-table">
+      <tr><th>Setup Time</th><td>~5 minutes</td></tr>
+      <tr><th>Cost</th><td>$0 (free: 10K req/month, 100 bins)</td></tr>
+      <tr><th>Request Limits</th><td>10,000 requests/month</td></tr>
+      <tr><th>Latency</th><td>~300ms</td></tr>
+      <tr><th>Query Capability</th><td>No SQL — JSON read/write only</td></tr>
+      <tr><th>Real-time?</th><td>No</td></tr>
+      <tr><th>Dashboard</th><td>JSONBin web dashboard</td></tr>
+    </table>
+    <div class="pros-cons">
+      <h4 class="pros-title">✓ Pros</h4>
+      <ul class="pro-list">
+        <li>Extremely simple API — just POST JSON</li>
+        <li>No server code at all</li>
+        <li>Instant setup — ~5 minutes</li>
+        <li>JSON native — no schema needed</li>
+        <li>Collections for grouping related bins</li>
+      </ul>
+      <h4 class="cons-title" style="margin-top:16px">✗ Cons</h4>
+      <ul class="con-list">
+        <li>10K requests/month limit on free tier</li>
+        <li>No SQL queries — JSON blobs only</li>
+        <li>No real-time updates</li>
+        <li>API key exposed in client (but data is write-only from game)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-section">
+    <h4>💻 Code Preview</h4>
+    <div class="code-block">
+      <span class="label">game-side · JavaScript</span>
+<span class="comment">// In game — POST analytics to JSONBin.io</span>
+<span class="func">fetch</span>(<span class="string">'https://api.jsonbin.io/v3/b'</span>, {
+  <span class="obj">method</span>: <span class="string">'POST'</span>,
+  <span class="obj">headers</span>: {
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,
+    <span class="string">'X-Master-Key'</span>: <span class="string">'YOUR_KEY'</span>,
+    <span class="string">'X-Collection-Id'</span>: <span class="string">'YOUR_COLLECTION'</span>
+  },
+  <span class="obj">body</span>: <span class="const">JSON</span>.<span class="method">stringify</span>(<span class="obj">analyticsData</span>)
+});
+    </div>
+  </div>
+  <a class="choose-btn" href="https://jsonbin.io/api-reference" target="_blank" rel="noopener">Choose JSONBin.io — View Docs</a>
+</div>
+
+<!-- ==================== PANEL 7: M365 Family ==================== -->
+<div class="tab-panel" data-panel="7">
+  <div class="panel-header">
+    <h3>🏠 Microsoft 365 Family — Excel Online + Power Automate</h3>
+    <div class="badges">
+      <span class="badge badge-paid">M365 FAMILY</span>
+      <span class="badge badge-rec">🏠 Best for M365 Family</span>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:8px;font-size:.88rem;">Game POSTs to a Power Automate flow (included in M365 Family $99/yr plan), which writes to an Excel workbook stored in OneDrive.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-node"><span class="arch-icon">🎮</span><span class="arch-label"><strong>Browser</strong>OKR Miner Game</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">⚡</span><span class="arch-label"><strong>Power Automate</strong>HTTP Trigger</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">📊</span><span class="arch-label"><strong>Excel Online</strong>OneDrive workbook</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">👁️</span><span class="arch-label"><strong>View</strong>Excel / Power BI Free</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <table class="detail-table">
+      <tr><th>Setup Time</th><td>~20 minutes</td></tr>
+      <tr><th>Cost</th><td>$0 extra (M365 Family $99/yr shared)</td></tr>
+      <tr><th>Request Limits</th><td>~6,000 runs/month (Family plan)</td></tr>
+      <tr><th>Latency</th><td>~3-5 seconds</td></tr>
+      <tr><th>Query Capability</th><td>Excel formulas / Power BI Free</td></tr>
+      <tr><th>Real-time?</th><td>No</td></tr>
+      <tr><th>Dashboard</th><td>Excel Online / Power BI Free</td></tr>
+    </table>
+    <div class="pros-cons">
+      <h4 class="pros-title">✓ Pros</h4>
+      <ul class="pro-list">
+        <li>Uses your existing M365 Family license</li>
+        <li>Excel Online as dashboard — familiar to everyone</li>
+        <li>Power Automate included in subscription</li>
+        <li>OneDrive storage — share workbook with family</li>
+        <li>Power Automate can send email alerts</li>
+      </ul>
+      <h4 class="cons-title" style="margin-top:16px">✗ Cons</h4>
+      <ul class="con-list">
+        <li>~6,000 runs/month limit on Family plan</li>
+        <li>~3-5 second latency per request</li>
+        <li>Excel Online has 5M cell limit</li>
+        <li>Requires Microsoft account</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-section">
+    <h4>💻 Code Preview</h4>
+    <div class="code-block">
+      <span class="label">game-side · JavaScript</span>
+<span class="comment">// In game — POST to Power Automate HTTP trigger</span>
+<span class="func">fetch</span>(<span class="string">'https://prod-XX.westus.logic.azure.com:443/workflows/YOUR_FLOW/triggers/manual/paths/invoke?api-version=2016-06-01&amp;sp=%2Ftriggers%2Fmanual%2Frun&amp;sv=1.0&amp;sig=YOUR_SIG'</span>, {
+  <span class="obj">method</span>: <span class="string">'POST'</span>,
+  <span class="obj">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+  <span class="obj">body</span>: <span class="const">JSON</span>.<span class="method">stringify</span>(<span class="obj">analyticsData</span>)
+});
+    </div>
+    <div class="code-block" style="margin-top:12px">
+      <span class="label">Power Automate Flow — Setup Steps</span>
+<span class="comment">// 1. Open Power Automate (flow.microsoft.com) with M365 Family account</span>
+<span class="comment">// 2. Create "Instant cloud flow" → trigger: "When an HTTP request is received"</span>
+<span class="comment">// 3. Add JSON schema for the analytics payload</span>
+<span class="comment">// 4. Add action: "Add a row into a table" → select Excel file in OneDrive</span>
+<span class="comment">// 5. Map fields from the HTTP body to Excel columns</span>
+<span class="comment">// 6. Save → copy the HTTP POST URL</span>
+<span class="comment">//</span>
+<span class="comment">// OneDrive / File: Analytics.xlsx / Table: SessionData</span>
+    </div>
+  </div>
+  <a class="choose-btn" href="https://flow.microsoft.com/" target="_blank" rel="noopener">Choose M365 Family — View Docs</a>
+</div>
+
+<!-- ==================== PANEL 8: GitHub Issues ==================== -->
+<div class="tab-panel" data-panel="8">
+  <div class="panel-header">
+    <h3>🔧 GitHub Issues as Database</h3>
+    <div class="badges">
+      <span class="badge badge-free">FREE</span>
+      <span class="badge badge-rec">🔧 Most Creative</span>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:8px;font-size:.88rem;">Game creates a GitHub Issue via the API for each session, using issue labels for filtering — creative and completely free.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-node"><span class="arch-icon">🎮</span><span class="arch-label"><strong>Browser</strong>OKR Miner Game</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🐙</span><span class="arch-label"><strong>GitHub API</strong>REST v3</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">📋</span><span class="arch-label"><strong>Repository</strong>Issues as data</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🔍</span><span class="arch-label"><strong>Search</strong>GitHub Issue Search</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <table class="detail-table">
+      <tr><th>Setup Time</th><td>~10 minutes</td></tr>
+      <tr><th>Cost</th><td>$0 forever</td></tr>
+      <tr><th>Request Limits</th><td>5,000 requests/hr (authenticated)</td></tr>
+      <tr><th>Latency</th><td>~500ms</td></tr>
+      <tr><th>Query Capability</th><td>GitHub Issue search &amp; labels</td></tr>
+      <tr><th>Real-time?</th><td>No</td></tr>
+      <tr><th>Dashboard</th><td>GitHub Issues page + Actions</td></tr>
+    </table>
+    <div class="pros-cons">
+      <h4 class="pros-title">✓ Pros</h4>
+      <ul class="pro-list">
+        <li>Completely free — no limits on storage</li>
+        <li>Built-in search &amp; filter with labels</li>
+        <li>Data lives alongside your code</li>
+        <li>GitHub Actions can process data automatically</li>
+        <li>Issue labels for easy categorization</li>
+      </ul>
+      <h4 class="cons-title" style="margin-top:16px">✗ Cons</h4>
+      <ul class="con-list">
+        <li>Not a real database — no SQL queries</li>
+        <li>Token exposed in client (use fine-grained with issue:write only)</li>
+        <li>Rate limited to 5,000 requests/hr</li>
+        <li>Messy for high volume — lots of issues</li>
+        <li>Visible to public on public repos</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-section">
+    <h4>💻 Code Preview</h4>
+    <div class="code-block">
+      <span class="label">game-side · JavaScript</span>
+<span class="comment">// In game — create a GitHub Issue for each session</span>
+<span class="func">fetch</span>(<span class="string">'https://api.github.com/repos/SimonBourdages/OKR-Miner/issues'</span>, {
+  <span class="obj">method</span>: <span class="string">'POST'</span>,
+  <span class="obj">headers</span>: {
+    <span class="string">'Authorization'</span>: <span class="string">'token YOUR_FINE_GRAINED_TOKEN'</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+  },
+  <span class="obj">body</span>: <span class="const">JSON</span>.<span class="method">stringify</span>({
+    <span class="obj">title</span>: <span class="string">'📊 Session: '</span> + <span class="obj">duration</span> + <span class="string">'s, '</span> + <span class="obj">milestones</span> + <span class="string">' milestones'</span>,
+    <span class="obj">body</span>: <span class="string">'```json\n'</span> + <span class="const">JSON</span>.<span class="method">stringify</span>(<span class="obj">analyticsData</span>, <span class="keyword">null</span>, <span class="num">2</span>) + <span class="string">'\n```'</span>,
+    <span class="obj">labels</span>: [<span class="string">'analytics'</span>, <span class="obj">mode</span>]
+  })
+});
+    </div>
+  </div>
+  <a class="choose-btn" href="https://docs.github.com/en/rest/issues/issues#create-an-issue" target="_blank" rel="noopener">Choose GitHub Issues — View Docs</a>
+</div>
+
 </div><!-- /container -->
 
 <footer>
@@ -759,7 +1010,7 @@
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
       const current = document.querySelector('.tab-btn.active');
       const idx = parseInt(current.dataset.tab);
-      const next = e.key === 'ArrowRight' ? (idx + 1) % 6 : (idx + 5) % 6;
+      const next = e.key === 'ArrowRight' ? (idx + 1) % 9 : (idx + 8) % 9;
       document.querySelector(`.tab-btn[data-tab="${next}"]`).click();
     }
   });
