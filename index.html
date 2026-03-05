@@ -535,13 +535,20 @@
         <button id="soundToggleBtn" onclick="game.cycleSoundMode()">🔊 All Sound</button>
         <button onclick="game.showAchievements()">🏆</button>
         <button onclick="game.showEventHistory()">📜</button>
-        <button onclick="game.buyRepairBot()">🔧 Repair Bot (<span id="repairBotCost">200</span>)</button>
         <button onclick="game.openBugReport()">🐛 Bug</button>
-        <span style="color:#0ff;font-size:10px;">Bots: <span id="repairBotCount">0</span></span>
         <span style="color:#ff0;font-size:10px;margin-left:auto;">⏱ <span id="eventCountdown">--</span>s</span>
     </div>
 
-    <div id="buildings" style="display:none;"></div>
+    <div id="buildings" style="display:none;">
+        <!-- building buttons injected by JS -->
+    </div>
+    <div id="repairBotPanel" style="display:none;position:fixed;right:10px;bottom:60px;z-index:10;">
+        <button onclick="game.buyRepairBot()" style="background:rgba(0,20,40,0.9);border:2px solid #00e5ff;border-radius:8px;padding:10px 14px;color:#0ff;cursor:pointer;font-family:inherit;font-size:12px;text-align:left;min-width:160px;">
+            <div style="font-weight:bold;font-size:14px;">🔧 Repair Bot</div>
+            <div style="color:#ff0;"><span id="repairBotCost">200</span> AC</div>
+            <div style="color:#8f8;font-size:11px;">Bots: <span id="repairBotCount">0</span></div>
+        </button>
+    </div>
 
     <div id="menu">
         <h1>OKR FARMING</h1>
@@ -990,8 +997,8 @@
             this.mouseY = 0;
             this.canvas.addEventListener('mousemove', function(e) {
                 var rect = self.canvas.getBoundingClientRect();
-                self.mouseX = e.clientX - rect.left;
-                self.mouseY = e.clientY - rect.top;
+                self.mouseX = (e.clientX - rect.left) * (self.canvas.width / rect.width);
+                self.mouseY = (e.clientY - rect.top) * (self.canvas.height / rect.height);
             });
 
             this.setupVideoIntro();
@@ -1334,6 +1341,7 @@
             document.getElementById('ui').style.display = 'block';
             document.getElementById('controls').style.display = 'flex';
             document.getElementById('buildings').style.display = 'flex';
+            document.getElementById('repairBotPanel').style.display = 'block';
 
             // Update labels
             var lv = LEVELS[level];
@@ -1400,8 +1408,8 @@
             if (!this.running || !this.state) return;
 
             var rect = this.canvas.getBoundingClientRect();
-            var x = e.clientX - rect.left;
-            var y = e.clientY - rect.top;
+            var x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
+            var y = (e.clientY - rect.top) * (this.canvas.height / rect.height);
 
             // Check if clicking on a thief ship — destroy it!
             for (var i = this.thiefShips.length - 1; i >= 0; i--) {
@@ -4427,6 +4435,7 @@
             document.getElementById('ui').style.display = 'none';
             document.getElementById('controls').style.display = 'none';
             document.getElementById('buildings').style.display = 'none';
+            document.getElementById('repairBotPanel').style.display = 'none';
             this.stopMusic();
             this.renderMenuBackground();
         };
