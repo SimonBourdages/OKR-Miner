@@ -1019,10 +1019,10 @@
                 // Convert screen → world coordinates
                 self.mouseX = (sx - self.camera.offsetX) / self.camera.zoom;
                 self.mouseY = (sy - self.camera.offsetY) / self.camera.zoom;
-                // Handle right-click drag panning
+                // Handle right-click drag panning (dx/dy in canvas pixels)
                 if (self.isPanning) {
-                    var dx = e.clientX - self.panStartX;
-                    var dy = e.clientY - self.panStartY;
+                    var dx = sx - self.panStartX;
+                    var dy = sy - self.panStartY;
                     self.camera.offsetX = self.panStartOffsetX + dx;
                     self.camera.offsetY = self.panStartOffsetY + dy;
                     self.camera.targetOffsetX = self.camera.offsetX;
@@ -1032,9 +1032,12 @@
             // Right-click drag to pan
             this.canvas.addEventListener('mousedown', function(e) {
                 if (e.button === 2) {
+                    var rect = self.canvas.getBoundingClientRect();
+                    var scaleX = self.canvas.width / rect.width;
+                    var scaleY = self.canvas.height / rect.height;
                     self.isPanning = true;
-                    self.panStartX = e.clientX;
-                    self.panStartY = e.clientY;
+                    self.panStartX = (e.clientX - rect.left) * scaleX;
+                    self.panStartY = (e.clientY - rect.top) * scaleY;
                     self.panStartOffsetX = self.camera.offsetX;
                     self.panStartOffsetY = self.camera.offsetY;
                     self.canvas.style.cursor = 'grabbing';
@@ -2497,9 +2500,11 @@
             var worldLeft = (0 - this.camera.offsetX) / this.camera.zoom;
             var worldRight = (this.canvas.width - this.camera.offsetX) / this.camera.zoom;
             var worldTop = (0 - this.camera.offsetY) / this.camera.zoom;
+            var worldBottom = (this.canvas.height - this.camera.offsetY) / this.camera.zoom;
             if (boxX < worldLeft + 5) boxX = worldLeft + 5;
             if (boxX + boxW > worldRight - 5) boxX = worldRight - 5 - boxW;
             if (boxY < worldTop + 5) boxY = y + 35;
+            if (boxY + boxH > worldBottom - 5) boxY = worldBottom - 5 - boxH;
 
             // Background
             ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
