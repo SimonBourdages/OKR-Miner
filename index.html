@@ -1599,21 +1599,6 @@
                 return;
             }
 
-            // Must be within 200px of factory or another building
-            var maxRange = 200;
-            if (this.nodes.length > 0) {
-                var closestDist = distToFactory;
-                for (var i = 0; i < this.nodes.length; i++) {
-                    var ndx = x - this.nodes[i].x, ndy = y - this.nodes[i].y;
-                    var nd = Math.sqrt(ndx * ndx + ndy * ndy);
-                    if (nd < closestDist) closestDist = nd;
-                }
-                if (closestDist > maxRange) {
-                    this.addFloatingText(x, y - 20, 'Too far! Stay within range.', '#f84');
-                    return;
-                }
-            }
-
             this.placeBuilding(x, y);
         };
 
@@ -2963,20 +2948,7 @@
             var tooCloseToEdge = mx < 40 || mx > this.canvas.width - 40 || my < 40 || my > this.canvas.height - 40;
             var canAfford = this.state.currencies.ac >= b.cost;
 
-            // Check max range from nearest building or factory
-            var maxRange = 200;
-            var tooFar = false;
-            if (this.nodes.length > 0) {
-                var closestDist = distToFactory;
-                for (var ci = 0; ci < this.nodes.length; ci++) {
-                    var cdx = mx - this.nodes[ci].x, cdy = my - this.nodes[ci].y;
-                    var cd = Math.sqrt(cdx * cdx + cdy * cdy);
-                    if (cd < closestDist) closestDist = cd;
-                }
-                tooFar = closestDist > maxRange;
-            }
-
-            var blocked = tooCloseToFactory || tooCloseToEdge || tooFar;
+            var blocked = tooCloseToFactory || tooCloseToEdge;
 
             var ringColor, ghostAlpha;
             if (blocked) {
@@ -3039,9 +3011,6 @@
             } else if (tooCloseToEdge) {
                 ctx.fillStyle = '#f66';
                 ctx.fillText('Too close to edge!', mx, my + 35);
-            } else if (tooFar) {
-                ctx.fillStyle = '#f66';
-                ctx.fillText('Too far! Stay within range.', mx, my + 35);
             } else if (!canAfford) {
                 ctx.fillStyle = '#f66';
                 ctx.fillText('Need ' + b.cost + ' AC', mx, my + 35);
