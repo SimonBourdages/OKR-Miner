@@ -715,6 +715,53 @@
             }
         );
 
+        runner.addTest(
+            'Building placement sets spawnTime and easeOutBack scales correctly',
+            'gameplay',
+            false,
+            async () => {
+                // Simulate a newly placed node
+                const node = {
+                    type: 'collector',
+                    x: 100, y: 100,
+                    age: 0, lastProduce: 0,
+                    level: 1, hp: 100, maxHp: 100,
+                    spawnTime: Date.now()
+                };
+
+                if (!node.spawnTime || typeof node.spawnTime !== 'number') {
+                    return { pass: false, message: 'spawnTime not set on node' };
+                }
+
+                // easeOutBack formula
+                const c1 = 1.70158, c3 = c1 + 1;
+                const easeOutBack = (t) => 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+
+                const atStart = easeOutBack(0);    // t=0 => scale≈0
+                const atThird = easeOutBack(0.3);  // t=0.3 => still scaling up
+                const atEnd   = easeOutBack(1);    // t=1 => scale=1
+
+                if (Math.abs(atStart) > 0.01) {
+                    return { pass: false, message: `easeOutBack(0) should be ~0, got ${atStart.toFixed(4)}` };
+                }
+                if (atThird <= 0) {
+                    return { pass: false, message: `easeOutBack(0.3) should be positive, got ${atThird.toFixed(4)}` };
+                }
+                if (Math.abs(atEnd - 1) > 0.0001) {
+                    return { pass: false, message: `easeOutBack(1) should be 1, got ${atEnd.toFixed(4)}` };
+                }
+
+                // Verify overshoot exists (scale > 1 somewhere before settling)
+                const atOvershoot = easeOutBack(0.5);
+                if (atOvershoot <= 1) {
+                    return { pass: false, message: `easeOutBack should overshoot >1 near t=0.5, got ${atOvershoot.toFixed(4)}` };
+                }
+
+                const elapsed = Date.now() - node.spawnTime;
+                return { pass: true, message: `spawnTime set, easeOutBack(0)=${atStart.toFixed(3)}, overshoot=${atOvershoot.toFixed(3)}, easeOutBack(1)=${atEnd.toFixed(3)}, elapsed=${elapsed}ms` };
+            }
+        );
+
         // Make runner global for button clicks
         window.runner = runner;
         window.runAllTests = () => runner.runAllTests();

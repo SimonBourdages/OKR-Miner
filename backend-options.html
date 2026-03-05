@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Miner — Analytics Backend Options</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0a0a;--surface:#111;--surface2:#1a1a1a;--surface3:#222;
+    --emerald:#00ff88;--emerald-dim:#00cc6a;--emerald-glow:rgba(0,255,136,.15);
+    --cyan:#00e5ff;--amber:#ffb300;--red:#ff4444;--blue:#448aff;
+    --text:#e0e0e0;--text-dim:#888;--text-bright:#fff;
+    --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+    --mono:'Cascadia Code','Fira Code','Consolas',monospace;
+    --radius:8px;
+  }
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;overflow-x:hidden}
+
+  /* Matrix rain background */
+  .matrix-bg{position:fixed;inset:0;z-index:0;opacity:.04;pointer-events:none;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,.03) 2px,rgba(0,255,136,.03) 4px)}
+
+  .container{max-width:1300px;margin:0 auto;padding:24px;position:relative;z-index:1}
+
+  /* Header */
+  header{text-align:center;padding:48px 0 32px;position:relative}
+  header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:200px;height:2px;
+    background:linear-gradient(90deg,transparent,var(--emerald),transparent)}
+  h1{font-size:2.4rem;font-weight:300;letter-spacing:2px;color:var(--text-bright)}
+  h1 span{color:var(--emerald);font-weight:600}
+  .subtitle{color:var(--text-dim);margin-top:8px;font-size:1rem;letter-spacing:1px}
+
+  /* Badges */
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;vertical-align:middle}
+  .badge-free{background:rgba(0,255,136,.15);color:var(--emerald);border:1px solid rgba(0,255,136,.3)}
+  .badge-low{background:rgba(68,138,255,.15);color:var(--blue);border:1px solid rgba(68,138,255,.3)}
+  .badge-paid{background:rgba(255,179,0,.15);color:var(--amber);border:1px solid rgba(255,179,0,.3)}
+  .badge-rec{background:rgba(0,255,136,.2);color:var(--emerald);border:1px solid var(--emerald);animation:pulse-badge 2s infinite}
+  @keyframes pulse-badge{0%,100%{box-shadow:0 0 4px rgba(0,255,136,.3)}50%{box-shadow:0 0 12px rgba(0,255,136,.5)}}
+
+  /* ============ SUMMARY TABLE ============ */
+  .summary-section{margin:40px 0}
+  .summary-section h2{font-size:1.3rem;font-weight:400;color:var(--emerald);margin-bottom:16px;letter-spacing:1px}
+  .summary-table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid rgba(0,255,136,.15)}
+  .summary-table{width:100%;border-collapse:collapse;font-size:.82rem}
+  .summary-table th,.summary-table td{padding:10px 14px;text-align:center;border:1px solid rgba(255,255,255,.06)}
+  .summary-table thead th{background:rgba(0,255,136,.08);color:var(--emerald);font-weight:600;position:sticky;top:0;white-space:nowrap}
+  .summary-table thead th:first-child{text-align:left}
+  .summary-table tbody td:first-child{text-align:left;font-weight:600;color:var(--text-bright);white-space:nowrap}
+  .summary-table tbody tr{background:var(--surface)}
+  .summary-table tbody tr:nth-child(even){background:var(--surface2)}
+  .summary-table tbody tr:hover{background:rgba(0,255,136,.05)}
+  .summary-table .check{color:var(--emerald)}
+  .summary-table .cross{color:var(--red)}
+  .summary-table .star{color:#ffd700;font-size:1rem}
+
+  /* ============ TABS ============ */
+  .tabs{display:flex;gap:4px;margin:32px 0 0;flex-wrap:wrap}
+  .tab-btn{
+    padding:10px 18px;border:1px solid rgba(255,255,255,.08);border-bottom:none;
+    background:var(--surface);color:var(--text-dim);cursor:pointer;
+    border-radius:var(--radius) var(--radius) 0 0;font-family:var(--font);font-size:.82rem;
+    transition:all .2s;white-space:nowrap;position:relative}
+  .tab-btn:hover{background:var(--surface2);color:var(--text)}
+  .tab-btn.active{background:var(--surface2);color:var(--emerald);border-color:rgba(0,255,136,.25);
+    box-shadow:inset 0 2px 0 var(--emerald)}
+  .tab-btn .tab-cost{font-size:.65rem;opacity:.7;display:block;margin-top:2px}
+  .tab-panel{display:none;background:var(--surface2);border:1px solid rgba(255,255,255,.08);
+    border-radius:0 var(--radius) var(--radius) var(--radius);padding:32px;animation:fadeIn .3s}
+  .tab-panel.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Panel header */
+  .panel-header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+  .panel-header h3{font-size:1.5rem;font-weight:400;color:var(--text-bright)}
+  .panel-header .badges{display:flex;gap:8px;align-items:center}
+
+  /* ============ ARCHITECTURE DIAGRAM ============ */
+  .arch-diagram{
+    display:flex;align-items:center;justify-content:center;gap:0;
+    padding:32px 16px;margin:24px 0;
+    background:linear-gradient(135deg,rgba(0,255,136,.03),transparent 60%);
+    border:1px solid rgba(0,255,136,.1);border-radius:var(--radius);
+    overflow-x:auto;flex-wrap:nowrap}
+  .arch-node{
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    padding:16px 20px;min-width:110px;
+    background:var(--surface);border:1px solid rgba(255,255,255,.1);
+    border-radius:var(--radius);text-align:center;position:relative;flex-shrink:0;
+    transition:all .3s}
+  .arch-node:hover{border-color:var(--emerald);box-shadow:0 0 20px rgba(0,255,136,.1);transform:translateY(-2px)}
+  .arch-icon{font-size:1.8rem}
+  .arch-label{font-size:.75rem;color:var(--text-dim);line-height:1.3}
+  .arch-label strong{color:var(--text-bright);display:block;font-size:.85rem}
+  .arch-arrow{
+    display:flex;align-items:center;flex-shrink:0;padding:0 4px;position:relative;min-width:60px;justify-content:center}
+  .arch-arrow svg{overflow:visible}
+  .arrow-line{stroke:var(--emerald);stroke-width:2;stroke-dasharray:6 4;fill:none}
+  .arrow-head{fill:var(--emerald)}
+  .arrow-animated .arrow-line{animation:dash 1s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-10}}
+
+  /* ============ COMPARISON MINI-TABLE ============ */
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 0}
+  @media(max-width:800px){.detail-grid{grid-template-columns:1fr}}
+  .detail-table{width:100%;border-collapse:collapse;font-size:.82rem}
+  .detail-table th,.detail-table td{padding:8px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06)}
+  .detail-table th{color:var(--emerald);font-weight:600;width:40%;white-space:nowrap}
+  .detail-table td{color:var(--text)}
+
+  /* Pros/Cons */
+  .pros-cons{margin:24px 0}
+  .pros-cons h4{font-size:.9rem;margin-bottom:10px;font-weight:600;letter-spacing:.5px}
+  .pros-cons h4.pros-title{color:var(--emerald)}
+  .pros-cons h4.cons-title{color:var(--red)}
+  .pros-cons ul{list-style:none;padding:0}
+  .pros-cons li{padding:5px 0;padding-left:24px;position:relative;font-size:.85rem;color:var(--text)}
+  .pros-cons li::before{position:absolute;left:0;font-size:.9rem}
+  .pro-list li::before{content:'✓';color:var(--emerald)}
+  .con-list li::before{content:'✗';color:var(--red)}
+
+  /* ============ CODE BLOCKS ============ */
+  .code-section{margin:24px 0}
+  .code-section h4{font-size:.9rem;color:var(--emerald);margin-bottom:12px;font-weight:600;letter-spacing:.5px}
+  .code-block{
+    background:#0d1117;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);
+    padding:20px;overflow-x:auto;font-family:var(--mono);font-size:.78rem;line-height:1.7;
+    color:#c9d1d9;position:relative}
+  .code-block .comment{color:#6a9955}
+  .code-block .keyword{color:#c586c0}
+  .code-block .string{color:#ce9178}
+  .code-block .func{color:#dcdcaa}
+  .code-block .const{color:#4fc1ff}
+  .code-block .obj{color:#9cdcfe}
+  .code-block .num{color:#b5cea8}
+  .code-block .method{color:#dcdcaa}
+  .code-block .type{color:#4ec9b0}
+  .code-block .label{position:absolute;top:8px;right:12px;font-size:.6rem;color:var(--text-dim);
+    font-family:var(--font);text-transform:uppercase;letter-spacing:1px;background:#0d1117;padding:2px 6px;border-radius:3px}
+
+  /* Choose button */
+  .choose-btn{
+    display:inline-flex;align-items:center;gap:8px;margin-top:24px;
+    padding:12px 28px;border:1px solid var(--emerald);border-radius:var(--radius);
+    background:transparent;color:var(--emerald);font-family:var(--font);font-size:.9rem;
+    cursor:pointer;transition:all .3s;text-decoration:none}
+  .choose-btn:hover{background:rgba(0,255,136,.1);box-shadow:0 0 20px rgba(0,255,136,.15);transform:translateY(-1px)}
+  .choose-btn::after{content:'→';transition:transform .2s}
+  .choose-btn:hover::after{transform:translateX(4px)}
+
+  /* Footer */
+  footer{text-align:center;padding:40px 0 24px;color:var(--text-dim);font-size:.75rem;border-top:1px solid rgba(255,255,255,.06);margin-top:48px}
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(0,255,136,.2);border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(0,255,136,.4)}
+</style>
+</head>
+<body>
+<div class="matrix-bg"></div>
+<div class="container">
+
+<!-- ========== HEADER ========== -->
+<header>
+  <h1><span>OKR Miner</span> — Analytics Backend Options</h1>
+  <p class="subtitle">Compare 6 approaches to collect analytics from all online players</p>
+</header>
+
+<!-- ========== QUICK COMPARISON SUMMARY ========== -->
+<section class="summary-section">
+  <h2>⚡ Quick Comparison</h2>
+  <div class="summary-table-wrap">
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Google Sheets <span class="star">⭐</span></th>
+          <th>Supabase <span class="star">⭐</span></th>
+          <th>Firebase</th>
+          <th>Azure Functions + Cosmos</th>
+          <th>Power Automate + SharePoint</th>
+          <th>Cloudflare Workers + D1</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Cost</td>
+          <td><span class="badge badge-free">FREE</span></td>
+          <td><span class="badge badge-free">FREE</span></td>
+          <td><span class="badge badge-free">FREE</span></td>
+          <td><span class="badge badge-low">$5-25/mo</span></td>
+          <td><span class="badge badge-paid">M365 License</span></td>
+          <td><span class="badge badge-free">FREE</span></td>
+        </tr>
+        <tr>
+          <td>Setup Time</td>
+          <td>~15 min</td>
+          <td>~20 min</td>
+          <td>~15 min</td>
+          <td>~45 min</td>
+          <td>~30 min</td>
+          <td>~25 min</td>
+        </tr>
+        <tr>
+          <td>Request Limits</td>
+          <td>20K/day</td>
+          <td>50K/month</td>
+          <td>100 simultaneous</td>
+          <td>1M/month (free tier)</td>
+          <td>Varies by plan</td>
+          <td>100K/day</td>
+        </tr>
+        <tr>
+          <td>Latency</td>
+          <td>~2s</td>
+          <td>~200ms</td>
+          <td>~100ms</td>
+          <td>~150ms</td>
+          <td>~3-5s</td>
+          <td>~50ms</td>
+        </tr>
+        <tr>
+          <td>SQL Queries</td>
+          <td class="cross">✗</td>
+          <td class="check">✓ Full PostgreSQL</td>
+          <td class="cross">✗ NoSQL</td>
+          <td class="check">✓ Cosmos SQL</td>
+          <td class="cross">✗ List views</td>
+          <td class="check">✓ SQLite</td>
+        </tr>
+        <tr>
+          <td>Real-time</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+        </tr>
+        <tr>
+          <td>Dashboard</td>
+          <td>Google Sheets</td>
+          <td>Supabase UI</td>
+          <td>Firebase Console</td>
+          <td>Power BI / Azure</td>
+          <td>Power BI / SharePoint</td>
+          <td>Cloudflare Dash</td>
+        </tr>
+        <tr>
+          <td>Best For</td>
+          <td><span class="badge badge-rec">⭐ Best Free</span></td>
+          <td><span class="badge badge-rec">⭐ Best Free</span></td>
+          <td>Real-time fans</td>
+          <td>Enterprise scale</td>
+          <td><span class="badge badge-paid">Best M365</span></td>
+          <td>Speed demons</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ========== TABS ========== -->
+<div class="tabs" id="tabs">
+  <button class="tab-btn active" data-tab="0">📊 Google Sheets<span class="tab-cost">FREE ⭐</span></button>
+  <button class="tab-btn" data-tab="1">🐘 Supabase<span class="tab-cost">FREE ⭐</span></button>
+  <button class="tab-btn" data-tab="2">🔥 Firebase<span class="tab-cost">FREE</span></button>
+  <button class="tab-btn" data-tab="3">☁️ Azure<span class="tab-cost">$5-25/mo</span></button>
+  <button class="tab-btn" data-tab="4">⚡ Power Automate<span class="tab-cost">M365</span></button>
+  <button class="tab-btn" data-tab="5">🌐 Cloudflare<span class="tab-cost">FREE</span></button>
+</div>
+
+<!-- ==================== PANEL 0: Google Sheets ==================== -->
+<div class="tab-panel active" data-panel="0">
+  <div class="panel-header">
+    <h3>📊 Google Sheets via Apps Script</h3>
+    <div class="badges">
+      <span class="badge badge-free">FREE</span>
+      <span class="badge badge-rec">⭐ Recommended Free</span>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:8px;font-size:.88rem;">Game POSTs JSON to a Google Apps Script web app, which writes rows to a Google Sheet.</p>
+
+  <!-- Architecture -->
+  <div class="arch-diagram">
+    <div class="arch-node"><span class="arch-icon">🎮</span><span class="arch-label"><strong>Browser</strong>OKR Miner Game</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">⚙️</span><span class="arch-label"><strong>Apps Script</strong>doPost() handler</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">📊</span><span class="arch-label"><strong>Google Sheet</strong>Rows of data</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">👁️</span><span class="arch-label"><strong>You</strong>View in Sheets</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <!-- Details table -->
+    <table class="detail-table">
+      <tr><th>Setup Time</th><td>~15 minutes</td></tr>
+      <tr><th>Cost</th><td>$0 forever</td></tr>
+      <tr><th>Request Limits</th><td>20,000 requests/day</td></tr>
+      <tr><th>Latency</th><td>~2 seconds</td></tr>
+      <tr><th>Query Capability</th><td>Sheets formulas / QUERY()</td></tr>
+      <tr><th>Real-time?</th><td>No</td></tr>
+      <tr><th>Dashboard</th><td>Google Sheets (built-in charts)</td></tr>
+    </table>
+    <!-- Pros / Cons -->
+    <div class="pros-cons">
+      <h4 class="pros-title">✓ Pros</h4>
+      <ul class="pro-list">
+        <li>Zero cost — no credit card, no subscription</li>
+        <li>No server to manage or deploy</li>
+        <li>Familiar UI — everyone knows Google Sheets</li>
+        <li>Easy to share with teammates</li>
+        <li>Built-in charting and pivot tables</li>
+      </ul>
+      <h4 class="cons-title" style="margin-top:16px">✗ Cons</h4>
+      <ul class="con-list">
+        <li>20,000 requests/day limit</li>
+        <li>~2 second latency per write</li>
+        <li>Data lives in Google's cloud</li>
+        <li>No real-time dashboard</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Code -->
+  <div class="code-section">
+    <h4>💻 Code Preview</h4>
+    <div class="code-block">
+      <span class="label">game-side · JavaScript</span>
+<span class="comment">// In game — send analytics on session end</span>
+<span class="func">fetch</span>(<span class="string">'https://script.google.com/macros/s/YOUR_ID/exec'</span>, {
+  <span class="obj">method</span>: <span class="string">'POST'</span>,
+  <span class="obj">mode</span>: <span class="string">'no-cors'</span>,
+  <span class="obj">body</span>: <span class="const">JSON</span>.<span class="method">stringify</span>(<span class="obj">analyticsData</span>)
+});
+    </div>
+    <div class="code-block" style="margin-top:12px">
+      <span class="label">server-side · Apps Script</span>
+<span class="comment">// Google Apps Script — doPost handler</span>
+<span class="keyword">function</span> <span class="func">doPost</span>(<span class="obj">e</span>) {
+  <span class="keyword">var</span> <span class="obj">data</span> = <span class="const">JSON</span>.<span class="method">parse</span>(<span class="obj">e</span>.<span class="obj">postData</span>.<span class="obj">contents</span>);
+  <span class="keyword">var</span> <span class="obj">sheet</span> = <span class="type">SpreadsheetApp</span>.<span class="method">getActiveSpreadsheet</span>().<span class="method">getActiveSheet</span>();
+  <span class="obj">sheet</span>.<span class="method">appendRow</span>([
+    <span class="keyword">new</span> <span class="type">Date</span>(),
+    <span class="obj">data</span>.<span class="obj">duration</span>,
+    <span class="obj">data</span>.<span class="obj">mode</span>,
+    <span class="obj">data</span>.<span class="obj">milestones</span>,
+    <span class="obj">data</span>.<span class="obj">peakOKR</span>,
+    <span class="obj">data</span>.<span class="obj">buildingsPlaced</span>
+  ]);
+}
+    </div>
+  </div>
+  <a class="choose-btn" href="https://developers.google.com/apps-script/guides/web" target="_blank" rel="noopener">Choose Google Sheets — View Docs</a>
+</div>
+
+<!-- ==================== PANEL 1: Supabase ==================== -->
+<div class="tab-panel" data-panel="1">
+  <div class="panel-header">
+    <h3>🐘 Supabase (PostgreSQL)</h3>
+    <div class="badges">
+      <span class="badge badge-free">FREE TIER</span>
+      <span class="badge badge-rec">⭐ Best Free DB</span>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:8px;font-size:.88rem;">Game sends analytics to Supabase PostgreSQL via REST API with an anonymous key.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-node"><span class="arch-icon">🎮</span><span class="arch-label"><strong>Browser</strong>OKR Miner Game</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🔌</span><span class="arch-label"><strong>Supabase REST</strong>PostgREST API</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🐘</span><span class="arch-label"><strong>PostgreSQL</strong>Full SQL database</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">📈</span><span class="arch-label"><strong>Dashboard</strong>Supabase UI</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <table class="detail-table">
+      <tr><th>Setup Time</th><td>~20 minutes</td></tr>
+      <tr><th>Cost</th><td>$0 (free: 500MB, 50K req/month)</td></tr>
+      <tr><th>Request Limits</th><td>50,000 requests/month</td></tr>
+      <tr><th>Latency</th><td>~200ms</td></tr>
+      <tr><th>Query Capability</th><td>Full PostgreSQL SQL</td></tr>
+      <tr><th>Real-time?</th><td>Yes — real-time subscriptions</td></tr>
+      <tr><th>Dashboard</th><td>Supabase Table Editor &amp; SQL Editor</td></tr>
+    </table>
+    <div class="pros-cons">
+      <h4 class="pros-title">✓ Pros</h4>
+      <ul class="pro-list">
+        <li>Real PostgreSQL — full SQL power</li>
+        <li>Real-time subscriptions built in</li>
+        <li>Generous free tier (500MB storage)</li>
+        <li>REST API + JavaScript client library</li>
+        <li>Row-level security available</li>
+      </ul>
+      <h4 class="cons-title" style="margin-top:16px">✗ Cons</h4>
+      <ul class="con-list">
+        <li>Requires Supabase account creation</li>
+        <li>50K requests/month limit on free tier</li>
+        <li>Anon key exposed in client-side code</li>
+        <li>Project pauses after 1 week inactivity (free tier)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-section">
+    <h4>💻 Code Preview</h4>
+    <div class="code-block">
+      <span class="label">game-side · JavaScript</span>
+<span class="comment">// In game — POST analytics to Supabase</span>
+<span class="func">fetch</span>(<span class="string">'https://YOUR_PROJECT.supabase.co/rest/v1/analytics'</span>, {
+  <span class="obj">method</span>: <span class="string">'POST'</span>,
+  <span class="obj">headers</span>: {
+    <span class="string">'apikey'</span>: <span class="string">'YOUR_ANON_KEY'</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+  },
+  <span class="obj">body</span>: <span class="const">JSON</span>.<span class="method">stringify</span>({
+    <span class="obj">session_data</span>: <span class="obj">analyticsData</span>,
+    <span class="obj">created_at</span>: <span class="keyword">new</span> <span class="type">Date</span>().<span class="method">toISOString</span>()
+  })
+});
+    </div>
+  </div>
+  <a class="choose-btn" href="https://supabase.com/docs/guides/getting-started" target="_blank" rel="noopener">Choose Supabase — View Docs</a>
+</div>
+
+<!-- ==================== PANEL 2: Firebase ==================== -->
+<div class="tab-panel" data-panel="2">
+  <div class="panel-header">
+    <h3>🔥 Firebase Realtime Database</h3>
+    <div class="badges">
+      <span class="badge badge-free">FREE TIER</span>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:8px;font-size:.88rem;">Game writes to Firebase Realtime Database using the REST API — no SDK needed.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-node"><span class="arch-icon">🎮</span><span class="arch-label"><strong>Browser</strong>OKR Miner Game</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🔥</span><span class="arch-label"><strong>Firebase REST</strong>RTDB API</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🗄️</span><span class="arch-label"><strong>Realtime DB</strong>JSON tree store</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🖥️</span><span class="arch-label"><strong>Console</strong>Firebase Console</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <table class="detail-table">
+      <tr><th>Setup Time</th><td>~15 minutes</td></tr>
+      <tr><th>Cost</th><td>$0 (Spark: 1GB storage, 100 connections)</td></tr>
+      <tr><th>Request Limits</th><td>100 simultaneous connections</td></tr>
+      <tr><th>Latency</th><td>~100ms</td></tr>
+      <tr><th>Query Capability</th><td>NoSQL — limited queries</td></tr>
+      <tr><th>Real-time?</th><td>Yes — core feature</td></tr>
+      <tr><th>Dashboard</th><td>Firebase Console</td></tr>
+    </table>
+    <div class="pros-cons">
+      <h4 class="pros-title">✓ Pros</h4>
+      <ul class="pro-list">
+        <li>True real-time — data syncs instantly</li>
+        <li>Google ecosystem integration</li>
+        <li>Dead-simple REST API</li>
+        <li>No server code needed</li>
+      </ul>
+      <h4 class="cons-title" style="margin-top:16px">✗ Cons</h4>
+      <ul class="con-list">
+        <li>NoSQL — much harder to query / aggregate</li>
+        <li>1GB storage limit on free tier</li>
+        <li>Google account required</li>
+        <li>Data structure can get messy over time</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-section">
+    <h4>💻 Code Preview</h4>
+    <div class="code-block">
+      <span class="label">game-side · JavaScript</span>
+<span class="comment">// In game — POST to Firebase RTDB REST API</span>
+<span class="func">fetch</span>(<span class="string">'https://YOUR_PROJECT.firebaseio.com/analytics.json'</span>, {
+  <span class="obj">method</span>: <span class="string">'POST'</span>,
+  <span class="obj">body</span>: <span class="const">JSON</span>.<span class="method">stringify</span>(<span class="obj">analyticsData</span>)
+});
+    </div>
+  </div>
+  <a class="choose-btn" href="https://firebase.google.com/docs/database/rest/start" target="_blank" rel="noopener">Choose Firebase — View Docs</a>
+</div>
+
+<!-- ==================== PANEL 3: Azure ==================== -->
+<div class="tab-panel" data-panel="3">
+  <div class="panel-header">
+    <h3>☁️ Azure Functions + Cosmos DB</h3>
+    <div class="badges">
+      <span class="badge badge-low">$5-25/month</span>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:8px;font-size:.88rem;">Game POSTs to an Azure Function HTTP trigger, which stores documents in Cosmos DB.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-node"><span class="arch-icon">🎮</span><span class="arch-label"><strong>Browser</strong>OKR Miner Game</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">⚡</span><span class="arch-label"><strong>Azure Function</strong>HTTP Trigger</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🌍</span><span class="arch-label"><strong>Cosmos DB</strong>Document store</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">📊</span><span class="arch-label"><strong>Power BI</strong>Azure Portal</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <table class="detail-table">
+      <tr><th>Setup Time</th><td>~45 minutes</td></tr>
+      <tr><th>Cost</th><td>~$5-25/month (pay-as-you-go)</td></tr>
+      <tr><th>Request Limits</th><td>1M executions/month (func free tier)</td></tr>
+      <tr><th>Latency</th><td>~150ms</td></tr>
+      <tr><th>Query Capability</th><td>Full SQL queries on Cosmos DB</td></tr>
+      <tr><th>Real-time?</th><td>Yes — Change Feed / SignalR</td></tr>
+      <tr><th>Dashboard</th><td>Power BI / Azure Portal / Monitor</td></tr>
+    </table>
+    <div class="pros-cons">
+      <h4 class="pros-title">✓ Pros</h4>
+      <ul class="pro-list">
+        <li>Enterprise-grade reliability &amp; security</li>
+        <li>Scales to infinity automatically</li>
+        <li>Deep integration with Power BI &amp; Azure Monitor</li>
+        <li>Full SQL queries on Cosmos DB</li>
+        <li>Global distribution available</li>
+      </ul>
+      <h4 class="cons-title" style="margin-top:16px">✗ Cons</h4>
+      <ul class="con-list">
+        <li>Requires Azure subscription</li>
+        <li>Most complex setup of all options</li>
+        <li>Potential costs can escalate with heavy usage</li>
+        <li>Overkill for small-scale analytics</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-section">
+    <h4>💻 Code Preview</h4>
+    <div class="code-block">
+      <span class="label">server-side · Azure Function (Node.js)</span>
+<span class="comment">// Azure Function — HTTP trigger with Cosmos DB output binding</span>
+<span class="obj">module</span>.<span class="obj">exports</span> = <span class="keyword">async</span> <span class="keyword">function</span>(<span class="obj">context</span>, <span class="obj">req</span>) {
+    <span class="keyword">const</span> <span class="obj">data</span> = <span class="obj">req</span>.<span class="obj">body</span>;
+    <span class="obj">context</span>.<span class="obj">bindings</span>.<span class="obj">cosmosOutput</span> = {
+        ...<span class="obj">data</span>,
+        <span class="obj">id</span>: <span class="type">Date</span>.<span class="method">now</span>().<span class="method">toString</span>(),
+        <span class="obj">timestamp</span>: <span class="keyword">new</span> <span class="type">Date</span>()
+    };
+    <span class="obj">context</span>.<span class="obj">res</span> = { <span class="obj">status</span>: <span class="num">200</span>, <span class="obj">body</span>: <span class="string">'OK'</span> };
+};
+    </div>
+    <div class="code-block" style="margin-top:12px">
+      <span class="label">game-side · JavaScript</span>
+<span class="comment">// In game — POST to Azure Function</span>
+<span class="func">fetch</span>(<span class="string">'https://your-func.azurewebsites.net/api/analytics'</span>, {
+  <span class="obj">method</span>: <span class="string">'POST'</span>,
+  <span class="obj">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+  <span class="obj">body</span>: <span class="const">JSON</span>.<span class="method">stringify</span>(<span class="obj">analyticsData</span>)
+});
+    </div>
+  </div>
+  <a class="choose-btn" href="https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview" target="_blank" rel="noopener">Choose Azure — View Docs</a>
+</div>
+
+<!-- ==================== PANEL 4: Power Automate ==================== -->
+<div class="tab-panel" data-panel="4">
+  <div class="panel-header">
+    <h3>⚡ Power Automate + SharePoint List</h3>
+    <div class="badges">
+      <span class="badge badge-paid">M365 LICENSE</span>
+      <span class="badge badge-rec">Best for M365 Users</span>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:8px;font-size:.88rem;">Game POSTs to a Power Automate HTTP trigger flow, which creates items in a SharePoint list.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-node"><span class="arch-icon">🎮</span><span class="arch-label"><strong>Browser</strong>OKR Miner Game</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">⚡</span><span class="arch-label"><strong>Power Automate</strong>HTTP Trigger</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">📋</span><span class="arch-label"><strong>SharePoint</strong>List items</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">📊</span><span class="arch-label"><strong>Power BI</strong>SharePoint Views</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <table class="detail-table">
+      <tr><th>Setup Time</th><td>~30 minutes</td></tr>
+      <tr><th>Cost</th><td>$0 if you have M365 E3/E5</td></tr>
+      <tr><th>Request Limits</th><td>Varies by M365 plan (daily run limits)</td></tr>
+      <tr><th>Latency</th><td>~3-5 seconds</td></tr>
+      <tr><th>Query Capability</th><td>SharePoint list views / Power BI</td></tr>
+      <tr><th>Real-time?</th><td>No</td></tr>
+      <tr><th>Dashboard</th><td>Power BI / SharePoint views</td></tr>
+    </table>
+    <div class="pros-cons">
+      <h4 class="pros-title">✓ Pros</h4>
+      <ul class="pro-list">
+        <li>No extra services — uses existing M365 license</li>
+        <li>Power BI integration out of the box</li>
+        <li>SharePoint lists are familiar &amp; easy to browse</li>
+        <li>Power Automate can add notifications &amp; alerts</li>
+        <li>IT-approved — stays within your org's tenant</li>
+      </ul>
+      <h4 class="cons-title" style="margin-top:16px">✗ Cons</h4>
+      <ul class="con-list">
+        <li>Requires M365 license with Power Automate</li>
+        <li>Daily flow run limits vary by plan</li>
+        <li>~3-5 second latency per request</li>
+        <li>SharePoint list has 30M item limit</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-section">
+    <h4>💻 Code Preview</h4>
+    <div class="code-block">
+      <span class="label">game-side · JavaScript</span>
+<span class="comment">// In game — POST to Power Automate HTTP trigger</span>
+<span class="func">fetch</span>(<span class="string">'https://prod-XX.westus.logic.azure.com:443/workflows/YOUR_FLOW_ID/triggers/manual/paths/invoke?api-version=2016-06-01&amp;sp=%2Ftriggers%2Fmanual%2Frun&amp;sv=1.0&amp;sig=YOUR_SIG'</span>, {
+  <span class="obj">method</span>: <span class="string">'POST'</span>,
+  <span class="obj">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+  <span class="obj">body</span>: <span class="const">JSON</span>.<span class="method">stringify</span>(<span class="obj">analyticsData</span>)
+});
+    </div>
+    <div class="code-block" style="margin-top:12px">
+      <span class="label">Power Automate Flow — Steps</span>
+<span class="comment">// Trigger: "When an HTTP request is received"</span>
+<span class="comment">// → Action: "Create item" in SharePoint list</span>
+<span class="comment">//</span>
+<span class="comment">// SharePoint List Columns:</span>
+<span class="comment">//   SessionDate    (Date/Time)</span>
+<span class="comment">//   Duration       (Number)</span>
+<span class="comment">//   Mode           (Text)</span>
+<span class="comment">//   Milestones     (Number)</span>
+<span class="comment">//   PeakOKR        (Number)</span>
+<span class="comment">//   BuildingsPlaced (Number)</span>
+    </div>
+  </div>
+  <a class="choose-btn" href="https://learn.microsoft.com/en-us/power-automate/getting-started" target="_blank" rel="noopener">Choose Power Automate — View Docs</a>
+</div>
+
+<!-- ==================== PANEL 5: Cloudflare ==================== -->
+<div class="tab-panel" data-panel="5">
+  <div class="panel-header">
+    <h3>🌐 Cloudflare Workers + D1</h3>
+    <div class="badges">
+      <span class="badge badge-free">FREE</span>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);margin-bottom:8px;font-size:.88rem;">Game POSTs to a Cloudflare Worker at the edge, which writes to D1 (SQLite at the edge).</p>
+
+  <div class="arch-diagram">
+    <div class="arch-node"><span class="arch-icon">🎮</span><span class="arch-label"><strong>Browser</strong>OKR Miner Game</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">⚡</span><span class="arch-label"><strong>CF Worker</strong>Edge function</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">🗃️</span><span class="arch-label"><strong>D1 SQLite</strong>Edge database</span></div>
+    <div class="arch-arrow arrow-animated"><svg width="60" height="20"><line class="arrow-line" x1="0" y1="10" x2="48" y2="10"/><polygon class="arrow-head" points="48,5 58,10 48,15"/></svg></div>
+    <div class="arch-node"><span class="arch-icon">📈</span><span class="arch-label"><strong>Dashboard</strong>Cloudflare Dash</span></div>
+  </div>
+
+  <div class="detail-grid">
+    <table class="detail-table">
+      <tr><th>Setup Time</th><td>~25 minutes</td></tr>
+      <tr><th>Cost</th><td>$0 (100K req/day, 5GB D1)</td></tr>
+      <tr><th>Request Limits</th><td>100,000 requests/day</td></tr>
+      <tr><th>Latency</th><td>~50ms (edge network!)</td></tr>
+      <tr><th>Query Capability</th><td>Full SQLite SQL</td></tr>
+      <tr><th>Real-time?</th><td>No (but very fast polling)</td></tr>
+      <tr><th>Dashboard</th><td>Cloudflare Dashboard + custom</td></tr>
+    </table>
+    <div class="pros-cons">
+      <h4 class="pros-title">✓ Pros</h4>
+      <ul class="pro-list">
+        <li>Blazing fast — runs on edge network (~50ms)</li>
+        <li>Very generous free tier (100K req/day)</li>
+        <li>Real SQL — SQLite with full query power</li>
+        <li>Cloudflare dashboard &amp; analytics</li>
+        <li>Global edge deployment by default</li>
+      </ul>
+      <h4 class="cons-title" style="margin-top:16px">✗ Cons</h4>
+      <ul class="con-list">
+        <li>Requires Cloudflare account</li>
+        <li>D1 is still in beta — potential breaking changes</li>
+        <li>Need to write Worker code yourself</li>
+        <li>Less familiar ecosystem than AWS/Azure</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-section">
+    <h4>💻 Code Preview</h4>
+    <div class="code-block">
+      <span class="label">worker · Cloudflare Worker</span>
+<span class="comment">// Cloudflare Worker with D1 binding</span>
+<span class="keyword">export default</span> {
+  <span class="keyword">async</span> <span class="func">fetch</span>(<span class="obj">request</span>, <span class="obj">env</span>) {
+    <span class="keyword">const</span> <span class="obj">data</span> = <span class="keyword">await</span> <span class="obj">request</span>.<span class="method">json</span>();
+    <span class="keyword">await</span> <span class="obj">env</span>.<span class="obj">DB</span>.<span class="method">prepare</span>(
+      <span class="string">'INSERT INTO analytics (data, ts) VALUES (?, ?)'</span>
+    ).<span class="method">bind</span>(<span class="const">JSON</span>.<span class="method">stringify</span>(<span class="obj">data</span>), <span class="type">Date</span>.<span class="method">now</span>()).<span class="method">run</span>();
+
+    <span class="keyword">return new</span> <span class="type">Response</span>(<span class="string">'OK'</span>, {
+      <span class="obj">headers</span>: { <span class="string">'Access-Control-Allow-Origin'</span>: <span class="string">'*'</span> }
+    });
+  }
+};
+    </div>
+    <div class="code-block" style="margin-top:12px">
+      <span class="label">game-side · JavaScript</span>
+<span class="comment">// In game — POST to Cloudflare Worker</span>
+<span class="func">fetch</span>(<span class="string">'https://analytics.your-worker.workers.dev'</span>, {
+  <span class="obj">method</span>: <span class="string">'POST'</span>,
+  <span class="obj">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+  <span class="obj">body</span>: <span class="const">JSON</span>.<span class="method">stringify</span>(<span class="obj">analyticsData</span>)
+});
+    </div>
+  </div>
+  <a class="choose-btn" href="https://developers.cloudflare.com/workers/" target="_blank" rel="noopener">Choose Cloudflare — View Docs</a>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  <div class="container">OKR Miner — Analytics Backend Comparison &nbsp;·&nbsp; Pick one, wire it up, ship it 🚀</div>
+</footer>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = btn.dataset.tab;
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelector(`.tab-panel[data-panel="${idx}"]`).classList.add('active');
+    });
+  });
+
+  // Keyboard navigation (left/right arrows)
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      const current = document.querySelector('.tab-btn.active');
+      const idx = parseInt(current.dataset.tab);
+      const next = e.key === 'ArrowRight' ? (idx + 1) % 6 : (idx + 5) % 6;
+      document.querySelector(`.tab-btn[data-tab="${next}"]`).click();
+    }
+  });
+</script>
+</body>
+</html>
