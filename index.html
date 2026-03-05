@@ -2494,6 +2494,7 @@
             this.camera.offsetY += (this.camera.targetOffsetY - this.camera.offsetY) * 0.12;
 
             ctx.save();
+            try {
             ctx.translate(this.screenShake.x, this.screenShake.y);
 
             // Background always fills the screen (drawn before camera transform)
@@ -2501,6 +2502,7 @@
 
             // Apply camera transform for all world-space elements
             ctx.save();
+            try {
             ctx.translate(this.camera.offsetX, this.camera.offsetY);
             ctx.scale(this.camera.zoom, this.camera.zoom);
 
@@ -2513,7 +2515,6 @@
             var edges = this.computeConnectionEdges();
             for (var i = 0; i < edges.length; i++) {
                 var e = edges[i];
-                // Determine type from the "from" node for coloring
                 var nodeIdx = e.from.idx;
                 var edgeType = (nodeIdx >= 0 && this.nodes[nodeIdx]) ? this.nodes[nodeIdx].type : 'collector';
                 this.drawPixelConnection(ctx, e.from.x, e.from.y, e.to.x, e.to.y, edgeType);
@@ -2527,7 +2528,7 @@
 
             // Building nodes
             for (var i = 0; i < this.nodes.length; i++) {
-                this.drawPixelNode(ctx, this.nodes[i]);
+                try { this.drawPixelNode(ctx, this.nodes[i]); } catch(e) { console.error('drawPixelNode error:', e); }
             }
 
             // Draw info tooltip for hovered node
@@ -2535,30 +2536,29 @@
                 var n = this.nodes[i];
                 var dx = this.mouseX - n.x, dy = this.mouseY - n.y;
                 if (Math.sqrt(dx*dx + dy*dy) < 25) {
-                    this.drawNodeTooltip(ctx, n);
+                    try { this.drawNodeTooltip(ctx, n); } catch(e) { console.error('tooltip error:', e); }
                     break;
                 }
             }
 
             // Placement ghost preview at mouse cursor
-            this.drawPlacementPreview(ctx, fX, fY);
+            try { this.drawPlacementPreview(ctx, fX, fY); } catch(e) { console.error('preview error:', e); }
 
             // World-space effects
             this.drawParticles(ctx);
             this.drawShips(ctx);
-            this.drawRepairDrones(ctx);
-            this.drawThiefShips(ctx);
-            // Floating texts are world-space (tied to node/click positions)
+            try { this.drawRepairDrones(ctx); } catch(e) {}
+            try { this.drawThiefShips(ctx); } catch(e) {}
             this.drawFloatingTexts(ctx);
 
-            ctx.restore(); // end camera transform
+            } finally { ctx.restore(); } // end camera transform
 
             // Screen-space UI elements (not affected by camera)
             this.drawComboDisplay(ctx, w, h);
             this.drawEventBanner(ctx, w, h);
             this.drawScanlines(ctx, w, h);
 
-            ctx.restore(); // end screen shake
+            } finally { ctx.restore(); } // end screen shake
         };
 
         // =========================================================
