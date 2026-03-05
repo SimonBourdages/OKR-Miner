@@ -677,12 +677,6 @@
         <div style="max-width:600px;margin:0 auto;">
             <h2 style="color:#ff9800;font-size:24px;text-align:center;margin-bottom:16px;">🐛 Bug Report / Suggestion</h2>
             <div style="margin-bottom:12px;">
-                <label style="color:#8cf;font-size:12px;display:block;margin-bottom:4px;">Screenshot (auto-captured)</label>
-                <div style="border:1px solid #456;border-radius:6px;overflow:hidden;background:#111;">
-                    <img id="bugScreenshot" style="width:100%;display:block;" />
-                </div>
-            </div>
-            <div style="margin-bottom:12px;">
                 <label style="color:#8cf;font-size:12px;display:block;margin-bottom:4px;">Type</label>
                 <select id="bugType" style="width:100%;padding:8px;background:#111;color:#fff;border:1px solid #456;border-radius:4px;font-family:inherit;font-size:14px;">
                     <option value="bug">🐛 Bug Report</option>
@@ -703,6 +697,12 @@
                 <input id="bugContact" type="text" placeholder="e.g. your@email.com or @username" style="width:100%;padding:8px;background:#111;color:#fff;border:1px solid #456;border-radius:4px;font-family:inherit;font-size:14px;box-sizing:border-box;" />
             </div>
             <div id="bugGameState" style="margin-bottom:12px;padding:8px;background:#0a0a0a;border:1px solid #333;border-radius:4px;font-size:10px;color:#666;max-height:60px;overflow:hidden;"></div>
+            <div style="margin-bottom:12px;">
+                <label style="color:#8cf;font-size:12px;display:block;margin-bottom:4px;">Screenshot (auto-captured)</label>
+                <div style="border:1px solid #456;border-radius:6px;overflow:hidden;background:#111;">
+                    <img id="bugScreenshot" style="width:100%;display:block;" />
+                </div>
+            </div>
             <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
                 <button onclick="game.submitBugReport()" style="background:#ff9800;color:#000;border:none;padding:10px 30px;font-family:inherit;font-size:14px;font-weight:bold;cursor:pointer;border-radius:6px;">Submit to GitHub</button>
                 <button onclick="game.closeBugReport()" style="background:#333;color:#fff;border:1px solid #666;padding:10px 30px;font-family:inherit;font-size:14px;cursor:pointer;border-radius:6px;">Cancel</button>
