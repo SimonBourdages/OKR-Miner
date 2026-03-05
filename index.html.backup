@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Dominos - Corporate Automation Evolution</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .ui-overlay > * {
+            pointer-events: auto;
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .currency-display {
+            display: flex;
+            gap: 30px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .currency-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+
+        .phase-indicator {
+            font-size: 18px;
+            color: #4ecdc4;
+            text-align: right;
+        }
+
+        .shop-panel {
+            position: absolute;
+            right: 20px;
+            top: 100px;
+            width: 350px;
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #4ecdc4;
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            max-height: 70vh;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .shop-panel.active {
+            display: block;
+        }
+
+        .shop-toggle {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4ecdc4;
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .shop-toggle:hover {
+            background: #3dada4;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .upgrade-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-name {
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .upgrade-level {
+            color: #ffaa00;
+        }
+
+        .upgrade-description {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-button {
+            width: 100%;
+            padding: 10px;
+            background: #4ecdc4;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .upgrade-button:hover:not(:disabled) {
+            background: #3dada4;
+            transform: scale(1.02);
+        }
+
+        .upgrade-button:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .workers-panel {
+            position: absolute;
+            left: 20px;
+            top: 100px;
+            width: 350px;
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            max-height: 70vh;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .workers-panel.active {
+            display: block;
+        }
+
+        .worker-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255,107,107,0.3);
+        }
+
+        .automation-panel {
+            position: absolute;
+            left: 50%;
+            top: 100px;
+            transform: translateX(-50%);
+            width: 500px;
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #a864fd;
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            max-height: 70vh;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .automation-panel.active {
+            display: block;
+        }
+
+        .building-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .building-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(168,100,253,0.3);
+            text-align: center;
+        }
+
+        .cutscene-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            animation: fadeIn 1s;
+        }
+
+        .cutscene-overlay.active {
+            display: flex;
+        }
+
+        .cutscene-content {
+            text-align: center;
+            color: white;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .cutscene-title {
+            font-size: 48px;
+            color: #4ecdc4;
+            margin-bottom: 30px;
+            animation: glow 2s infinite;
+        }
+
+        .cutscene-text {
+            font-size: 24px;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .cutscene-button {
+            margin-top: 40px;
+            padding: 20px 60px;
+            font-size: 24px;
+            background: #4ecdc4;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .cutscene-button:hover {
+            background: #3dada4;
+            transform: scale(1.1);
+        }
+
+        .win-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .win-screen.active {
+            display: flex;
+        }
+
+        .win-content {
+            text-align: center;
+            color: white;
+            max-width: 700px;
+            padding: 60px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+        }
+
+        .win-title {
+            font-size: 64px;
+            margin-bottom: 30px;
+            animation: rainbow 3s infinite;
+        }
+
+        .win-stats {
+            font-size: 20px;
+            margin: 30px 0;
+            line-height: 2;
+        }
+
+        .win-choices {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .win-choice {
+            padding: 20px 40px;
+            font-size: 18px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .win-choice:hover {
+            background: white;
+            color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .controls-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 30px;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #4ecdc4;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a3a0);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px #4ecdc4; }
+            50% { text-shadow: 0 0 40px #4ecdc4, 0 0 60px #4ecdc4; }
+        }
+
+        @keyframes rainbow {
+            0% { color: #ff6b6b; }
+            33% { color: #4ecdc4; }
+            66% { color: #a864fd; }
+            100% { color: #ff6b6b; }
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #4ecdc4;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #4ecdc4;
+            padding-bottom: 10px;
+        }
+
+        .stat-display {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="ui-overlay">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="currency-display" id="currencyDisplay"></div>
+            <div class="phase-indicator" id="phaseIndicator"></div>
+        </div>
+
+        <!-- Shop Toggle -->
+        <button class="shop-toggle" onclick="game.toggleShop()">SHOP</button>
+
+        <!-- Shop Panel (Phase 1) -->
+        <div class="shop-panel" id="shopPanel"></div>
+
+        <!-- Workers Panel (Phase 2) -->
+        <div class="workers-panel" id="workersPanel"></div>
+
+        <!-- Automation Panel (Phase 3) -->
+        <div class="automation-panel" id="automationPanel"></div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Controls Hint -->
+        <div class="controls-hint" id="controlsHint">
+            WASD/Arrows: Move | Space: Jump | Shift: Sprint | E: Collect | ESC: Shop
+        </div>
+    </div>
+
+    <!-- Cutscene Overlay -->
+    <div class="cutscene-overlay" id="cutsceneOverlay">
+        <div class="cutscene-content" id="cutsceneContent"></div>
+    </div>
+
+    <!-- Win Screen -->
+    <div class="win-screen" id="winScreen">
+        <div class="win-content" id="winContent"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ==================== GAME STATE ====================
+        const gameState = {
+            phase: 1,
+            currencies: { dp: 0, mp: 0, ac: 0 },
+            totalOKRsDelivered: 0,
+            currentOKRs: 0,
+            evolutionsComplete: 0,
+            stats: {
+                speed: 1,
+                jump: 1,
+                capacity: 1,
+                sprint: 1,
+                autoCollect: 0
+            },
+            upgrades: {
+                movementSpeed: 0,
+                jumpHeight: 0,
+                carryCapacity: 0,
+                sprintDuration: 0,
+                autoCollectRadius: 0
+            },
+            aiWorkers: [],
+            buildings: [],
+            automationBuildings: [],
+            achievements: [],
+            shopOpen: false
+        };
+
+        // ==================== UPGRADE DEFINITIONS ====================
+        const Phase1Upgrades = {
+            movementSpeed: { 
+                cost: [5,10,20,40,80], 
+                max: 5, 
+                name: 'Movement Speed',
+                effect: '+10% speed per level'
+            },
+            jumpHeight: { 
+                cost: [5,10,20,40,80], 
+                max: 5,
+                name: 'Jump Height',
+                effect: '+10% jump per level'
+            },
+            carryCapacity: { 
+                cost: [10,25,50,100], 
+                max: 4,
+                name: 'Carry Capacity',
+                effect: '+1 OKR capacity'
+            },
+            sprintDuration: { 
+                cost: [15,30,60], 
+                max: 3,
+                name: 'Sprint Duration',
+                effect: '+2 sec sprint'
+            },
+            autoCollectRadius: { 
+                cost: [50,100,200], 
+                max: 3,
+                name: 'Auto-Collect Radius',
+                effect: 'Radius: 0/2/4/6 units'
+            }
+        };
+
+        const AIWorkers = {
+            runner1: { hireCost: 10, deliveryRate: 1, name: 'Junior Runner' },
+            runner2: { hireCost: 25, deliveryRate: 2, name: 'Senior Runner' },
+            runner3: { hireCost: 50, deliveryRate: 3, name: 'Elite Runner' },
+            speedUpgrade: { cost: 20, effect: '+25% worker speed' },
+            capacityUpgrade: { cost: 30, effect: '+1 worker capacity' }
+        };
+
+        const Buildings = {
+            coffeeStation: { cost: 100, effect: 'All workers +50% speed', owned: false },
+            deliveryHub: { cost: 150, effect: '+10 OKRs/min passive', owned: false },
+            trainingRoom: { cost: 200, effect: 'Workers +25% rate', owned: false },
+            automationNode: { cost: 500, effect: 'Unlock Evolution 2', owned: false }
+        };
+
+        const AutomationBuildings = {
+            conveyorBelt: { cost: 50, effect: 'Auto-transport OKRs', count: 0 },
+            processingNode: { cost: 100, effect: '10 OKRs/sec', rate: 10, count: 0 },
+            efficiencyCore: { cost: 200, effect: '2x all production', multiplier: 2, count: 0 },
+            quantumProcessor: { cost: 500, effect: '10x all production', multiplier: 10, count: 0 },
+            aiDirector: { cost: 1000, effect: '+100 OKRs/sec', rate: 100, count: 0 },
+            okrFactory: { cost: 500, effect: '+50 OKRs/sec', rate: 50, count: 0 },
+            cloneLab: { cost: 1000, effect: '+200 OKRs/sec', rate: 200, count: 0 },
+            theCloud: { cost: 5000, effect: '+1000 OKRs/sec', rate: 1000, count: 0 }
+        };
+
+        // ==================== THREE.JS SETUP ====================
+        const canvas = document.getElementById('gameCanvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 20, 10);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        // ==================== GAME OBJECTS ====================
+        let player, jrod;
+        const okrs = [];
+        const aiWorkerObjects = [];
+        const platforms = [];
+
+        // Player
+        const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
+        const playerMaterial = new THREE.MeshPhongMaterial({ color: 0x4ecdc4 });
+        player = new THREE.Mesh(playerGeometry, playerMaterial);
+        player.position.set(0, 1, 0);
+        player.castShadow = true;
+        scene.add(player);
+
+        // Player physics
+        const playerState = {
+            velocity: new THREE.Vector3(),
+            onGround: false,
+            sprintTime: 0,
+            maxSprintTime: 5
+        };
+
+        // Jrod (delivery target)
+        const jrodGeometry = new THREE.BoxGeometry(2, 3, 2);
+        const jrodMaterial = new THREE.MeshPhongMaterial({ color: 0xff6b6b });
+        jrod = new THREE.Mesh(jrodGeometry, jrodMaterial);
+        jrod.position.set(40, 1.5, 0);
+        jrod.castShadow = true;
+        scene.add(jrod);
+
+        // Ground
+        const groundGeometry = new THREE.PlaneGeometry(100, 50);
+        const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x2d4a3e });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        platforms.push({ mesh: ground, box: new THREE.Box3().setFromObject(ground) });
+
+        // Platforms for platforming
+        function createPlatform(x, y, z, width, height, depth) {
+            const geometry = new THREE.BoxGeometry(width, height, depth);
+            const material = new THREE.MeshPhongMaterial({ color: 0x95a5a6 });
+            const platform = new THREE.Mesh(geometry, material);
+            platform.position.set(x, y, z);
+            platform.receiveShadow = true;
+            platform.castShadow = true;
+            scene.add(platform);
+            platforms.push({ mesh: platform, box: new THREE.Box3().setFromObject(platform) });
+            return platform;
+        }
+
+        // Create level platforms
+        createPlatform(10, 1, 0, 8, 2, 8);
+        createPlatform(20, 3, 0, 8, 2, 8);
+        createPlatform(30, 5, 0, 8, 2, 8);
+        createPlatform(40, 2, 0, 10, 2, 10);
+
+        // Spawn OKRs
+        function spawnOKR(x, y, z) {
+            const geometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const material = new THREE.MeshPhongMaterial({ 
+                color: 0xffaa00,
+                emissive: 0xffaa00,
+                emissiveIntensity: 0.5
+            });
+            const okr = new THREE.Mesh(geometry, material);
+            okr.position.set(x, y, z);
+            okr.castShadow = true;
+            scene.add(okr);
+            okrs.push(okr);
+        }
+
+        // Initial OKRs
+        function spawnInitialOKRs() {
+            for (let i = 0; i < 10; i++) {
+                const x = Math.random() * 40;
+                const z = (Math.random() - 0.5) * 20;
+                const y = 2 + Math.random() * 5;
+                spawnOKR(x, y, z);
+            }
+        }
+
+        spawnInitialOKRs();
+
+        // Camera setup
+        camera.position.set(0, 10, 20);
+        camera.lookAt(player.position);
+
+        // ==================== INPUT HANDLING ====================
+        const keys = {};
+        window.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.key === 'Escape') game.toggleShop();
+            if (e.key.toLowerCase() === 'e') game.collectOKRs();
+        });
+        window.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        // ==================== GAME LOGIC ====================
+        const game = {
+            init() {
+                this.loadGame();
+                this.updateUI();
+                this.startGameLoop();
+                this.startAutoSave();
+            },
+
+            startGameLoop() {
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    this.update();
+                    renderer.render(scene, camera);
+                };
+                animate();
+            },
+
+            update() {
+                const delta = 0.016;
+                this.updatePlayer(delta);
+                this.updateCamera();
+                this.updateOKRs(delta);
+                this.updateAIWorkers(delta);
+                this.updateAutomation(delta);
+                this.checkDelivery();
+                this.checkEvolutions();
+                this.updateUI();
+            },
+
+            updatePlayer(delta) {
+                const moveSpeed = 10 * gameState.stats.speed * delta;
+                const jumpPower = 8 * gameState.stats.jump;
+                const isSprinting = keys['shift'] && playerState.sprintTime > 0;
+                const actualSpeed = isSprinting ? moveSpeed * 1.5 : moveSpeed;
+
+                // Movement
+                if (keys['w'] || keys['arrowup']) {
+                    player.position.z -= actualSpeed;
+                }
+                if (keys['s'] || keys['arrowdown']) {
+                    player.position.z += actualSpeed;
+                }
+                if (keys['a'] || keys['arrowleft']) {
+                    player.position.x -= actualSpeed;
+                }
+                if (keys['d'] || keys['arrowright']) {
+                    player.position.x += actualSpeed;
+                }
+
+                // Sprint management
+                if (isSprinting) {
+                    playerState.sprintTime -= delta;
+                } else if (playerState.sprintTime < playerState.maxSprintTime) {
+                    playerState.sprintTime += delta * 0.5;
+                }
+
+                // Gravity
+                playerState.velocity.y -= 20 * delta;
+                player.position.y += playerState.velocity.y * delta;
+
+                // Jump
+                if (keys[' '] && playerState.onGround) {
+                    playerState.velocity.y = jumpPower;
+                    playerState.onGround = false;
+                }
+
+                // Ground collision
+                playerState.onGround = false;
+                const playerBox = new THREE.Box3().setFromObject(player);
+                
+                for (const platform of platforms) {
+                    platform.box.setFromObject(platform.mesh);
+                    if (playerBox.intersectsBox(platform.box)) {
+                        if (playerState.velocity.y < 0) {
+                            player.position.y = platform.mesh.position.y + platform.mesh.geometry.parameters.height / 2 + 1;
+                            playerState.velocity.y = 0;
+                            playerState.onGround = true;
+                        }
+                    }
+                }
+
+                // Boundaries
+                player.position.x = Math.max(-10, Math.min(50, player.position.x));
+                player.position.z = Math.max(-20, Math.min(20, player.position.z));
+                if (player.position.y < -10) {
+                    player.position.set(0, 5, 0);
+                    playerState.velocity.set(0, 0, 0);
+                }
+
+                // Auto-collect
+                if (gameState.stats.autoCollect > 0) {
+                    this.autoCollectOKRs();
+                }
+            },
+
+            updateCamera() {
+                camera.position.x = player.position.x;
+                camera.position.y = player.position.y + 10;
+                camera.position.z = player.position.z + 20;
+                camera.lookAt(player.position);
+            },
+
+            updateOKRs(delta) {
+                okrs.forEach(okr => {
+                    okr.rotation.y += delta * 2;
+                });
+            },
+
+            collectOKRs() {
+                const collectRadius = 2;
+                const playerPos = player.position;
+                const capacity = 1 + gameState.stats.capacity;
+
+                for (let i = okrs.length - 1; i >= 0; i--) {
+                    if (gameState.currentOKRs >= capacity) break;
+                    
+                    const okr = okrs[i];
+                    const distance = playerPos.distanceTo(okr.position);
+                    
+                    if (distance < collectRadius) {
+                        scene.remove(okr);
+                        okrs.splice(i, 1);
+                        gameState.currentOKRs++;
+                    }
+                }
+
+                // Respawn OKRs if needed
+                if (okrs.length < 5) {
+                    for (let i = 0; i < 3; i++) {
+                        const x = Math.random() * 40;
+                        const z = (Math.random() - 0.5) * 20;
+                        const y = 2 + Math.random() * 5;
+                        spawnOKR(x, y, z);
+                    }
+                }
+            },
+
+            autoCollectOKRs() {
+                const radius = gameState.stats.autoCollect;
+                const playerPos = player.position;
+                const capacity = 1 + gameState.stats.capacity;
+
+                for (let i = okrs.length - 1; i >= 0; i--) {
+                    if (gameState.currentOKRs >= capacity) break;
+                    
+                    const okr = okrs[i];
+                    const distance = playerPos.distanceTo(okr.position);
+                    
+                    if (distance < radius) {
+                        scene.remove(okr);
+                        okrs.splice(i, 1);
+                        gameState.currentOKRs++;
+                    }
+                }
+            },
+
+            checkDelivery() {
+                const distance = player.position.distanceTo(jrod.position);
+                if (distance < 3 && gameState.currentOKRs > 0) {
+                    const delivered = gameState.currentOKRs;
+                    gameState.totalOKRsDelivered += delivered;
+                    
+                    if (gameState.phase === 1) {
+                        gameState.currencies.dp += delivered;
+                    } else if (gameState.phase === 2) {
+                        gameState.currencies.mp += delivered;
+                    } else if (gameState.phase === 3) {
+                        gameState.currencies.ac += delivered;
+                    }
+                    
+                    gameState.currentOKRs = 0;
+                }
+            },
+
+            checkEvolutions() {
+                if (gameState.phase === 1 && gameState.currencies.dp >= 500 && gameState.evolutionsComplete === 0) {
+                    this.triggerEvolution1();
+                } else if (gameState.phase === 2 && gameState.currencies.mp >= 2000 && gameState.evolutionsComplete === 1) {
+                    this.triggerEvolution2();
+                } else if (gameState.phase === 3 && gameState.totalOKRsDelivered >= 10000 && gameState.evolutionsComplete === 2) {
+                    this.showWinScreen();
+                }
+            },
+
+            triggerEvolution1() {
+                const cutscene = document.getElementById('cutsceneOverlay');
+                const content = document.getElementById('cutsceneContent');
+                
+                content.innerHTML = `
+                    <div class="cutscene-title">PROMOTION!</div>
+                    <div class="cutscene-text">Congratulations! You've been promoted to Manager!</div>
+                    <div class="cutscene-text">You can now hire AI teammates to help deliver.</div>
+                    <div class="cutscene-text">Your stats are partially retained. Let's scale up!</div>
+                    <button class="cutscene-button" onclick="game.completeEvolution1()">BEGIN PHASE 2</button>
+                `;
+                
+                cutscene.classList.add('active');
+            },
+
+            completeEvolution1() {
+                // Keep 50% of stats
+                gameState.stats.speed = 1 + (gameState.stats.speed - 1) * 0.5;
+                gameState.stats.jump = 1 + (gameState.stats.jump - 1) * 0.5;
+                gameState.stats.capacity = Math.ceil(gameState.stats.capacity * 0.5);
+                
+                gameState.phase = 2;
+                gameState.evolutionsComplete = 1;
+                gameState.currencies.mp = 0;
+                
+                document.getElementById('cutsceneOverlay').classList.remove('active');
+                document.getElementById('workersPanel').classList.add('active');
+                
+                // Change scene to darker theme
+                scene.background = new THREE.Color(0x1a1a2e);
+                groundMaterial.color.set(0x1a1a2e);
+                
+                this.updateUI();
+            },
+
+            triggerEvolution2() {
+                const cutscene = document.getElementById('cutsceneOverlay');
+                const content = document.getElementById('cutsceneContent');
+                
+                content.innerHTML = `
+                    <div class="cutscene-title">ASCENSION!</div>
+                    <div class="cutscene-text">Exceptional work! You're now Director of Automation!</div>
+                    <div class="cutscene-text">Build fully automated systems. The machines will do the rest.</div>
+                    <div class="cutscene-text">Some bonuses retained. Time to transcend.</div>
+                    <button class="cutscene-button" onclick="game.completeEvolution2()">BEGIN PHASE 3</button>
+                `;
+                
+                cutscene.classList.add('active');
+            },
+
+            completeEvolution2() {
+                // Keep 25% of Phase 2 bonuses
+                const workerBonus = gameState.aiWorkers.length * 0.25;
+                
+                gameState.phase = 3;
+                gameState.evolutionsComplete = 2;
+                gameState.currencies.ac = Math.floor(workerBonus * 50);
+                
+                document.getElementById('cutsceneOverlay').classList.remove('active');
+                document.getElementById('workersPanel').classList.remove('active');
+                document.getElementById('automationPanel').classList.add('active');
+                
+                // Change to glitchy theme
+                scene.background = new THREE.Color(0x0a0a1e);
+                ambientLight.color.set(0xa864fd);
+                
+                this.updateUI();
+            },
+
+            showWinScreen() {
+                const winScreen = document.getElementById('winScreen');
+                const content = document.getElementById('winContent');
+                
+                const playTime = Math.floor((Date.now() - (gameState.startTime || Date.now())) / 1000 / 60);
+                
+                content.innerHTML = `
+                    <div class="win-title">DIGITAL TRANSFORMATION COMPLETE!</div>
+                    <div class="win-stats">
+                        <div>Total OKRs Delivered: ${gameState.totalOKRsDelivered.toLocaleString()}</div>
+                        <div>Play Time: ${playTime} minutes</div>
+                        <div>AI Workers Hired: ${gameState.aiWorkers.length}</div>
+                        <div>Buildings Built: ${gameState.automationBuildings.length}</div>
+                    </div>
+                    <div class="cutscene-text">You've achieved perfect efficiency.</div>
+                    <div class="cutscene-text">What will you do now?</div>
+                    <div class="win-choices">
+                        <button class="win-choice" onclick="game.winChoice('retire')">Retire<br>(Watch Forever)</button>
+                        <button class="win-choice" onclick="game.winChoice('optimize')">Optimize<br>(Merge with System)</button>
+                        <button class="win-choice" onclick="game.winChoice('restart')">Start Over<br>(New Game+ 2x)</button>
+                    </div>
+                `;
+                
+                winScreen.classList.add('active');
+            },
+
+            winChoice(choice) {
+                if (choice === 'retire') {
+                    alert('You retire to a digital beach. The automation runs forever. Thanks for playing!');
+                } else if (choice === 'optimize') {
+                    alert('You merge with the system, becoming one with the OKRs. Efficiency: 100%. Thanks for playing!');
+                } else if (choice === 'restart') {
+                    // New Game+ with 2x bonuses
+                    const newGame = {
+                        ...gameState,
+                        phase: 1,
+                        currencies: { dp: 0, mp: 0, ac: 0 },
+                        totalOKRsDelivered: 0,
+                        currentOKRs: 0,
+                        evolutionsComplete: 0,
+                        stats: {
+                            speed: 2,
+                            jump: 2,
+                            capacity: 2,
+                            sprint: 2,
+                            autoCollect: 0
+                        },
+                        upgrades: {
+                            movementSpeed: 0,
+                            jumpHeight: 0,
+                            carryCapacity: 0,
+                            sprintDuration: 0,
+                            autoCollectRadius: 0
+                        }
+                    };
+                    Object.assign(gameState, newGame);
+                    document.getElementById('winScreen').classList.remove('active');
+                    location.reload();
+                }
+            },
+
+            updateAIWorkers(delta) {
+                if (gameState.phase < 2) return;
+
+                // AI workers generate passive income
+                let totalRate = 0;
+                gameState.aiWorkers.forEach(worker => {
+                    let rate = worker.deliveryRate;
+                    
+                    // Apply building bonuses
+                    if (Buildings.coffeeStation.owned) rate *= 1.5;
+                    if (Buildings.trainingRoom.owned) rate *= 1.25;
+                    
+                    totalRate += rate;
+                });
+
+                // Add passive income from delivery hub
+                if (Buildings.deliveryHub.owned) {
+                    totalRate += 10 / 60; // 10 per minute
+                }
+
+                gameState.currencies.mp += totalRate * delta;
+
+                // Visual: Move AI workers
+                aiWorkerObjects.forEach((obj, idx) => {
+                    obj.position.x = 20 + Math.sin(Date.now() * 0.001 + idx) * 10;
+                    obj.position.z = Math.cos(Date.now() * 0.001 + idx) * 10;
+                });
+            },
+
+            updateAutomation(delta) {
+                if (gameState.phase < 3) return;
+
+                let totalRate = 0;
+                let multiplier = 1;
+
+                // Calculate base rate
+                Object.keys(AutomationBuildings).forEach(key => {
+                    const building = AutomationBuildings[key];
+                    if (building.rate && building.count > 0) {
+                        totalRate += building.rate * building.count;
+                    }
+                    if (building.multiplier && building.count > 0) {
+                        multiplier *= Math.pow(building.multiplier, building.count);
+                    }
+                });
+
+                const finalRate = totalRate * multiplier;
+                gameState.currencies.ac += finalRate * delta;
+                gameState.totalOKRsDelivered += finalRate * delta;
+            },
+
+            toggleShop() {
+                gameState.shopOpen = !gameState.shopOpen;
+                const shopPanel = document.getElementById('shopPanel');
+                shopPanel.classList.toggle('active');
+                
+                if (gameState.shopOpen) {
+                    this.renderShop();
+                }
+            },
+
+            renderShop() {
+                const shopPanel = document.getElementById('shopPanel');
+                const currency = gameState.phase === 1 ? 'DP' : (gameState.phase === 2 ? 'MP' : 'AC');
+                const currencyAmount = gameState.currencies[currency.toLowerCase()];
+
+                let html = `<div class="section-title">UPGRADE SHOP</div>`;
+
+                if (gameState.phase === 1) {
+                    Object.keys(Phase1Upgrades).forEach(key => {
+                        const upgrade = Phase1Upgrades[key];
+                        const level = gameState.upgrades[key];
+                        const cost = level < upgrade.max ? upgrade.cost[level] : 0;
+                        const canAfford = currencyAmount >= cost;
+                        const maxed = level >= upgrade.max;
+
+                        html += `
+                            <div class="upgrade-item">
+                                <div class="upgrade-header">
+                                    <span class="upgrade-name">${upgrade.name}</span>
+                                    <span class="upgrade-level">Level ${level}/${upgrade.max}</span>
+                                </div>
+                                <div class="upgrade-description">${upgrade.effect}</div>
+                                <button class="upgrade-button" 
+                                    onclick="game.buyUpgrade('${key}')"
+                                    ${!canAfford || maxed ? 'disabled' : ''}>
+                                    ${maxed ? 'MAX LEVEL' : `Upgrade (${cost} ${currency})`}
+                                </button>
+                            </div>
+                        `;
+                    });
+                } else if (gameState.phase === 2) {
+                    html += `<h3>Hire Workers</h3>`;
+                    Object.keys(AIWorkers).forEach(key => {
+                        if (key.includes('Upgrade')) return;
+                        
+                        const worker = AIWorkers[key];
+                        const canAfford = gameState.currencies.mp >= worker.hireCost;
+
+                        html += `
+                            <div class="upgrade-item">
+                                <div class="upgrade-header">
+                                    <span class="upgrade-name">${worker.name}</span>
+                                    <span class="upgrade-level">${worker.deliveryRate} OKRs/min</span>
+                                </div>
+                                <button class="upgrade-button" 
+                                    onclick="game.hireWorker('${key}')"
+                                    ${!canAfford ? 'disabled' : ''}>
+                                    Hire (${worker.hireCost} MP)
+                                </button>
+                            </div>
+                        `;
+                    });
+
+                    html += `<h3 style="margin-top: 20px;">Buildings</h3>`;
+                    Object.keys(Buildings).forEach(key => {
+                        const building = Buildings[key];
+                        const canAfford = gameState.currencies.mp >= building.cost;
+
+                        html += `
+                            <div class="upgrade-item">
+                                <div class="upgrade-header">
+                                    <span class="upgrade-name">${key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                </div>
+                                <div class="upgrade-description">${building.effect}</div>
+                                <button class="upgrade-button" 
+                                    onclick="game.buyBuilding('${key}')"
+                                    ${!canAfford || building.owned ? 'disabled' : ''}>
+                                    ${building.owned ? 'OWNED' : `Build (${building.cost} MP)`}
+                                </button>
+                            </div>
+                        `;
+                    });
+                } else if (gameState.phase === 3) {
+                    html += `<div class="building-grid">`;
+                    Object.keys(AutomationBuildings).forEach(key => {
+                        const building = AutomationBuildings[key];
+                        const canAfford = gameState.currencies.ac >= building.cost;
+
+                        html += `
+                            <div class="building-item">
+                                <div class="upgrade-name">${key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                                <div class="upgrade-description">${building.effect}</div>
+                                <div class="upgrade-level">Owned: ${building.count}</div>
+                                <button class="upgrade-button" 
+                                    onclick="game.buyAutomation('${key}')"
+                                    ${!canAfford ? 'disabled' : ''}>
+                                    Build (${Math.floor(building.cost * Math.pow(1.15, building.count))} AC)
+                                </button>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+
+                shopPanel.innerHTML = html;
+            },
+
+            buyUpgrade(key) {
+                const upgrade = Phase1Upgrades[key];
+                const level = gameState.upgrades[key];
+                
+                if (level >= upgrade.max) return;
+                
+                const cost = upgrade.cost[level];
+                if (gameState.currencies.dp < cost) return;
+
+                gameState.currencies.dp -= cost;
+                gameState.upgrades[key]++;
+
+                // Apply stat changes
+                switch(key) {
+                    case 'movementSpeed':
+                        gameState.stats.speed += 0.1;
+                        break;
+                    case 'jumpHeight':
+                        gameState.stats.jump += 0.1;
+                        break;
+                    case 'carryCapacity':
+                        gameState.stats.capacity++;
+                        break;
+                    case 'sprintDuration':
+                        playerState.maxSprintTime += 2;
+                        break;
+                    case 'autoCollectRadius':
+                        gameState.stats.autoCollect = [0, 2, 4, 6][gameState.upgrades[key]];
+                        break;
+                }
+
+                this.renderShop();
+            },
+
+            hireWorker(key) {
+                const worker = AIWorkers[key];
+                if (gameState.currencies.mp < worker.hireCost) return;
+
+                gameState.currencies.mp -= worker.hireCost;
+                gameState.aiWorkers.push({
+                    type: key,
+                    deliveryRate: worker.deliveryRate,
+                    name: worker.name
+                });
+
+                // Add visual worker
+                const workerGeo = new THREE.BoxGeometry(0.8, 1.6, 0.8);
+                const workerMat = new THREE.MeshPhongMaterial({ color: 0xff6b6b });
+                const workerMesh = new THREE.Mesh(workerGeo, workerMat);
+                workerMesh.position.set(20, 1, gameState.aiWorkers.length * 2);
+                scene.add(workerMesh);
+                aiWorkerObjects.push(workerMesh);
+
+                this.renderShop();
+                this.updateWorkersPanel();
+            },
+
+            buyBuilding(key) {
+                const building = Buildings[key];
+                if (gameState.currencies.mp < building.cost || building.owned) return;
+
+                gameState.currencies.mp -= building.cost;
+                building.owned = true;
+                gameState.buildings.push(key);
+
+                this.renderShop();
+            },
+
+            buyAutomation(key) {
+                const building = AutomationBuildings[key];
+                const cost = Math.floor(building.cost * Math.pow(1.15, building.count));
+                
+                if (gameState.currencies.ac < cost) return;
+
+                gameState.currencies.ac -= cost;
+                building.count++;
+                gameState.automationBuildings.push(key);
+
+                this.renderShop();
+            },
+
+            updateWorkersPanel() {
+                const panel = document.getElementById('workersPanel');
+                let html = `<div class="section-title">AI WORKERS</div>`;
+
+                if (gameState.aiWorkers.length === 0) {
+                    html += `<p style="text-align: center; color: #888;">No workers hired yet</p>`;
+                } else {
+                    gameState.aiWorkers.forEach((worker, idx) => {
+                        let rate = worker.deliveryRate;
+                        if (Buildings.coffeeStation.owned) rate *= 1.5;
+                        if (Buildings.trainingRoom.owned) rate *= 1.25;
+
+                        html += `
+                            <div class="worker-item">
+                                <div class="upgrade-header">
+                                    <span class="upgrade-name">${worker.name}</span>
+                                    <span class="upgrade-level">${rate.toFixed(1)} OKRs/min</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    // Show total rate
+                    let totalRate = 0;
+                    gameState.aiWorkers.forEach(w => {
+                        let r = w.deliveryRate;
+                        if (Buildings.coffeeStation.owned) r *= 1.5;
+                        if (Buildings.trainingRoom.owned) r *= 1.25;
+                        totalRate += r;
+                    });
+                    if (Buildings.deliveryHub.owned) totalRate += 10;
+
+                    html += `
+                        <div class="stat-display">
+                            <span>Total Production:</span>
+                            <span style="color: #4ecdc4; font-weight: bold;">${totalRate.toFixed(1)} OKRs/min</span>
+                        </div>
+                    `;
+                }
+
+                panel.innerHTML = html;
+            },
+
+            updateUI() {
+                // Currency display
+                const currencyDisplay = document.getElementById('currencyDisplay');
+                let currencies = '';
+                
+                if (gameState.phase === 1) {
+                    currencies = `
+                        <div class="currency-item">
+                            <span>DP:</span>
+                            <span>${Math.floor(gameState.currencies.dp)}</span>
+                        </div>
+                        <div class="currency-item">
+                            <span>OKRs:</span>
+                            <span>${gameState.currentOKRs}/${1 + gameState.stats.capacity}</span>
+                        </div>
+                    `;
+                } else if (gameState.phase === 2) {
+                    currencies = `
+                        <div class="currency-item">
+                            <span>MP:</span>
+                            <span>${Math.floor(gameState.currencies.mp)}</span>
+                        </div>
+                        <div class="currency-item">
+                            <span>Workers:</span>
+                            <span>${gameState.aiWorkers.length}</span>
+                        </div>
+                    `;
+                } else if (gameState.phase === 3) {
+                    currencies = `
+                        <div class="currency-item">
+                            <span>AC:</span>
+                            <span>${Math.floor(gameState.currencies.ac).toLocaleString()}</span>
+                        </div>
+                        <div class="currency-item">
+                            <span>OKRs/sec:</span>
+                            <span>${this.calculateProductionRate().toFixed(1)}</span>
+                        </div>
+                    `;
+                }
+                
+                currencyDisplay.innerHTML = currencies;
+
+                // Phase indicator
+                const phaseIndicator = document.getElementById('phaseIndicator');
+                const phaseNames = ['Manual Delivery', 'Team Management', 'Full Automation'];
+                const targets = [500, 2000, 10000];
+                const currentProgress = gameState.phase === 1 ? gameState.currencies.dp : 
+                                       gameState.phase === 2 ? gameState.currencies.mp :
+                                       gameState.totalOKRsDelivered;
+                
+                phaseIndicator.innerHTML = `
+                    <div>Phase ${gameState.phase}: ${phaseNames[gameState.phase - 1]}</div>
+                    <div style="font-size: 14px; color: #888;">
+                        ${gameState.phase < 3 ? 
+                            `Next Evolution: ${currentProgress.toFixed(0)}/${targets[gameState.phase - 1]}` :
+                            `Total Delivered: ${gameState.totalOKRsDelivered.toFixed(0)}/10000`
+                        }
+                    </div>
+                `;
+
+                // Progress bar
+                const progressFill = document.getElementById('progressFill');
+                const progress = Math.min(100, (currentProgress / targets[gameState.phase - 1]) * 100);
+                progressFill.style.width = `${progress}%`;
+                progressFill.textContent = `${progress.toFixed(1)}%`;
+
+                // Update workers panel if in phase 2
+                if (gameState.phase === 2) {
+                    this.updateWorkersPanel();
+                }
+            },
+
+            calculateProductionRate() {
+                if (gameState.phase < 3) return 0;
+
+                let totalRate = 0;
+                let multiplier = 1;
+
+                Object.keys(AutomationBuildings).forEach(key => {
+                    const building = AutomationBuildings[key];
+                    if (building.rate && building.count > 0) {
+                        totalRate += building.rate * building.count;
+                    }
+                    if (building.multiplier && building.count > 0) {
+                        multiplier *= Math.pow(building.multiplier, building.count);
+                    }
+                });
+
+                return totalRate * multiplier;
+            },
+
+            saveGame() {
+                const saveData = {
+                    ...gameState,
+                    buildings: Object.fromEntries(
+                        Object.entries(Buildings).map(([k, v]) => [k, v.owned])
+                    ),
+                    automationBuildings: Object.fromEntries(
+                        Object.entries(AutomationBuildings).map(([k, v]) => [k, v.count])
+                    ),
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('teamDominosSave', JSON.stringify(saveData));
+            },
+
+            loadGame() {
+                const saved = localStorage.getItem('teamDominosSave');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        Object.assign(gameState, data);
+                        
+                        // Restore building states
+                        if (data.buildings) {
+                            Object.keys(data.buildings).forEach(key => {
+                                if (Buildings[key]) {
+                                    Buildings[key].owned = data.buildings[key];
+                                }
+                            });
+                        }
+                        
+                        if (data.automationBuildings) {
+                            Object.keys(data.automationBuildings).forEach(key => {
+                                if (AutomationBuildings[key]) {
+                                    AutomationBuildings[key].count = data.automationBuildings[key];
+                                }
+                            });
+                        }
+
+                        // Restore visual workers
+                        for (let i = 0; i < gameState.aiWorkers.length; i++) {
+                            const workerGeo = new THREE.BoxGeometry(0.8, 1.6, 0.8);
+                            const workerMat = new THREE.MeshPhongMaterial({ color: 0xff6b6b });
+                            const workerMesh = new THREE.Mesh(workerGeo, workerMat);
+                            workerMesh.position.set(20, 1, i * 2);
+                            scene.add(workerMesh);
+                            aiWorkerObjects.push(workerMesh);
+                        }
+
+                        // Show appropriate panels
+                        if (gameState.phase >= 2) {
+                            document.getElementById('workersPanel').classList.add('active');
+                        }
+                        if (gameState.phase >= 3) {
+                            document.getElementById('automationPanel').classList.add('active');
+                            document.getElementById('workersPanel').classList.remove('active');
+                        }
+                    } catch (e) {
+                        console.error('Failed to load save:', e);
+                    }
+                } else {
+                    gameState.startTime = Date.now();
+                }
+            },
+
+            startAutoSave() {
+                setInterval(() => {
+                    this.saveGame();
+                }, 10000);
+            }
+        };
+
+        // Window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Start game
+        game.init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visual Feedback Test</title>
+    <style>
+        body { background: #1a1a2e; color: #fff; font-family: monospace; padding: 20px; }
+        button { 
+            background: #E21A2C; 
+            color: #fff; 
+            border: none; 
+            padding: 15px 30px; 
+            font-size: 16px; 
+            margin: 10px; 
+            cursor: pointer; 
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.1s ease;
+        }
+        button:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(226,26,44,0.7);
+            filter: brightness(1.15);
+        }
+        button:active {
+            transform: scale(1.02);
+            filter: brightness(0.95);
+        }
+        #damage-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(255,0,0,0) 50%, rgba(255,0,0,0.3) 100%);
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+        #damage-overlay.active { opacity: 1; }
+        #floating-text-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 55;
+        }
+        .floating-text {
+            position: absolute;
+            font-weight: bold;
+            font-size: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            animation: floatUp 1.5s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-70px) scale(1); opacity: 0; }
+        }
+        #test-area {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        .hud-value {
+            font-size: 32px;
+            color: #FFD700;
+            display: inline-block;
+        }
+        .hud-value.animating { animation: hudPulse 0.3s ease-out; }
+        @keyframes hudPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); color: #FFD700; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Team Dominos - Visual Feedback Test</h1>
+    
+    <div>
+        <button onclick="testDamage()">💥 Test Damage Effect</button>
+        <button onclick="testPickup()">⭐ Test Pickup Feedback</button>
+        <button onclick="testDelivery()">🎉 Test Delivery Celebration</button>
+        <button onclick="testSound('pickup')">🔊 Test Pickup Sound</button>
+        <button onclick="testSound('powerup')">🔊 Test Powerup Sound</button>
+        <button onclick="testSound('delivery')">🔊 Test Delivery Sound</button>
+    </div>
+    
+    <div id="test-area">
+        <h3>Test Results:</h3>
+        <div id="results"></div>
+        <p>Tokens: <span class="hud-value" id="token-display">0</span></p>
+    </div>
+    
+    <div id="damage-overlay"></div>
+    <div id="floating-text-container"></div>
+    
+    <script>
+        let audioCtx = null;
+        let tokens = 0;
+        let tokenDisplayValue = 0;
+        
+        const SOUND_EFFECTS = {
+            damage: { freq: 100, duration: 0.15, type: 'sawtooth' },
+            pickup: { freq: 600, duration: 0.1, type: 'sine' },
+            powerup: { freq: 800, duration: 0.2, type: 'square' },
+            delivery: { freq: 1000, duration: 0.3, type: 'triangle' }
+        };
+        
+        function playSound(soundType) {
+            if (!audioCtx) {
+                try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return; }
+            }
+            const sound = SOUND_EFFECTS[soundType];
+            if (!sound) return;
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = sound.type;
+            osc.frequency.value = sound.freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + sound.duration);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + sound.duration);
+        }
+        
+        function createFloatingText(text, x, y, color = '#FFD700', size = 20) {
+            const container = document.getElementById('floating-text-container');
+            const div = document.createElement('div');
+            div.className = 'floating-text';
+            div.textContent = text;
+            div.style.left = x + 'px';
+            div.style.top = y + 'px';
+            div.style.color = color;
+            div.style.fontSize = size + 'px';
+            container.appendChild(div);
+            setTimeout(() => div.remove(), 1500);
+        }
+        
+        function animateTokenCount(newValue) {
+            const step = () => {
+                const diff = newValue - tokenDisplayValue;
+                if (Math.abs(diff) < 0.5) {
+                    tokenDisplayValue = newValue;
+                    document.getElementById('token-display').textContent = Math.floor(tokenDisplayValue);
+                    return;
+                }
+                tokenDisplayValue += diff * 0.15;
+                document.getElementById('token-display').textContent = Math.floor(tokenDisplayValue);
+                requestAnimationFrame(step);
+            };
+            step();
+        }
+        
+        function animateHudValue(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.classList.add('animating');
+            setTimeout(() => el.classList.remove('animating'), 300);
+        }
+        
+        function testDamage() {
+            const overlay = document.getElementById('damage-overlay');
+            overlay.classList.add('active');
+            setTimeout(() => overlay.classList.remove('active'), 100);
+            playSound('damage');
+            createFloatingText('SCOPE CREEP!', Math.random() * window.innerWidth, Math.random() * 200 + 100, '#FF0000', 24);
+            log('✅ Damage effect triggered: red flash + sound + floating text');
+        }
+        
+        function testPickup() {
+            playSound('pickup');
+            tokens += 5;
+            animateTokenCount(tokens);
+            animateHudValue('token-display');
+            createFloatingText('+5', Math.random() * window.innerWidth, Math.random() * 200 + 100, '#FFD700', 18);
+            log('✅ Pickup effect: sparkle sound + +5 tokens + floating text');
+        }
+        
+        function testDelivery() {
+            playSound('delivery');
+            tokens += 10;
+            animateTokenCount(tokens);
+            animateHudValue('token-display');
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFloatingText('🎉', Math.random() * window.innerWidth, Math.random() * 200 + 100, '#FFD700', 32);
+                }, i * 100);
+            }
+            log('✅ Delivery celebration: confetti + sound + token animation');
+        }
+        
+        function testSound(type) {
+            playSound(type);
+            log(`✅ Played ${type} sound effect`);
+        }
+        
+        function log(message) {
+            const results = document.getElementById('results');
+            const p = document.createElement('p');
+            p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(p);
+            if (results.children.length > 10) {
+                results.removeChild(results.firstChild);
+            }
+        }
+        
+        log('🎮 Visual feedback test page loaded. Click buttons to test effects!');
+    </script>
+</body>
+</html>

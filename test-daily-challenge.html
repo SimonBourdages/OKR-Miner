@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Challenge Test</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a2e; color: #fff; }
+    .test { margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; }
+    .pass { border-left: 4px solid #00cc66; }
+    .fail { border-left: 4px solid #E21A2C; }
+    h2 { color: #FFD700; }
+  </style>
+</head>
+<body>
+  <h1>Daily Challenge System Test</h1>
+  
+  <div id="tests"></div>
+  
+  <script>
+    // Challenge type definitions
+    const CHALLENGE_TYPES = {
+      speedRun: {
+        name: 'Speed Run',
+        desc: 'Deliver {target} OKRs in {time} seconds',
+        icon: '⚡',
+        color: '#00FF00',
+        generate: (seed) => ({
+          target: 5 + Math.floor(seed % 5),
+          time: 30 + Math.floor((seed * 13) % 30)
+        }),
+        check: (progress, challenge) => progress.deliveries >= challenge.target && progress.time <= challenge.time
+      },
+      perfectRun: {
+        name: 'Perfect Run',
+        desc: 'Complete level without taking damage',
+        icon: '🛡️',
+        color: '#00BFFF',
+        generate: () => ({ level: 1 }),
+        check: (progress) => progress.damageTaken === 0 && progress.levelComplete
+      },
+      collector: {
+        name: 'Collector',
+        desc: 'Collect {target} power-ups in one run',
+        icon: '💎',
+        color: '#FF00FF',
+        generate: (seed) => ({ target: 3 + Math.floor(seed % 5) }),
+        check: (progress, challenge) => progress.powerupsCollected >= challenge.target
+      },
+      efficiency: {
+        name: 'Efficiency',
+        desc: 'Deliver {target} OKRs with less than {maxTokens} tokens',
+        icon: '💰',
+        color: '#FFD700',
+        generate: (seed) => ({
+          target: 5 + Math.floor(seed % 5),
+          maxTokens: 100 + Math.floor((seed * 17) % 100)
+        }),
+        check: (progress, challenge) => progress.deliveries >= challenge.target && progress.tokensUsed < challenge.maxTokens
+      },
+      survivor: {
+        name: 'Survivor',
+        desc: 'Survive {time} seconds without dying',
+        icon: '⏱️',
+        color: '#FFA500',
+        generate: (seed) => ({ time: 60 + Math.floor((seed * 11) % 60) }),
+        check: (progress, challenge) => progress.time >= challenge.time && !progress.died
+      },
+      marathon: {
+        name: 'Marathon',
+        desc: 'Complete {target} deliveries in one game',
+        icon: '🏃',
+        color: '#E21A2C',
+        generate: (seed) => ({ target: 10 + Math.floor(seed % 10) }),
+        check: (progress, challenge) => progress.deliveries >= challenge.target
+      }
+    };
+    
+    function getDailySeed() {
+      const now = new Date();
+      const utc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+      return Math.floor(utc / 86400000);
+    }
+    
+    function seedRandom(seed) {
+      const x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
+    }
+    
+    function generateDailyChallenge() {
+      const seed = getDailySeed();
+      const challengeTypes = Object.keys(CHALLENGE_TYPES);
+      const typeIndex = Math.floor(seedRandom(seed) * challengeTypes.length);
+      const type = challengeTypes[typeIndex];
+      const definition = CHALLENGE_TYPES[type];
+      
+      const challenge = {
+        date: new Date().toISOString().split('T')[0],
+        seed: seed,
+        type: type,
+        name: definition.name,
+        icon: definition.icon,
+        color: definition.color,
+        params: definition.generate(seed)
+      };
+      
+      challenge.description = definition.desc.replace(/\{(\w+)\}/g, (_, key) => challenge.params[key]);
+      return challenge;
+    }
+    
+    // Run tests
+    const testsDiv = document.getElementById('tests');
+    
+    function test(name, fn) {
+      try {
+        fn();
+        testsDiv.innerHTML += `<div class="test pass">✓ ${name}</div>`;
+      } catch(e) {
+        testsDiv.innerHTML += `<div class="test fail">✗ ${name}: ${e.message}</div>`;
+      }
+    }
+    
+    test('Daily seed generation', () => {
+      const seed = getDailySeed();
+      if (typeof seed !== 'number' || seed < 0) throw new Error('Invalid seed');
+    });
+    
+    test('Seed random function', () => {
+      const r1 = seedRandom(12345);
+      const r2 = seedRandom(12345);
+      if (r1 !== r2) throw new Error('Not deterministic');
+      if (r1 < 0 || r1 > 1) throw new Error('Out of range');
+    });
+    
+    test('Challenge generation', () => {
+      const challenge = generateDailyChallenge();
+      if (!challenge.type) throw new Error('No type');
+      if (!challenge.name) throw new Error('No name');
+      if (!challenge.description) throw new Error('No description');
+      if (!challenge.params) throw new Error('No params');
+    });
+    
+    test('Same challenge for same day', () => {
+      const c1 = generateDailyChallenge();
+      const c2 = generateDailyChallenge();
+      if (c1.type !== c2.type) throw new Error('Different types');
+      if (c1.seed !== c2.seed) throw new Error('Different seeds');
+    });
+    
+    test('All challenge types can be generated', () => {
+      const types = Object.keys(CHALLENGE_TYPES);
+      types.forEach(type => {
+        const def = CHALLENGE_TYPES[type];
+        const params = def.generate(12345);
+        if (!params) throw new Error(`No params for ${type}`);
+      });
+    });
+    
+    // Display today's challenge
+    const challenge = generateDailyChallenge();
+    testsDiv.innerHTML += `
+      <div class="test" style="border-left-color: ${challenge.color}">
+        <h2>Today's Challenge (${challenge.date})</h2>
+        <div style="font-size: 24px; margin: 10px 0;">${challenge.icon} ${challenge.name}</div>
+        <div style="font-size: 16px;">${challenge.description}</div>
+        <div style="margin-top: 10px; color: #aaa; font-size: 12px;">
+          Type: ${challenge.type}<br>
+          Seed: ${challenge.seed}<br>
+          Params: ${JSON.stringify(challenge.params)}
+        </div>
+      </div>
+    `;
+  </script>
+</body>
+</html>

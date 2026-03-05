@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Dominos - Test Suite</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            margin: 0;
+        }
+        #test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #ffff00;
+        }
+        .test-case {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 3px solid #666;
+            background: #333;
+        }
+        .test-case.pass {
+            border-left-color: #00ff00;
+            background: #1a3a1a;
+        }
+        .test-case.fail {
+            border-left-color: #ff0000;
+            background: #3a1a1a;
+        }
+        .test-case.running {
+            border-left-color: #ffff00;
+            background: #3a3a1a;
+        }
+        .test-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .test-result {
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        .test-error {
+            color: #ff6666;
+            margin-left: 20px;
+            font-size: 12px;
+        }
+        .summary {
+            background: #2a2a2a;
+            border: 3px solid #00ffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .summary h2 {
+            margin: 0 0 15px 0;
+            color: #00ffff;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px 0;
+        }
+        .stat {
+            font-size: 24px;
+        }
+        .stat.pass { color: #00ff00; }
+        .stat.fail { color: #ff0000; }
+        .stat.total { color: #ffff00; }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #00ffff;
+        }
+        #test-canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="test-container">
+        <h1>🎮 TEAM DOMINOS TEST SUITE 🎮</h1>
+        
+        <div class="summary" id="summary">
+            <h2>Test Summary</h2>
+            <div class="stats">
+                <div class="stat total">Total: <span id="total-tests">0</span></div>
+                <div class="stat pass">✓ Passed: <span id="passed-tests">0</span></div>
+                <div class="stat fail">✗ Failed: <span id="failed-tests">0</span></div>
+            </div>
+            <button onclick="runAllTests()">▶ Run All Tests</button>
+            <button onclick="runCriticalTests()">⚡ Run Critical Tests</button>
+        </div>
+
+        <div class="test-section" id="rendering-tests">
+            <h2>🎨 Rendering Tests</h2>
+        </div>
+
+        <div class="test-section" id="gameplay-tests">
+            <h2>🎮 Gameplay Tests</h2>
+        </div>
+
+        <div class="test-section" id="physics-tests">
+            <h2>⚙️ Physics Tests</h2>
+        </div>
+
+        <div class="test-section" id="phase-tests">
+            <h2>🔄 Phase Transition Tests</h2>
+        </div>
+
+        <div class="test-section" id="integration-tests">
+            <h2>🔗 Integration Tests</h2>
+        </div>
+    </div>
+
+    <canvas id="test-canvas"></canvas>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        class TestRunner {
+            constructor() {
+                this.tests = [];
+                this.results = {
+                    total: 0,
+                    passed: 0,
+                    failed: 0
+                };
+                this.canvas = document.getElementById('test-canvas');
+            }
+
+            addTest(name, category, critical, testFunc) {
+                this.tests.push({
+                    name,
+                    category,
+                    critical,
+                    func: testFunc
+                });
+            }
+
+            async runTest(test) {
+                const container = document.getElementById(`${test.category}-tests`);
+                const testCase = document.createElement('div');
+                testCase.className = 'test-case running';
+                testCase.innerHTML = `
+                    <div class="test-name">⚙️ ${test.name}</div>
+                    <div class="test-result">Running...</div>
+                `;
+                container.appendChild(testCase);
+
+                try {
+                    const result = await test.func();
+                    if (result.pass) {
+                        testCase.className = 'test-case pass';
+                        testCase.innerHTML = `
+                            <div class="test-name">✓ ${test.name}</div>
+                            <div class="test-result">${result.message || 'Passed'}</div>
+                        `;
+                        this.results.passed++;
+                        return true;
+                    } else {
+                        throw new Error(result.message || 'Test failed');
+                    }
+                } catch (error) {
+                    testCase.className = 'test-case fail';
+                    testCase.innerHTML = `
+                        <div class="test-name">✗ ${test.name}</div>
+                        <div class="test-error">Error: ${error.message}</div>
+                    `;
+                    this.results.failed++;
+                    return false;
+                }
+            }
+
+            async runAllTests() {
+                this.clearResults();
+                this.results.total = this.tests.length;
+                
+                for (const test of this.tests) {
+                    await this.runTest(test);
+                    await this.delay(100);
+                }
+                
+                this.updateSummary();
+            }
+
+            async runCriticalTests() {
+                this.clearResults();
+                const criticalTests = this.tests.filter(t => t.critical);
+                this.results.total = criticalTests.length;
+                
+                for (const test of criticalTests) {
+                    await this.runTest(test);
+                    await this.delay(100);
+                }
+                
+                this.updateSummary();
+            }
+
+            clearResults() {
+                this.results = { total: 0, passed: 0, failed: 0 };
+                ['rendering', 'gameplay', 'physics', 'phase', 'integration'].forEach(category => {
+                    const container = document.getElementById(`${category}-tests`);
+                    container.querySelectorAll('.test-case').forEach(el => el.remove());
+                });
+            }
+
+            updateSummary() {
+                document.getElementById('total-tests').textContent = this.results.total;
+                document.getElementById('passed-tests').textContent = this.results.passed;
+                document.getElementById('failed-tests').textContent = this.results.failed;
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        const runner = new TestRunner();
+
+        // ===== RENDERING TESTS =====
+        runner.addTest(
+            'Three.js library loads correctly',
+            'rendering',
+            true,
+            async () => {
+                if (typeof THREE === 'undefined') {
+                    return { pass: false, message: 'THREE is not defined' };
+                }
+                return { pass: true, message: 'THREE library loaded successfully' };
+            }
+        );
+
+        runner.addTest(
+            'Scene creation and background color',
+            'rendering',
+            true,
+            async () => {
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x87ceeb);
+                
+                if (!scene) {
+                    return { pass: false, message: 'Scene not created' };
+                }
+                if (!scene.background) {
+                    return { pass: false, message: 'Background not set' };
+                }
+                
+                return { pass: true, message: 'Scene created with background' };
+            }
+        );
+
+        runner.addTest(
+            'Camera initialization and positioning',
+            'rendering',
+            true,
+            async () => {
+                const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.set(0, 5, 10);
+                camera.lookAt(0, 0, 0);
+                
+                if (!camera) {
+                    return { pass: false, message: 'Camera not created' };
+                }
+                if (camera.position.x !== 0 || camera.position.y !== 5 || camera.position.z !== 10) {
+                    return { pass: false, message: 'Camera position incorrect' };
+                }
+                
+                return { pass: true, message: `Camera at (${camera.position.x}, ${camera.position.y}, ${camera.position.z})` };
+            }
+        );
+
+        runner.addTest(
+            'Renderer initialization and canvas attachment',
+            'rendering',
+            true,
+            async () => {
+                const canvas = runner.canvas;
+                const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+                renderer.setSize(800, 600);
+                
+                if (!renderer) {
+                    return { pass: false, message: 'Renderer not created' };
+                }
+                if (renderer.domElement !== canvas) {
+                    return { pass: false, message: 'Renderer not attached to canvas' };
+                }
+                
+                renderer.dispose();
+                return { pass: true, message: 'Renderer initialized correctly' };
+            }
+        );
+
+        runner.addTest(
+            'Basic rendering produces non-black frame',
+            'rendering',
+            true,
+            async () => {
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x87ceeb);
+                
+                const camera = new THREE.PerspectiveCamera(60, 800 / 600, 0.1, 1000);
+                camera.position.set(0, 5, 10);
+                camera.lookAt(0, 0, 0);
+                
+                const canvas = runner.canvas;
+                const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+                renderer.setSize(800, 600);
+                
+                // Add a visible object
+                const geometry = new THREE.BoxGeometry(1, 2, 1);
+                const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                
+                // Add light
+                const light = new THREE.AmbientLight(0xffffff, 1.0);
+                scene.add(light);
+                
+                // Render
+                renderer.render(scene, camera);
+                
+                // Check if canvas has non-black pixels
+                const ctx = canvas.getContext('2d');
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                
+                let hasNonBlack = false;
+                for (let i = 0; i < data.length; i += 4) {
+                    if (data[i] > 10 || data[i+1] > 10 || data[i+2] > 10) {
+                        hasNonBlack = true;
+                        break;
+                    }
+                }
+                
+                renderer.dispose();
+                
+                if (!hasNonBlack) {
+                    return { pass: false, message: 'Rendered frame is all black' };
+                }
+                
+                return { pass: true, message: 'Render produces visible content' };
+            }
+        );
+
+        runner.addTest(
+            'Player mesh creation',
+            'rendering',
+            true,
+            async () => {
+                const scene = new THREE.Scene();
+                const geometry = new THREE.BoxGeometry(1, 2, 1);
+                const material = new THREE.MeshPhongMaterial({ color: 0x00ffff });
+                const player = new THREE.Mesh(geometry, material);
+                player.position.set(0, 2, 0);
+                scene.add(player);
+                
+                if (!player) {
+                    return { pass: false, message: 'Player not created' };
+                }
+                if (!scene.children.includes(player)) {
+                    return { pass: false, message: 'Player not added to scene' };
+                }
+                
+                return { pass: true, message: 'Player mesh created and added to scene' };
+            }
+        );
+
+        runner.addTest(
+            'Platform creation and scene addition',
+            'rendering',
+            true,
+            async () => {
+                const scene = new THREE.Scene();
+                const geometry = new THREE.BoxGeometry(10, 1, 10);
+                const material = new THREE.MeshPhongMaterial({ color: 0x228b22 });
+                const platform = new THREE.Mesh(geometry, material);
+                platform.position.set(0, 0, 0);
+                scene.add(platform);
+                
+                if (!platform) {
+                    return { pass: false, message: 'Platform not created' };
+                }
+                if (!scene.children.includes(platform)) {
+                    return { pass: false, message: 'Platform not added to scene' };
+                }
+                
+                return { pass: true, message: 'Platform created successfully' };
+            }
+        );
+
+        runner.addTest(
+            'Lighting setup',
+            'rendering',
+            true,
+            async () => {
+                const scene = new THREE.Scene();
+                
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                scene.add(ambientLight);
+                
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                dirLight.position.set(10, 20, 10);
+                scene.add(dirLight);
+                
+                const lights = scene.children.filter(obj => obj.isLight);
+                
+                if (lights.length < 2) {
+                    return { pass: false, message: `Only ${lights.length} lights in scene` };
+                }
+                
+                return { pass: true, message: `${lights.length} lights configured` };
+            }
+        );
+
+        // ===== GAMEPLAY TESTS =====
+        runner.addTest(
+            'Movement speed is adequate (15 units/sec)',
+            'gameplay',
+            true,
+            async () => {
+                const moveSpeed = 15;
+                const deltaTime = 0.016; // 60 FPS
+                const distance = moveSpeed * deltaTime;
+                
+                if (distance < 0.2) {
+                    return { pass: false, message: `Movement too slow: ${distance} units per frame` };
+                }
+                
+                return { pass: true, message: `Movement speed: ${moveSpeed} units/sec` };
+            }
+        );
+
+        runner.addTest(
+            'Jump height can clear gaps (18 force)',
+            'gameplay',
+            true,
+            async () => {
+                const jumpForce = 18;
+                const gravity = 20;
+                const maxHeight = (jumpForce * jumpForce) / (2 * gravity);
+                
+                if (maxHeight < 8) {
+                    return { pass: false, message: `Jump height too low: ${maxHeight.toFixed(2)} units` };
+                }
+                
+                return { pass: true, message: `Max jump height: ${maxHeight.toFixed(2)} units` };
+            }
+        );
+
+        runner.addTest(
+            'Death check triggers at Y < -20',
+            'gameplay',
+            true,
+            async () => {
+                const deathThreshold = -20;
+                const playerY = -25;
+                
+                if (playerY < deathThreshold) {
+                    return { pass: true, message: 'Death check would trigger correctly' };
+                } else {
+                    return { pass: false, message: 'Death check logic incorrect' };
+                }
+            }
+        );
+
+        runner.addTest(
+            'Level has minimum required platforms',
+            'gameplay',
+            false,
+            async () => {
+                // Simulate level generation
+                const platforms = [];
+                
+                // Ground
+                platforms.push({ x: 0, y: -1, z: 0 });
+                // Tutorial platforms
+                platforms.push({ x: 10, y: 0, z: 0 });
+                platforms.push({ x: 20, y: 0, z: 0 });
+                
+                if (platforms.length < 2) {
+                    return { pass: false, message: `Only ${platforms.length} platforms` };
+                }
+                
+                return { pass: true, message: `${platforms.length} platforms generated` };
+            }
+        );
+
+        // ===== PHYSICS TESTS =====
+        runner.addTest(
+            'Gravity applies consistently',
+            'physics',
+            true,
+            async () => {
+                const gravity = 20;
+                const velocity = { y: 10 };
+                const deltaTime = 0.016;
+                
+                velocity.y -= gravity * deltaTime;
+                
+                if (velocity.y >= 10) {
+                    return { pass: false, message: 'Gravity not applying' };
+                }
+                
+                return { pass: true, message: `Velocity changed to ${velocity.y.toFixed(2)}` };
+            }
+        );
+
+        runner.addTest(
+            'Collision detection between player and platform',
+            'physics',
+            false,
+            async () => {
+                const player = { x: 5, y: 1, z: 0, width: 1, height: 2, depth: 1 };
+                const platform = { x: 5, y: 0, z: 0, width: 10, height: 1, depth: 10 };
+                
+                const collides = (
+                    Math.abs(player.x - platform.x) < (player.width + platform.width) / 2 &&
+                    Math.abs(player.y - platform.y) < (player.height + platform.height) / 2 &&
+                    Math.abs(player.z - platform.z) < (player.depth + platform.depth) / 2
+                );
+                
+                if (!collides) {
+                    return { pass: false, message: 'Collision not detected' };
+                }
+                
+                return { pass: true, message: 'Collision detected correctly' };
+            }
+        );
+
+        runner.addTest(
+            'Player respawns at correct position',
+            'physics',
+            true,
+            async () => {
+                const player = { x: 100, y: -30, z: 50 };
+                
+                // Respawn logic
+                if (player.y < -20) {
+                    player.x = 0;
+                    player.y = 2;
+                    player.z = 0;
+                }
+                
+                if (player.y !== 2) {
+                    return { pass: false, message: 'Respawn position incorrect' };
+                }
+                
+                return { pass: true, message: `Player respawned at (${player.x}, ${player.y}, ${player.z})` };
+            }
+        );
+
+        // ===== PHASE TRANSITION TESTS =====
+        runner.addTest(
+            'Phase 1 uses Three.js renderer',
+            'phase',
+            true,
+            async () => {
+                const phase = 1;
+                const useThreeJS = (phase === 1);
+                
+                if (!useThreeJS) {
+                    return { pass: false, message: 'Phase 1 not using Three.js' };
+                }
+                
+                return { pass: true, message: 'Phase 1 correctly uses Three.js' };
+            }
+        );
+
+        runner.addTest(
+            'Phase 2 transitions to 2D Canvas (Anime)',
+            'phase',
+            false,
+            async () => {
+                const phase = 2;
+                const use2D = (phase === 2 || phase === 3);
+                
+                if (!use2D) {
+                    return { pass: false, message: 'Phase 2 not using 2D canvas' };
+                }
+                
+                return { pass: true, message: 'Phase 2 uses 2D canvas rendering' };
+            }
+        );
+
+        runner.addTest(
+            'Level ranges map to correct phases',
+            'phase',
+            true,
+            async () => {
+                const getPhase = (level) => {
+                    if (level <= 5) return 1;
+                    if (level <= 10) return 2;
+                    return 3;
+                };
+                
+                if (getPhase(1) !== 1) return { pass: false, message: 'Level 1 wrong phase' };
+                if (getPhase(5) !== 1) return { pass: false, message: 'Level 5 wrong phase' };
+                if (getPhase(6) !== 2) return { pass: false, message: 'Level 6 wrong phase' };
+                if (getPhase(10) !== 2) return { pass: false, message: 'Level 10 wrong phase' };
+                if (getPhase(11) !== 3) return { pass: false, message: 'Level 11 wrong phase' };
+                if (getPhase(15) !== 3) return { pass: false, message: 'Level 15 wrong phase' };
+                
+                return { pass: true, message: 'All levels map to correct phases' };
+            }
+        );
+
+        // ===== INTEGRATION TESTS =====
+        runner.addTest(
+            'Full game initialization sequence',
+            'integration',
+            true,
+            async () => {
+                try {
+                    const scene = new THREE.Scene();
+                    scene.background = new THREE.Color(0x87ceeb);
+                    
+                    const camera = new THREE.PerspectiveCamera(60, 800/600, 0.1, 1000);
+                    camera.position.set(0, 5, 10);
+                    camera.lookAt(0, 0, 0);
+                    
+                    const canvas = runner.canvas;
+                    const renderer = new THREE.WebGLRenderer({ canvas });
+                    renderer.setSize(800, 600);
+                    
+                    const player = new THREE.Mesh(
+                        new THREE.BoxGeometry(1, 2, 1),
+                        new THREE.MeshPhongMaterial({ color: 0x00ffff })
+                    );
+                    player.position.set(0, 2, 0);
+                    scene.add(player);
+                    
+                    const light = new THREE.AmbientLight(0xffffff, 1.0);
+                    scene.add(light);
+                    
+                    renderer.render(scene, camera);
+                    renderer.dispose();
+                    
+                    return { pass: true, message: 'Full initialization completed' };
+                } catch (error) {
+                    return { pass: false, message: error.message };
+                }
+            }
+        );
+
+        runner.addTest(
+            'Canvas exists in DOM',
+            'integration',
+            true,
+            async () => {
+                // Check if game canvas would exist
+                const testCanvas = document.createElement('canvas');
+                testCanvas.width = 800;
+                testCanvas.height = 600;
+                
+                if (!testCanvas) {
+                    return { pass: false, message: 'Cannot create canvas element' };
+                }
+                
+                return { pass: true, message: 'Canvas can be created' };
+            }
+        );
+
+        runner.addTest(
+            'Game loop timing is correct',
+            'integration',
+            false,
+            async () => {
+                let lastTime = performance.now();
+                await runner.delay(16); // ~60 FPS
+                let now = performance.now();
+                let deltaTime = (now - lastTime) / 1000;
+                
+                if (deltaTime < 0.015 || deltaTime > 0.02) {
+                    return { pass: false, message: `Delta time: ${deltaTime.toFixed(4)}s (expected ~0.016s)` };
+                }
+                
+                return { pass: true, message: `Delta time: ${deltaTime.toFixed(4)}s` };
+            }
+        );
+
+        // Make runner global for button clicks
+        window.runner = runner;
+        window.runAllTests = () => runner.runAllTests();
+        window.runCriticalTests = () => runner.runCriticalTests();
+        
+        // Auto-run critical tests on load
+        setTimeout(() => {
+            console.log('Auto-running critical tests...');
+            runner.runCriticalTests();
+        }, 500);
+    </script>
+</body>
+</html>

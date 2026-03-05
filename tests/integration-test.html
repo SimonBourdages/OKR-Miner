@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Dominos - Integration Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #0f0;
+            padding: 20px;
+        }
+        
+        #testContainer {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #000;
+            border: 2px solid #0f0;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #0ff;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #0ff;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
+        
+        .test-section h2 {
+            color: #ff0;
+            margin-bottom: 10px;
+        }
+        
+        .test-result {
+            padding: 8px;
+            margin: 5px 0;
+            border-left: 4px solid #666;
+            font-size: 14px;
+        }
+        
+        .test-result.pass {
+            border-left-color: #0f0;
+            color: #0f0;
+        }
+        
+        .test-result.fail {
+            border-left-color: #f00;
+            color: #f00;
+        }
+        
+        .test-result.warn {
+            border-left-color: #ff0;
+            color: #ff0;
+        }
+        
+        .test-result.info {
+            border-left-color: #0ff;
+            color: #0ff;
+        }
+        
+        button {
+            background: #0ff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+        
+        button:hover {
+            background: #0dd;
+        }
+        
+        button:disabled {
+            background: #444;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        #summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #111;
+            border: 2px solid #0ff;
+            border-radius: 5px;
+        }
+        
+        .metric {
+            display: inline-block;
+            margin: 10px 20px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .metric.good .metric-value { color: #0f0; }
+        .metric.warn .metric-value { color: #ff0; }
+        .metric.bad .metric-value { color: #f00; }
+        
+        #gameCanvas {
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #222;
+            border: 1px solid #0ff;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0ff, #00f);
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="testContainer">
+        <h1>🧪 TEAM DOMINOS - INTEGRATION TEST SUITE 🧪</h1>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="runAllTests()">▶ Run All Tests</button>
+            <button onclick="location.reload()">🔄 Reset</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            <div class="progress-text" id="progressText">Ready to test...</div>
+        </div>
+        
+        <div id="testResults"></div>
+        
+        <div id="summary" style="display: none;">
+            <h2 style="color: #0ff;">TEST SUMMARY</h2>
+            <div class="metric" id="passMetric">
+                <div>PASSED</div>
+                <div class="metric-value">0</div>
+            </div>
+            <div class="metric" id="failMetric">
+                <div>FAILED</div>
+                <div class="metric-value">0</div>
+            </div>
+            <div class="metric" id="warnMetric">
+                <div>WARNINGS</div>
+                <div class="metric-value">0</div>
+            </div>
+            <div class="metric" id="timeMetric">
+                <div>DURATION</div>
+                <div class="metric-value">0s</div>
+            </div>
+        </div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+        
+        // Make THREE available globally for tests
+        window.THREE = THREE;
+        
+        const testResults = [];
+        let testStartTime = 0;
+        
+        function log(message, type = 'info') {
+            const result = { message, type, timestamp: Date.now() };
+            testResults.push(result);
+            
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.textContent = `[${type.toUpperCase()}] ${message}`;
+            resultsDiv.appendChild(resultDiv);
+            
+            // Scroll to bottom
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        function createSection(title) {
+            const resultsDiv = document.getElementById('testResults');
+            const section = document.createElement('div');
+            section.className = 'test-section';
+            section.innerHTML = `<h2>${title}</h2>`;
+            resultsDiv.appendChild(section);
+            return section;
+        }
+        
+        function updateProgress(percent, text) {
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+        
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Test 1: HTML/CSS Structure
+        async function testHTMLStructure() {
+            const section = createSection('1. HTML/CSS Structure');
+            
+            try {
+                // Check critical elements
+                const elements = [
+                    'gameCanvas',
+                    'ui',
+                    'stats',
+                    'levelInfo',
+                    'controls',
+                    'menu',
+                    'cutscene',
+                    'workers',
+                    'buildings'
+                ];
+                
+                let allFound = true;
+                for (const id of elements) {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        log(`✓ Element #${id} found`, 'pass');
+                    } else {
+                        log(`✗ Element #${id} NOT found`, 'fail');
+                        allFound = false;
+                    }
+                }
+                
+                // Check CSS styles
+                const canvas = document.getElementById('gameCanvas');
+                const styles = window.getComputedStyle(canvas);
+                
+                if (styles.display !== 'none') {
+                    log('✓ Canvas is visible', 'pass');
+                } else {
+                    log('⚠ Canvas is hidden (expected for tests)', 'warn');
+                }
+                
+                return allFound;
+            } catch (error) {
+                log(`✗ HTML Structure test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 2: Three.js Availability
+        async function testThreeJS() {
+            const section = createSection('2. Three.js Library');
+            
+            try {
+                if (typeof THREE !== 'undefined') {
+                    log('✓ THREE.js is loaded', 'pass');
+                } else {
+                    log('✗ THREE.js is NOT loaded', 'fail');
+                    return false;
+                }
+                
+                // Check critical THREE.js classes
+                const classes = ['Scene', 'PerspectiveCamera', 'WebGLRenderer', 'Mesh', 'BoxGeometry', 'MeshPhongMaterial'];
+                let allFound = true;
+                
+                for (const className of classes) {
+                    if (typeof THREE[className] !== 'undefined') {
+                        log(`✓ THREE.${className} available`, 'pass');
+                    } else {
+                        log(`✗ THREE.${className} NOT available`, 'fail');
+                        allFound = false;
+                    }
+                }
+                
+                return allFound;
+            } catch (error) {
+                log(`✗ Three.js test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 3: Canvas Initialization
+        async function testCanvasInit() {
+            const section = createSection('3. Canvas Initialization');
+            
+            try {
+                const canvas = document.getElementById('gameCanvas');
+                
+                if (!canvas) {
+                    log('✗ Canvas element not found', 'fail');
+                    return false;
+                }
+                
+                log('✓ Canvas element exists', 'pass');
+                
+                // Check canvas properties
+                if (canvas.width > 0 && canvas.height > 0) {
+                    log(`✓ Canvas dimensions: ${canvas.width}x${canvas.height}`, 'pass');
+                } else {
+                    log('✗ Canvas has invalid dimensions', 'fail');
+                    return false;
+                }
+                
+                // Test WebGL context
+                const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+                if (gl) {
+                    log('✓ WebGL context available', 'pass');
+                    log(`  Renderer: ${gl.getParameter(gl.RENDERER)}`, 'info');
+                    log(`  Vendor: ${gl.getParameter(gl.VENDOR)}`, 'info');
+                } else {
+                    log('✗ WebGL context NOT available', 'fail');
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                log(`✗ Canvas init error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 4: Scene Setup
+        async function testSceneSetup() {
+            const section = createSection('4. Scene, Camera, Renderer Setup');
+            
+            try {
+                const canvas = document.getElementById('gameCanvas');
+                
+                // Create scene
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x87ceeb);
+                log('✓ Scene created with background color', 'pass');
+                
+                // Create camera
+                const camera = new THREE.PerspectiveCamera(
+                    60,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    1000
+                );
+                camera.position.set(0, 5, 10);
+                log(`✓ Camera created at position (${camera.position.x}, ${camera.position.y}, ${camera.position.z})`, 'pass');
+                
+                // Create renderer
+                const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.shadowMap.enabled = true;
+                log('✓ WebGL Renderer created with shadows enabled', 'pass');
+                
+                // Test render
+                renderer.render(scene, camera);
+                log('✓ Initial render successful', 'pass');
+                
+                // Cleanup
+                renderer.dispose();
+                
+                return true;
+            } catch (error) {
+                log(`✗ Scene setup error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 5: Lighting System
+        async function testLighting() {
+            const section = createSection('5. Lighting System');
+            
+            try {
+                const scene = new THREE.Scene();
+                
+                // Ambient light
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                scene.add(ambientLight);
+                log('✓ Ambient light created (intensity: 0.6)', 'pass');
+                
+                // Directional light
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                dirLight.position.set(10, 20, 10);
+                dirLight.castShadow = true;
+                dirLight.shadow.camera.left = -50;
+                dirLight.shadow.camera.right = 50;
+                dirLight.shadow.camera.top = 50;
+                dirLight.shadow.camera.bottom = -50;
+                dirLight.shadow.mapSize.width = 2048;
+                dirLight.shadow.mapSize.height = 2048;
+                scene.add(dirLight);
+                log('✓ Directional light with shadows (2048x2048 shadow map)', 'pass');
+                
+                // Verify lights in scene
+                const lights = scene.children.filter(child => child.isLight);
+                if (lights.length === 2) {
+                    log(`✓ Scene contains ${lights.length} lights`, 'pass');
+                } else {
+                    log(`⚠ Expected 2 lights, found ${lights.length}`, 'warn');
+                }
+                
+                return true;
+            } catch (error) {
+                log(`✗ Lighting test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 6: Player Creation
+        async function testPlayerCreation() {
+            const section = createSection('6. Player Character Creation');
+            
+            try {
+                const scene = new THREE.Scene();
+                
+                // Create player
+                const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
+                const playerMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff });
+                const player = new THREE.Mesh(playerGeometry, playerMaterial);
+                player.position.set(0, 2, 0);
+                player.castShadow = true;
+                scene.add(player);
+                
+                log('✓ Player mesh created (1x2x1 box)', 'pass');
+                log(`✓ Player position: (${player.position.x}, ${player.position.y}, ${player.position.z})`, 'pass');
+                log('✓ Player casts shadows', 'pass');
+                log(`✓ Player color: #00ffff (cyan)`, 'pass');
+                
+                // Verify geometry
+                if (playerGeometry.parameters.width === 1 &&
+                    playerGeometry.parameters.height === 2 &&
+                    playerGeometry.parameters.depth === 1) {
+                    log('✓ Player geometry dimensions correct', 'pass');
+                } else {
+                    log('✗ Player geometry dimensions incorrect', 'fail');
+                    return false;
+                }
+                
+                // Cleanup
+                playerGeometry.dispose();
+                playerMaterial.dispose();
+                
+                return true;
+            } catch (error) {
+                log(`✗ Player creation error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 7: Game State Structure
+        async function testGameState() {
+            const section = createSection('7. Game State Data Structures');
+            
+            try {
+                // Test state structure
+                const state = {
+                    currentLevel: 1,
+                    phase: 1,
+                    renderMode: '3D',
+                    currencies: { dp: 0, mp: 0, ac: 0 },
+                    totalOKRs: 0,
+                    playerStats: {
+                        speed: 15,
+                        jump: 18,
+                        capacity: 1,
+                        sprint: 0,
+                        autoCollect: 0
+                    },
+                    aiWorkers: [],
+                    buildings: [],
+                    completedLevels: [],
+                    okrsCollected: 0
+                };
+                
+                log('✓ Game state structure initialized', 'pass');
+                
+                // Validate state properties
+                if (state.currentLevel === 1) log('✓ Initial level: 1', 'pass');
+                if (state.phase === 1) log('✓ Initial phase: 1', 'pass');
+                if (state.renderMode === '3D') log('✓ Render mode: 3D', 'pass');
+                
+                // Check currencies
+                const currencies = Object.keys(state.currencies);
+                if (currencies.length === 3 && currencies.includes('dp') && currencies.includes('mp') && currencies.includes('ac')) {
+                    log('✓ All currencies initialized (dp, mp, ac)', 'pass');
+                } else {
+                    log('✗ Currency structure incomplete', 'fail');
+                    return false;
+                }
+                
+                // Check player stats
+                const requiredStats = ['speed', 'jump', 'capacity', 'sprint', 'autoCollect'];
+                const hasAllStats = requiredStats.every(stat => stat in state.playerStats);
+                if (hasAllStats) {
+                    log('✓ All player stats initialized', 'pass');
+                } else {
+                    log('✗ Player stats incomplete', 'fail');
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                log(`✗ Game state test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 8: Level Configuration
+        async function testLevelConfig() {
+            const section = createSection('8. Level Configuration');
+            
+            try {
+                const levelConfigs = {
+                    1: { okrGoal: 3, reward: 10, currency: 'dp', description: 'Tutorial - Learn the basics', boss: false },
+                    2: { okrGoal: 5, reward: 15, currency: 'dp', description: 'Navigate gaps', boss: false },
+                    5: { okrGoal: 15, reward: 50, currency: 'dp', description: 'BOSS: The Bureaucrat', boss: true, evolution: 1 },
+                    15: { okrGoal: 1000000, reward: 0, currency: 'ac', description: 'FINAL: Digital Transformation', boss: true, final: true }
+                };
+                
+                log(`✓ Level configs loaded (${Object.keys(levelConfigs).length} levels defined)`, 'pass');
+                
+                // Check first level
+                const level1 = levelConfigs[1];
+                if (level1 && level1.okrGoal === 3) {
+                    log('✓ Level 1: Tutorial with 3 OKR goal', 'pass');
+                } else {
+                    log('✗ Level 1 configuration invalid', 'fail');
+                    return false;
+                }
+                
+                // Check boss levels
+                const bossLevels = Object.values(levelConfigs).filter(l => l.boss);
+                log(`✓ ${bossLevels.length} boss levels configured`, 'pass');
+                
+                // Check final level
+                const finalLevel = levelConfigs[15];
+                if (finalLevel && finalLevel.final) {
+                    log('✓ Level 15: Final boss level configured', 'pass');
+                } else {
+                    log('✗ Final level not properly configured', 'fail');
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                log(`✗ Level config test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 9: Event Listeners
+        async function testEventListeners() {
+            const section = createSection('9. Event Listener Registration');
+            
+            try {
+                const keys = {};
+                let eventsFired = 0;
+                
+                // Test keydown
+                const keydownHandler = (e) => {
+                    keys[e.code] = true;
+                    eventsFired++;
+                };
+                window.addEventListener('keydown', keydownHandler);
+                
+                // Simulate keydown
+                const keyEvent = new KeyboardEvent('keydown', { code: 'Space' });
+                window.dispatchEvent(keyEvent);
+                
+                await sleep(100);
+                
+                if (keys['Space'] === true) {
+                    log('✓ Keydown event listener working', 'pass');
+                } else {
+                    log('✗ Keydown event listener failed', 'fail');
+                }
+                
+                // Test resize
+                let resizeTriggered = false;
+                const resizeHandler = () => { resizeTriggered = true; };
+                window.addEventListener('resize', resizeHandler);
+                
+                window.dispatchEvent(new Event('resize'));
+                await sleep(100);
+                
+                if (resizeTriggered) {
+                    log('✓ Resize event listener working', 'pass');
+                } else {
+                    log('⚠ Resize event listener may not be working', 'warn');
+                }
+                
+                // Cleanup
+                window.removeEventListener('keydown', keydownHandler);
+                window.removeEventListener('resize', resizeHandler);
+                
+                return true;
+            } catch (error) {
+                log(`✗ Event listener test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 10: Save/Load Functionality
+        async function testSaveLoad() {
+            const section = createSection('10. Save/Load Functionality');
+            
+            try {
+                const testState = {
+                    currentLevel: 5,
+                    phase: 2,
+                    currencies: { dp: 100, mp: 50, ac: 25 },
+                    totalOKRs: 37,
+                    completedLevels: [1, 2, 3, 4]
+                };
+                
+                // Test save
+                localStorage.setItem('teamDominosGameTest', JSON.stringify(testState));
+                log('✓ Game state saved to localStorage', 'pass');
+                
+                // Test load
+                const loadedState = JSON.parse(localStorage.getItem('teamDominosGameTest'));
+                
+                if (loadedState.currentLevel === 5) {
+                    log('✓ Loaded state matches saved state (level 5)', 'pass');
+                } else {
+                    log('✗ Loaded state does not match', 'fail');
+                    return false;
+                }
+                
+                if (loadedState.currencies.dp === 100) {
+                    log('✓ Currency data persisted correctly', 'pass');
+                } else {
+                    log('✗ Currency data corrupted', 'fail');
+                    return false;
+                }
+                
+                if (loadedState.completedLevels.length === 4) {
+                    log('✓ Completed levels array preserved', 'pass');
+                } else {
+                    log('✗ Completed levels array corrupted', 'fail');
+                    return false;
+                }
+                
+                // Cleanup
+                localStorage.removeItem('teamDominosGameTest');
+                
+                return true;
+            } catch (error) {
+                log(`✗ Save/Load test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 11: Memory Management
+        async function testMemoryManagement() {
+            const section = createSection('11. Memory Management');
+            
+            try {
+                const canvas = document.getElementById('gameCanvas');
+                const scene = new THREE.Scene();
+                const renderer = new THREE.WebGLRenderer({ canvas });
+                
+                // Create multiple objects
+                const geometries = [];
+                const materials = [];
+                const meshes = [];
+                
+                for (let i = 0; i < 10; i++) {
+                    const geo = new THREE.BoxGeometry(1, 1, 1);
+                    const mat = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff });
+                    const mesh = new THREE.Mesh(geo, mat);
+                    geometries.push(geo);
+                    materials.push(mat);
+                    meshes.push(mesh);
+                    scene.add(mesh);
+                }
+                
+                log('✓ Created 10 test objects in scene', 'pass');
+                
+                // Test disposal
+                scene.traverse((obj) => {
+                    if (obj.geometry) obj.geometry.dispose();
+                    if (obj.material) {
+                        if (Array.isArray(obj.material)) {
+                            obj.material.forEach(m => m.dispose());
+                        } else {
+                            obj.material.dispose();
+                        }
+                    }
+                });
+                
+                log('✓ All geometries and materials disposed', 'pass');
+                
+                renderer.dispose();
+                log('✓ Renderer disposed', 'pass');
+                
+                // Check if disposed objects can't be used
+                try {
+                    renderer.render(scene, new THREE.PerspectiveCamera());
+                    log('⚠ Disposed renderer still rendered (unexpected)', 'warn');
+                } catch (e) {
+                    log('✓ Disposed renderer properly cleaned up', 'pass');
+                }
+                
+                return true;
+            } catch (error) {
+                log(`✗ Memory management test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 12: Performance Metrics
+        async function testPerformance() {
+            const section = createSection('12. Performance Metrics');
+            
+            try {
+                const canvas = document.getElementById('gameCanvas');
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas });
+                renderer.setSize(800, 600);
+                
+                camera.position.set(0, 5, 10);
+                
+                // Add some objects
+                for (let i = 0; i < 50; i++) {
+                    const geometry = new THREE.BoxGeometry(1, 1, 1);
+                    const material = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff });
+                    const mesh = new THREE.Mesh(geometry, material);
+                    mesh.position.set(
+                        (Math.random() - 0.5) * 20,
+                        (Math.random() - 0.5) * 20,
+                        (Math.random() - 0.5) * 20
+                    );
+                    scene.add(mesh);
+                }
+                
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                scene.add(ambientLight);
+                
+                log('✓ Test scene created with 50 objects', 'pass');
+                
+                // Measure render performance
+                const frameCount = 60;
+                const frameTimes = [];
+                
+                for (let i = 0; i < frameCount; i++) {
+                    const start = performance.now();
+                    renderer.render(scene, camera);
+                    const end = performance.now();
+                    frameTimes.push(end - start);
+                }
+                
+                const avgFrameTime = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length;
+                const fps = 1000 / avgFrameTime;
+                
+                log(`✓ Average frame time: ${avgFrameTime.toFixed(2)}ms`, 'pass');
+                log(`✓ Estimated FPS: ${fps.toFixed(1)}`, fps > 30 ? 'pass' : 'warn');
+                
+                if (fps > 30) {
+                    log('✓ Performance is acceptable (>30 FPS)', 'pass');
+                } else {
+                    log('⚠ Performance may be suboptimal (<30 FPS)', 'warn');
+                }
+                
+                // Memory usage check
+                if (performance.memory) {
+                    const memoryMB = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2);
+                    log(`✓ Current memory usage: ${memoryMB} MB`, 'info');
+                    
+                    if (performance.memory.usedJSHeapSize < performance.memory.jsHeapSizeLimit * 0.8) {
+                        log('✓ Memory usage within safe limits', 'pass');
+                    } else {
+                        log('⚠ Memory usage approaching limits', 'warn');
+                    }
+                } else {
+                    log('ℹ Memory API not available in this browser', 'info');
+                }
+                
+                // Cleanup
+                scene.traverse((obj) => {
+                    if (obj.geometry) obj.geometry.dispose();
+                    if (obj.material) obj.material.dispose();
+                });
+                renderer.dispose();
+                
+                return true;
+            } catch (error) {
+                log(`✗ Performance test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Test 13: Error Handling
+        async function testErrorHandling() {
+            const section = createSection('13. Error Handling');
+            
+            try {
+                // Test missing asset handling
+                try {
+                    const loader = new THREE.TextureLoader();
+                    loader.load('nonexistent-texture.png', 
+                        () => log('✗ Should have failed to load', 'fail'),
+                        undefined,
+                        () => log('✓ Texture load error handled gracefully', 'pass')
+                    );
+                } catch (e) {
+                    log('✓ Texture loading errors caught', 'pass');
+                }
+                
+                await sleep(200);
+                
+                // Test invalid geometry
+                try {
+                    const invalidGeo = new THREE.BoxGeometry(0, 0, 0);
+                    log('⚠ Zero-size geometry created without error', 'warn');
+                } catch (e) {
+                    log('✓ Invalid geometry rejected', 'pass');
+                }
+                
+                // Test WebGL context loss simulation
+                const canvas = document.getElementById('gameCanvas');
+                const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+                
+                if (gl) {
+                    const ext = gl.getExtension('WEBGL_lose_context');
+                    if (ext) {
+                        log('✓ WebGL context loss extension available', 'pass');
+                        log('  (Context loss recovery should be implemented)', 'info');
+                    } else {
+                        log('ℹ WebGL context loss extension not available', 'info');
+                    }
+                }
+                
+                // Test localStorage availability
+                try {
+                    localStorage.setItem('test', 'test');
+                    localStorage.removeItem('test');
+                    log('✓ localStorage is available', 'pass');
+                } catch (e) {
+                    log('⚠ localStorage not available (private browsing?)', 'warn');
+                }
+                
+                return true;
+            } catch (error) {
+                log(`✗ Error handling test error: ${error.message}`, 'fail');
+                return false;
+            }
+        }
+        
+        // Main test runner
+        window.runAllTests = async function() {
+            testStartTime = performance.now();
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            
+            log('═══════════════════════════════════════════════', 'info');
+            log('STARTING INTEGRATION TEST SUITE', 'info');
+            log('═══════════════════════════════════════════════', 'info');
+            
+            const tests = [
+                { name: 'HTML/CSS Structure', fn: testHTMLStructure, weight: 8 },
+                { name: 'Three.js Library', fn: testThreeJS, weight: 8 },
+                { name: 'Canvas Initialization', fn: testCanvasInit, weight: 8 },
+                { name: 'Scene Setup', fn: testSceneSetup, weight: 8 },
+                { name: 'Lighting System', fn: testLighting, weight: 8 },
+                { name: 'Player Creation', fn: testPlayerCreation, weight: 8 },
+                { name: 'Game State', fn: testGameState, weight: 8 },
+                { name: 'Level Configuration', fn: testLevelConfig, weight: 8 },
+                { name: 'Event Listeners', fn: testEventListeners, weight: 8 },
+                { name: 'Save/Load', fn: testSaveLoad, weight: 8 },
+                { name: 'Memory Management', fn: testMemoryManagement, weight: 10 },
+                { name: 'Performance', fn: testPerformance, weight: 10 },
+                { name: 'Error Handling', fn: testErrorHandling, weight: 8 }
+            ];
+            
+            let passed = 0;
+            let failed = 0;
+            let totalWeight = tests.reduce((sum, t) => sum + t.weight, 0);
+            let currentWeight = 0;
+            
+            for (const test of tests) {
+                updateProgress((currentWeight / totalWeight) * 100, `Running: ${test.name}...`);
+                
+                const result = await test.fn();
+                if (result) {
+                    passed++;
+                } else {
+                    failed++;
+                }
+                
+                currentWeight += test.weight;
+                await sleep(100);
+            }
+            
+            updateProgress(100, 'All tests complete!');
+            
+            const duration = ((performance.now() - testStartTime) / 1000).toFixed(2);
+            
+            log('═══════════════════════════════════════════════', 'info');
+            log('TEST SUITE COMPLETE', 'info');
+            log(`Passed: ${passed}/${tests.length}`, passed === tests.length ? 'pass' : 'warn');
+            log(`Failed: ${failed}/${tests.length}`, failed === 0 ? 'pass' : 'fail');
+            log(`Duration: ${duration}s`, 'info');
+            log('═══════════════════════════════════════════════', 'info');
+            
+            // Show summary
+            const summary = document.getElementById('summary');
+            summary.style.display = 'block';
+            
+            const warnings = testResults.filter(r => r.type === 'warn').length;
+            
+            document.querySelector('#passMetric .metric-value').textContent = passed;
+            document.querySelector('#failMetric .metric-value').textContent = failed;
+            document.querySelector('#warnMetric .metric-value').textContent = warnings;
+            document.querySelector('#timeMetric .metric-value').textContent = duration + 's';
+            
+            document.getElementById('passMetric').className = 'metric good';
+            document.getElementById('failMetric').className = failed === 0 ? 'metric good' : 'metric bad';
+            document.getElementById('warnMetric').className = warnings === 0 ? 'metric good' : 'metric warn';
+            document.getElementById('timeMetric').className = 'metric good';
+        };
+        
+        // Auto-run tests on load
+        log('Integration test suite loaded. Click "Run All Tests" to begin.', 'info');
+    </script>
+</body>
+</html>

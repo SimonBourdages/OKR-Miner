@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>Team Dominos 3D - Delivering OKRs Since 2024</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#1a1a2e;overflow:hidden;font-family:'Courier New',monospace;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;width:100vw;}
+canvas{display:block;}
+#ui-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
+#ui-overlay *{pointer-events:auto;}
+#hud{position:absolute;top:0;left:0;width:100%;display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.8) 0%,rgba(0,0,0,0) 100%);font-size:14px;z-index:20;}
+.hud-item{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.5);padding:4px 10px;border-radius:4px;border:1px solid rgba(255,255,255,0.15);}
+.hud-label{color:#aaa;font-size:11px;text-transform:uppercase;}
+.hud-value{color:#fff;font-weight:bold;font-size:15px;}
+.hud-value.tokens{color:#E21A2C;}
+.hud-value.okrs{color:#FFD700;}
+.hud-value.level{color:#006491;}
+#controls-info{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:12px 20px;border-radius:8px;font-size:13px;text-align:center;}
+#loading-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#0d0d1a);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s;}
+#loading-screen.hidden{opacity:0;pointer-events:none;}
+.loading-spinner{width:60px;height:60px;border:4px solid rgba(226,26,44,0.3);border-top:4px solid #E21A2C;border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{color:#FFD700;font-size:18px;margin-top:20px;font-weight:bold;}
+#start-screen{position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at center,#1a1a2e 0%,#0d0d1a 100%);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#start-screen.hidden{display:none;}
+.title-logo{font-size:clamp(48px,10vw,96px);font-weight:bold;color:#E21A2C;text-shadow:4px 4px 0 #006491,8px 8px 0 rgba(0,0,0,0.3);margin-bottom:8px;letter-spacing:3px;}
+.title-sub{color:#FFD700;font-size:clamp(16px,3vw,24px);margin-bottom:60px;letter-spacing:5px;font-weight:bold;}
+.menu-btn{background:linear-gradient(135deg,#E21A2C,#b5151f);color:#fff;border:none;padding:16px 50px;font-size:20px;font-family:'Courier New',monospace;font-weight:bold;cursor:pointer;border-radius:10px;min-width:240px;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 6px 20px rgba(226,26,44,0.5);margin:10px;}
+.menu-btn:hover{transform:scale(1.1) translateY(-3px);box-shadow:0 10px 30px rgba(226,26,44,0.8);}
+.features{margin-top:40px;text-align:center;max-width:600px;padding:0 20px;}
+.feature{margin:12px 0;font-size:16px;color:#ccc;}
+.feature-icon{color:#FFD700;margin-right:8px;}
+</style>
+</head>
+<body>
+
+<div id="loading-screen">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading Team Dominos 3D...</div>
+</div>
+
+<div id="start-screen">
+  <div class="title-logo">TEAM DOMINOS</div>
+  <div class="title-sub">IN FULL 3D!</div>
+  <button class="menu-btn" id="start-btn">START GAME</button>
+  <div class="features">
+    <div class="feature"><span class="feature-icon">🎮</span> Full 3D Crossy Road Style Graphics</div>
+    <div class="feature"><span class="feature-icon">🎨</span> Voxel/Low-Poly Aesthetic</div>
+    <div class="feature"><span class="feature-icon">📦</span> 3D Characters, OKRs & Buildings</div>
+    <div class="feature"><span class="feature-icon">✨</span> Particle Effects & Animations</div>
+    <div class="feature"><span class="feature-icon">🎯</span> Isometric Camera View</div>
+  </div>
+</div>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="ui-overlay">
+  <div id="hud" style="display:none;">
+    <div class="hud-item"><span class="hud-label">Tokens</span><span class="hud-value tokens" id="hud-tokens">0</span></div>
+    <div class="hud-item"><span class="hud-label">OKRs</span><span class="hud-value okrs" id="hud-okrs">0/0</span></div>
+    <div class="hud-item"><span class="hud-label">Level</span><span class="hud-value level" id="hud-level">1</span></div>
+  </div>
+  <div id="controls-info" style="display:none;">
+    <strong>Controls:</strong> WASD or Arrow Keys to Move | Space: Dash | Hold Shift: Sprint<br>
+    <span style="color:#FFD700;">Deliver golden OKRs to JROD's HQ! 📦 ➡️ 🏢</span>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// TEAM DOMINOS 3D - Three.js Implementation
+// ============================================================
+
+const canvas = document.getElementById('game-canvas');
+const hud = document.getElementById('hud');
+const controlsInfo = document.getElementById('controls-info');
+const startScreen = document.getElementById('start-screen');
+const startBtn = document.getElementById('start-btn');
+
+// Game constants
+const TILE = 32;
+const PLAYER_SPEED = 120;
+const PLAYER_SIZE = 2;
+const OKR_SIZE = 1;
+const HQ_SIZE = 28;
+
+// Game state
+let gameState = 'start'; // 'start', 'playing', 'paused'
+let player = { x: 0, y: 0, z: 0, vx: 0, vy: 0, facing: 0, carriedOKRs: 0, maxCapacity: 3 };
+let hqPos = { x: 0, z: 0 };
+let okrs = [];
+let buildings = [];
+let tokens = 0;
+let level = 1;
+let deliveredOKRs = 0;
+let requiredOKRs = 5;
+let keys = {};
+let lastTime = 0;
+
+// Three.js objects
+let scene, camera, renderer;
+let playerMesh, hqMesh, groundMesh;
+let okrMeshes = [];
+let buildingMeshes = [];
+let particleSystems = [];
+
+// Materials
+const materials = {
+  player: new THREE.MeshLambertMaterial({ color: 0xE21A2C }),
+  okr: new THREE.MeshLambertMaterial({ color: 0xFFD700, emissive: 0xFFD700, emissiveIntensity: 0.3 }),
+  hq: new THREE.MeshLambertMaterial({ color: 0xFF6B6B, emissive: 0xE21A2C, emissiveIntensity: 0.2 }),
+  building: new THREE.MeshLambertMaterial({ color: 0x5a6a80 }),
+  grass: new THREE.MeshLambertMaterial({ color: 0x2a8c3f }),
+  road: new THREE.MeshLambertMaterial({ color: 0x444444 })
+};
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+
+function init() {
+  console.log('Initializing Three.js 3D scene...');
+  
+  // Scene
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0d0d1a);
+  scene.fog = new THREE.Fog(0x0d0d1a, 50, 150);
+  
+  // Camera - Isometric view
+  const aspect = window.innerWidth / window.innerHeight;
+  camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 500);
+  camera.position.set(40, 50, 40);
+  camera.lookAt(0, 0, 0);
+  
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ 
+    canvas: canvas,
+    antialias: true,
+    powerPreference: 'high-performance'
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  
+  // Lights
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
+  
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(50, 100, 50);
+  directionalLight.castShadow = true;
+  directionalLight.shadow.camera.left = -100;
+  directionalLight.shadow.camera.right = 100;
+  directionalLight.shadow.camera.top = 100;
+  directionalLight.shadow.camera.bottom = -100;
+  directionalLight.shadow.mapSize.width = 2048;
+  directionalLight.shadow.mapSize.height = 2048;
+  scene.add(directionalLight);
+  
+  const fillLight = new THREE.DirectionalLight(0x4488ff, 0.3);
+  fillLight.position.set(-50, 50, -50);
+  scene.add(fillLight);
+  
+  // Ground
+  const groundGeometry = new THREE.PlaneGeometry(200, 200, 20, 20);
+  groundMesh = new THREE.Mesh(groundGeometry, materials.grass);
+  groundMesh.rotation.x = -Math.PI / 2;
+  groundMesh.receiveShadow = true;
+  scene.add(groundMesh);
+  
+  // Create player
+  const playerGeometry = new THREE.BoxGeometry(PLAYER_SIZE, 3, PLAYER_SIZE);
+  playerMesh = new THREE.Mesh(playerGeometry, materials.player);
+  playerMesh.position.y = 1.5;
+  playerMesh.castShadow = true;
+  playerMesh.receiveShadow = true;
+  scene.add(playerMesh);
+  
+  // Window resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+  
+  // Input
+  window.addEventListener('keydown', (e) => { keys[e.key.toLowerCase()] = true; });
+  window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+  
+  // Hide loading screen
+  setTimeout(() => {
+    document.getElementById('loading-screen').classList.add('hidden');
+  }, 500);
+  
+  console.log('Three.js initialized!');
+}
+
+// ============================================================
+// GAME LOGIC
+// ============================================================
+
+function startGame() {
+  console.log('Starting game...');
+  
+  startScreen.classList.add('hidden');
+  hud.style.display = 'flex';
+  controlsInfo.style.display = 'block';
+  
+  gameState = 'playing';
+  level = 1;
+  tokens = 0;
+  deliveredOKRs = 0;
+  
+  initLevel();
+  
+  lastTime = performance.now();
+  requestAnimationFrame(gameLoop);
+}
+
+function initLevel() {
+  console.log('Initializing level', level);
+  
+  // Reset player
+  player = { 
+    x: -30, y: 0, z: -30, 
+    vx: 0, vy: 0, 
+    facing: 0, 
+    carriedOKRs: 0, 
+    maxCapacity: 3 
+  };
+  
+  // Clear previous objects
+  okrMeshes.forEach(mesh => scene.remove(mesh));
+  okrMeshes = [];
+  buildingMeshes.forEach(mesh => scene.remove(mesh));
+  buildingMeshes = [];
+  okrs = [];
+  buildings = [];
+  
+  // Place HQ
+  hqPos = { x: 30, z: 30 };
+  if (hqMesh) scene.remove(hqMesh);
+  const hqGeometry = new THREE.BoxGeometry(HQ_SIZE, 8, HQ_SIZE);
+  hqMesh = new THREE.Mesh(hqGeometry, materials.hq);
+  hqMesh.position.set(hqPos.x, 4, hqPos.z);
+  hqMesh.castShadow = true;
+  hqMesh.receiveShadow = true;
+  scene.add(hqMesh);
+  
+  // Spawn OKRs
+  requiredOKRs = 5 + level * 2;
+  for (let i = 0; i < requiredOKRs; i++) {
+    const angle = (Math.PI * 2 * i) / requiredOKRs;
+    const radius = 40 + Math.random() * 20;
+    const okr = {
+      x: Math.cos(angle) * radius,
+      z: Math.sin(angle) * radius,
+      bobPhase: Math.random() * Math.PI * 2,
+      collected: false
+    };
+    okrs.push(okr);
+    
+    // Create mesh
+    const okrGeometry = new THREE.BoxGeometry(OKR_SIZE, OKR_SIZE, OKR_SIZE);
+    const okrMesh = new THREE.Mesh(okrGeometry, materials.okr.clone());
+    okrMesh.position.set(okr.x, 1, okr.z);
+    okrMesh.castShadow = true;
+    okrMesh.userData.okrIndex = i;
+    scene.add(okrMesh);
+    okrMeshes.push(okrMesh);
+  }
+  
+  // Spawn buildings
+  for (let i = 0; i < 10; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 30 + Math.random() * 30;
+    const building = {
+      x: Math.cos(angle) * radius,
+      z: Math.sin(angle) * radius
+    };
+    
+    // Avoid HQ and player
+    const distToHQ = Math.hypot(building.x - hqPos.x, building.z - hqPos.z);
+    const distToPlayer = Math.hypot(building.x - player.x, building.z - player.z);
+    
+    if (distToHQ > 20 && distToPlayer > 15) {
+      buildings.push(building);
+      
+      const height = 4 + Math.random() * 8;
+      const buildingGeometry = new THREE.BoxGeometry(HQ_SIZE * 0.7, height, HQ_SIZE * 0.7);
+      const buildingMesh = new THREE.Mesh(buildingGeometry, materials.building);
+      buildingMesh.position.set(building.x, height / 2, building.z);
+      buildingMesh.castShadow = true;
+      buildingMesh.receiveShadow = true;
+      scene.add(buildingMesh);
+      buildingMeshes.push(buildingMesh);
+    }
+  }
+  
+  updateHUD();
+}
+
+function update(dt) {
+  if (gameState !== 'playing') return;
+  
+  // Player movement
+  let moveX = 0, moveZ = 0;
+  
+  if (keys['w'] || keys['arrowup']) moveZ -= 1;
+  if (keys['s'] || keys['arrowdown']) moveZ += 1;
+  if (keys['a'] || keys['arrowleft']) moveX -= 1;
+  if (keys['d'] || keys['arrowright']) moveX += 1;
+  
+  // Normalize diagonal movement
+  if (moveX !== 0 && moveZ !== 0) {
+    moveX *= 0.707;
+    moveZ *= 0.707;
+  }
+  
+  // Speed multiplier
+  const speed = (keys['shift'] ? PLAYER_SPEED * 1.5 : PLAYER_SPEED) * dt;
+  
+  player.x += moveX * speed;
+  player.z += moveZ * speed;
+  
+  // Update player mesh
+  playerMesh.position.set(player.x, 1.5 + Math.sin(performance.now() / 200) * 0.1, player.z);
+  
+  // Rotation
+  if (moveX !== 0 || moveZ !== 0) {
+    player.facing = Math.atan2(moveZ, moveX);
+    playerMesh.rotation.y = -player.facing + Math.PI / 2;
+  }
+  
+  // Update camera to follow player
+  const targetX = player.x + 35;
+  const targetZ = player.z + 35;
+  camera.position.x += (targetX - camera.position.x) * 0.1;
+  camera.position.z += (targetZ - camera.position.z) * 0.1;
+  camera.lookAt(player.x, 0, player.z);
+  
+  // Check OKR collection
+  okrs.forEach((okr, index) => {
+    if (!okr.collected && player.carriedOKRs < player.maxCapacity) {
+      const dist = Math.hypot(player.x - okr.x, player.z - okr.z);
+      if (dist < 3) {
+        okr.collected = true;
+        player.carriedOKRs++;
+        tokens += 10;
+        
+        // Remove mesh
+        if (okrMeshes[index]) {
+          scene.remove(okrMeshes[index]);
+        }
+        
+        // Particles
+        createParticles(okr.x, 1, okr.z, 0xFFD700);
+        
+        updateHUD();
+      }
+    }
+  });
+  
+  // Check HQ delivery
+  if (player.carriedOKRs > 0) {
+    const distToHQ = Math.hypot(player.x - hqPos.x, player.z - hqPos.z);
+    if (distToHQ < 16) {
+      deliveredOKRs += player.carriedOKRs;
+      tokens += player.carriedOKRs * 50;
+      player.carriedOKRs = 0;
+      
+      // Particles
+      createParticles(hqPos.x, 4, hqPos.z, 0xFFFFFF);
+      
+      updateHUD();
+      
+      // Check level completion
+      if (deliveredOKRs >= requiredOKRs) {
+        level++;
+        setTimeout(() => {
+          initLevel();
+        }, 1000);
+      }
+    }
+  }
+  
+  // Animate OKRs
+  okrMeshes.forEach((mesh, index) => {
+    if (mesh.parent && !okrs[index].collected) {
+      mesh.rotation.y += 0.02;
+      mesh.position.y = 1 + Math.sin(performance.now() / 300 + index) * 0.3;
+    }
+  });
+  
+  // Animate HQ
+  if (hqMesh) {
+    const glowIntensity = 0.2 + Math.sin(performance.now() / 300) * 0.1;
+    hqMesh.material.emissiveIntensity = glowIntensity;
+  }
+  
+  // Update particles
+  updateParticles(dt);
+}
+
+function render() {
+  renderer.render(scene, camera);
+}
+
+function gameLoop(timestamp) {
+  const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+  lastTime = timestamp;
+  
+  update(dt);
+  render();
+  
+  requestAnimationFrame(gameLoop);
+}
+
+// ============================================================
+// PARTICLES
+// ============================================================
+
+function createParticles(x, y, z, color) {
+  const geometry = new THREE.BufferGeometry();
+  const positions = [];
+  const velocities = [];
+  const count = 20;
+  
+  for (let i = 0; i < count; i++) {
+    positions.push(x, y, z);
+    velocities.push(
+      (Math.random() - 0.5) * 5,
+      Math.random() * 5 + 2,
+      (Math.random() - 0.5) * 5
+    );
+  }
+  
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  
+  const material = new THREE.PointsMaterial({
+    color: color,
+    size: 0.5,
+    transparent: true,
+    opacity: 1
+  });
+  
+  const particles = new THREE.Points(geometry, material);
+  particles.userData.velocities = velocities;
+  particles.userData.life = 1.0;
+  scene.add(particles);
+  particleSystems.push(particles);
+}
+
+function updateParticles(dt) {
+  for (let i = particleSystems.length - 1; i >= 0; i--) {
+    const system = particleSystems[i];
+    system.userData.life -= dt;
+    
+    if (system.userData.life <= 0) {
+      scene.remove(system);
+      system.geometry.dispose();
+      system.material.dispose();
+      particleSystems.splice(i, 1);
+      continue;
+    }
+    
+    const positions = system.geometry.attributes.position.array;
+    const velocities = system.userData.velocities;
+    
+    for (let j = 0; j < positions.length; j += 3) {
+      positions[j] += velocities[j] * dt;
+      positions[j + 1] += velocities[j + 1] * dt;
+      positions[j + 2] += velocities[j + 2] * dt;
+      
+      velocities[j + 1] -= 9.8 * dt;
+    }
+    
+    system.geometry.attributes.position.needsUpdate = true;
+    system.material.opacity = system.userData.life;
+  }
+}
+
+// ============================================================
+// HUD
+// ============================================================
+
+function updateHUD() {
+  document.getElementById('hud-tokens').textContent = tokens.toLocaleString();
+  document.getElementById('hud-okrs').textContent = `${player.carriedOKRs}/${player.maxCapacity}`;
+  document.getElementById('hud-level').textContent = level;
+}
+
+// ============================================================
+// START
+// ============================================================
+
+init();
+
+startBtn.addEventListener('click', startGame);
+
+</script>
+
+</body>
+</html>
