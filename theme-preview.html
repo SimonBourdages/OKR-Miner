@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKR Miner — Theme Preview</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a12;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #ccc;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        .page-header {
+            text-align: center;
+            padding: 28px 20px 12px;
+            background: linear-gradient(180deg, #12121e 0%, #0a0a12 100%);
+            border-bottom: 1px solid #222;
+        }
+        .page-header h1 {
+            font-size: 32px;
+            letter-spacing: 4px;
+            background: linear-gradient(90deg, #0ff, #88f, #f0f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .page-header p {
+            color: #667;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            padding: 16px 20px 0;
+            background: #0a0a12;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .tab-btn {
+            padding: 10px 22px;
+            border: 1px solid #333;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            background: #111;
+            color: #888;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            letter-spacing: 0.5px;
+        }
+        .tab-btn:hover { background: #1a1a2a; color: #aaa; }
+        .tab-btn.active {
+            background: #16162a;
+            color: var(--tab-color, #0ff);
+            border-color: var(--tab-color, #0ff);
+            box-shadow: 0 -2px 12px color-mix(in srgb, var(--tab-color, #0ff) 30%, transparent);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #16162a;
+        }
+        .tab-btn .tab-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        /* ── Theme panels ── */
+        .theme-panels {
+            padding: 0 20px 40px;
+            border-top: 1px solid #222;
+            background: #0e0e18;
+        }
+        .theme-panel {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+        .theme-panel.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Theme info bar ── */
+        .theme-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            background: #111;
+            border-radius: 10px;
+            margin: 20px auto 16px;
+            max-width: 1200px;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .theme-info .ti-left h2 {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .theme-info .ti-left p {
+            font-size: 13px;
+            color: #889;
+        }
+        .swatch-row {
+            display: flex;
+            gap: 8px;
+        }
+        .swatch {
+            width: 36px; height: 36px;
+            border-radius: 6px;
+            border: 2px solid #333;
+            position: relative;
+            cursor: default;
+        }
+        .swatch::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            white-space: nowrap;
+            color: #667;
+        }
+
+        /* ── Mock game area ── */
+        .mock-game {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 600px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #222;
+        }
+        .mock-bg {
+            position: absolute;
+            inset: 0;
+        }
+        .mock-bg canvas { width: 100%; height: 100%; display: block; }
+
+        /* Stats panel mock */
+        .mock-stats {
+            position: absolute;
+            top: 12px; left: 12px;
+            width: 200px;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            z-index: 2;
+        }
+        .mock-stats .ms-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+        }
+        .mock-stats .ms-label { opacity: 0.7; }
+        .mock-stats .ms-val { font-weight: bold; }
+        .mock-progress-outer {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            margin: 6px 0;
+            overflow: hidden;
+        }
+        .mock-progress-inner {
+            height: 100%;
+            width: 68%;
+            border-radius: 5px;
+        }
+
+        /* Level info panel */
+        .mock-level {
+            position: absolute;
+            top: 12px; right: 190px;
+            width: 180px;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            text-align: right;
+            z-index: 2;
+        }
+
+        /* Building buttons */
+        .mock-buildings {
+            position: absolute;
+            top: 12px; right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 2;
+        }
+        .mock-bldg-btn {
+            width: 160px;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 11px;
+            border-width: 2px;
+            border-style: solid;
+        }
+        .mock-bldg-btn .mb-name { font-weight: bold; font-size: 13px; }
+        .mock-bldg-btn .mb-cost { font-size: 11px; }
+        .mock-bldg-btn .mb-effect { font-size: 10px; }
+
+        /* Controls panel */
+        .mock-controls {
+            position: absolute;
+            bottom: 12px; left: 12px;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 11px;
+            z-index: 2;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            max-width: 380px;
+        }
+        .mock-ctrl-btn {
+            border-radius: 4px;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-family: inherit;
+            cursor: default;
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        /* Event banner */
+        .mock-event {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 2;
+            max-width: 280px;
+            text-align: center;
+        }
+
+        /* Menu overlay mock */
+        .mock-menu-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 3;
+            display: none;
+        }
+        .mock-menu-overlay h2 {
+            font-size: 36px;
+            letter-spacing: 6px;
+            margin-bottom: 8px;
+        }
+        .mock-menu-overlay .mm-sub {
+            font-size: 13px;
+            margin-bottom: 18px;
+            opacity: 0.7;
+        }
+        .mock-menu-btn {
+            display: block;
+            margin: 6px auto;
+            padding: 10px 32px;
+            border-radius: 8px;
+            border-width: 2px;
+            border-style: solid;
+            font-family: inherit;
+            font-size: 15px;
+            cursor: default;
+            min-width: 180px;
+            font-weight: 600;
+        }
+
+        /* Floating text samples */
+        .mock-float {
+            position: absolute;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 2;
+            text-shadow: 0 0 6px currentColor;
+            pointer-events: none;
+        }
+
+        /* ── CSS vars code block ── */
+        .css-vars {
+            max-width: 1200px;
+            margin: 16px auto 0;
+            background: #0c0c16;
+            border: 1px solid #222;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .css-vars summary {
+            padding: 12px 18px;
+            font-size: 13px;
+            color: #889;
+            cursor: pointer;
+            user-select: none;
+        }
+        .css-vars summary:hover { color: #aab; }
+        .css-vars pre {
+            padding: 14px 20px;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #9da;
+            font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+        }
+        .css-vars .cv-prop { color: #7af; }
+        .css-vars .cv-val  { color: #fca; }
+        .css-vars .cv-com  { color: #556; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h1>OKR MINER</h1>
+    <p>Theme Preview &amp; Comparison — pick the vibe, ship the pixels</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="theme-panels" id="panels"></div>
+
+<script>
+// ── Theme definitions ──
+const themes = [
+    {
+        id: 'deep-space',
+        name: 'Deep Space',
+        desc: 'The current aesthetic refined — clean cyan on deep navy. Classic, familiar, polished.',
+        primary: '#00ffff',
+        accent: '#ffd700',
+        danger: '#ff4444',
+        positive: '#00ff88',
+        panelBg: 'rgba(0, 15, 30, 0.9)',
+        panelBorder: '#00ffff',
+        btnBg: 'rgba(0, 255, 255, 0.12)',
+        gridColor: 'rgba(0, 255, 255, 0.06)',
+        nodeFill: '#00cccc',
+        nodeGlow: '#00ffff',
+        connectionColor: 'rgba(0, 255, 255, 0.25)',
+        bgBase: '#000a14',
+        bgStars: '#0a1828',
+        progressGrad: ['#0ff', '#0f0'],
+        floatDmg: '#ff4444',
+        floatHeal: '#00ffff',
+        floatCurrency: '#ffd700',
+    },
+    {
+        id: 'neon-synthwave',
+        name: 'Neon Synthwave',
+        desc: 'Hot pink & electric cyan — retro-future arcade energy straight from 1987.',
+        primary: '#ff00ff',
+        accent: '#00ffff',
+        danger: '#ff3366',
+        positive: '#66ff99',
+        panelBg: 'rgba(20, 0, 40, 0.92)',
+        panelBorder: '#ff00ff',
+        btnBg: 'rgba(255, 0, 255, 0.12)',
+        gridColor: 'rgba(255, 0, 255, 0.06)',
+        nodeFill: '#cc00cc',
+        nodeGlow: '#ff00ff',
+        connectionColor: 'rgba(255, 0, 255, 0.25)',
+        bgBase: '#0c0018',
+        bgStars: '#180028',
+        progressGrad: ['#ff00ff', '#00ffff'],
+        floatDmg: '#ff3366',
+        floatHeal: '#00ffff',
+        floatCurrency: '#ffcc00',
+    },
+    {
+        id: 'emerald-matrix',
+        name: 'Emerald Matrix',
+        desc: 'Terminal-green hacker aesthetic — digital rain vibes and forest depths.',
+        primary: '#00ff88',
+        accent: '#88ffcc',
+        danger: '#ff6644',
+        positive: '#44ffaa',
+        panelBg: 'rgba(0, 20, 10, 0.92)',
+        panelBorder: '#00ff88',
+        btnBg: 'rgba(0, 255, 136, 0.10)',
+        gridColor: 'rgba(0, 255, 136, 0.06)',
+        nodeFill: '#00cc66',
+        nodeGlow: '#00ff88',
+        connectionColor: 'rgba(0, 255, 136, 0.25)',
+        bgBase: '#000e08',
+        bgStars: '#061a10',
+        progressGrad: ['#00ff88', '#88ffcc'],
+        floatDmg: '#ff6644',
+        floatHeal: '#88ffcc',
+        floatCurrency: '#ffdd44',
+    },
+    {
+        id: 'solar-forge',
+        name: 'Solar Forge',
+        desc: 'Molten orange & amber — the warmth of a star forge, industrial and bold.',
+        primary: '#ff9900',
+        accent: '#ffcc00',
+        danger: '#ff3333',
+        positive: '#66ff66',
+        panelBg: 'rgba(25, 12, 0, 0.92)',
+        panelBorder: '#ff9900',
+        btnBg: 'rgba(255, 153, 0, 0.12)',
+        gridColor: 'rgba(255, 153, 0, 0.06)',
+        nodeFill: '#cc7700',
+        nodeGlow: '#ff9900',
+        connectionColor: 'rgba(255, 153, 0, 0.25)',
+        bgBase: '#0e0800',
+        bgStars: '#1a0f04',
+        progressGrad: ['#ff9900', '#ffcc00'],
+        floatDmg: '#ff3333',
+        floatHeal: '#66ff66',
+        floatCurrency: '#ffcc00',
+    },
+    {
+        id: 'arctic-command',
+        name: 'Arctic Command',
+        desc: 'Ice-blue & steel white — a clean, cold command center with crisp readability.',
+        primary: '#88ccff',
+        accent: '#ffffff',
+        danger: '#ff5555',
+        positive: '#55ff99',
+        panelBg: 'rgba(10, 15, 25, 0.92)',
+        panelBorder: '#88ccff',
+        btnBg: 'rgba(136, 204, 255, 0.10)',
+        gridColor: 'rgba(136, 204, 255, 0.06)',
+        nodeFill: '#6699cc',
+        nodeGlow: '#88ccff',
+        connectionColor: 'rgba(136, 204, 255, 0.25)',
+        bgBase: '#060a10',
+        bgStars: '#0c1220',
+        progressGrad: ['#88ccff', '#ffffff'],
+        floatDmg: '#ff5555',
+        floatHeal: '#88ccff',
+        floatCurrency: '#ffdd88',
+    },
+];
+
+// ── Build tabs ──
+const tabsEl = document.getElementById('tabs');
+const panelsEl = document.getElementById('panels');
+
+themes.forEach((t, i) => {
+    // Tab button
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+    btn.style.setProperty('--tab-color', t.primary);
+    btn.innerHTML = `<span class="tab-dot" style="background:${t.primary}"></span>${t.name}`;
+    btn.onclick = () => switchTab(i);
+    tabsEl.appendChild(btn);
+
+    // Panel
+    const panel = document.createElement('div');
+    panel.className = 'theme-panel' + (i === 0 ? ' active' : '');
+    panel.id = 'panel-' + t.id;
+    panel.innerHTML = buildPanel(t);
+    panelsEl.appendChild(panel);
+});
+
+function switchTab(idx) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+    document.querySelectorAll('.theme-panel').forEach((p, i) => {
+        p.classList.toggle('active', i === idx);
+        if (i === idx) drawGrid(themes[idx], p.querySelector('.mock-bg canvas'));
+    });
+}
+
+// Initial draw
+requestAnimationFrame(() => {
+    themes.forEach((t, i) => {
+        const canvas = document.querySelector(`#panel-${t.id} .mock-bg canvas`);
+        if (i === 0) drawGrid(t, canvas);
+        else drawGrid(t, canvas);
+    });
+});
+
+// ── Build a single theme panel HTML ──
+function buildPanel(t) {
+    const swatches = [
+        { c: t.primary, l: 'Primary' },
+        { c: t.accent, l: 'Accent' },
+        { c: t.danger, l: 'Danger' },
+        { c: t.positive, l: 'Positive' },
+        { c: t.panelBorder, l: 'Border' },
+        { c: t.nodeFill, l: 'Node' },
+    ];
+    const swatchHTML = swatches.map(s =>
+        `<div class="swatch" style="background:${s.c}" data-label="${s.l}"></div>`
+    ).join('');
+
+    return `
+    <!-- Info bar -->
+    <div class="theme-info">
+        <div class="ti-left">
+            <h2 style="color:${t.primary}">${t.name}</h2>
+            <p>${t.desc}</p>
+        </div>
+        <div class="swatch-row">${swatchHTML}</div>
+    </div>
+
+    <!-- Mock game -->
+    <div class="mock-game" style="background:${t.bgBase}">
+        <div class="mock-bg"><canvas></canvas></div>
+
+        <!-- Stats panel -->
+        <div class="mock-stats" style="background:${t.panelBg};border:1px solid ${t.panelBorder}">
+            <div class="ms-row"><span class="ms-label" style="color:${t.accent}">Level</span><span class="ms-val" style="color:${t.primary}">3</span></div>
+            <div class="ms-row"><span class="ms-label" style="color:${t.accent}">OKRs</span><span class="ms-val" style="color:${t.primary}">684 / 1000</span></div>
+            <div class="mock-progress-outer" style="background:${hex2rgba(t.primary,0.12)};border:1px solid ${t.panelBorder}">
+                <div class="mock-progress-inner" style="background:linear-gradient(90deg,${t.progressGrad[0]},${t.progressGrad[1]})"></div>
+            </div>
+            <div class="ms-row"><span class="ms-label" style="color:${t.accent}">AC</span><span class="ms-val" style="color:${t.accent}">1,240</span></div>
+            <div class="ms-row"><span class="ms-label" style="color:${t.accent}">OKR/s</span><span class="ms-val" style="color:${t.positive}">12.4</span></div>
+            <div class="ms-row"><span class="ms-label" style="color:${t.accent}">AC/s</span><span class="ms-val" style="color:${t.accent}">3.2</span></div>
+        </div>
+
+        <!-- Level info -->
+        <div class="mock-level" style="background:${t.panelBg};border:1px solid ${t.panelBorder}">
+            <div style="color:${t.accent};font-weight:bold;font-size:13px;">Objective</div>
+            <div style="color:${t.primary};font-size:12px;margin-top:2px;">Reach 1000 OKRs</div>
+            <div style="color:${hex2rgba(t.primary,0.6)};font-size:11px;margin-top:4px;">Phase: Expansion</div>
+        </div>
+
+        <!-- Building buttons -->
+        <div class="mock-buildings">
+            ${buildBuildingBtn(t, '⛏️ Miner', '50 AC', '+2 OKR/s', false)}
+            ${buildBuildingBtn(t, '🏭 Factory', '120 AC', '+5 OKR/s, +1 AC/s', false)}
+            ${buildBuildingBtn(t, '⚡ Generator', '300 AC', '+3 EL/s', true)}
+            ${buildBuildingBtn(t, '🔗 Relay', '80 AC', 'Boost adjacent', false)}
+        </div>
+
+        <!-- Controls -->
+        <div class="mock-controls" style="background:${t.panelBg};border:1px solid ${t.panelBorder}">
+            ${buildCtrlBtn(t, '💾 Save')}
+            ${buildCtrlBtn(t, '⏩ Skip')}
+            ${buildCtrlBtn(t, '🎵 Music')}
+            ${buildCtrlBtn(t, '🏆 Achieve')}
+        </div>
+
+        <!-- Event banner -->
+        <div class="mock-event" style="background:${hex2rgba(t.positive,0.15)};border:1px solid ${t.positive};color:${t.positive}">
+            ⚡ Power Surge! +50% output for 30s
+        </div>
+
+        <!-- Floating text samples -->
+        <span class="mock-float" style="top:35%;left:38%;color:${t.floatDmg}">-12 HP</span>
+        <span class="mock-float" style="top:50%;left:52%;color:${t.floatCurrency}">+24 AC</span>
+        <span class="mock-float" style="top:42%;left:44%;color:${t.positive};font-size:16px;">+8 OKR</span>
+        <span class="mock-float" style="top:58%;left:34%;color:${t.floatHeal}">+5 HP</span>
+    </div>
+
+    <!-- CSS Variables -->
+    <details class="css-vars" open>
+        <summary>📋 CSS Variables for "${t.name}"</summary>
+        <pre>${buildCSSVars(t)}</pre>
+    </details>
+    `;
+}
+
+function buildBuildingBtn(t, name, cost, effect, selected) {
+    const border = selected ? t.accent : t.panelBorder;
+    const shadow = selected ? `box-shadow:0 0 10px ${hex2rgba(t.accent,0.35)};` : '';
+    return `<div class="mock-bldg-btn" style="background:${t.panelBg};border-color:${border};color:${t.primary};${shadow}">
+        <div class="mb-name">${name}</div>
+        <div class="mb-cost" style="color:${t.accent}">${cost}</div>
+        <div class="mb-effect" style="color:${t.positive}">${effect}</div>
+    </div>`;
+}
+
+function buildCtrlBtn(t, label) {
+    return `<span class="mock-ctrl-btn" style="background:${t.btnBg};border-color:${t.panelBorder};color:${t.primary}">${label}</span>`;
+}
+
+function buildCSSVars(t) {
+    const lines = [
+        [`/* ${t.name} Theme */`],
+        [':root {'],
+        ['  --primary', t.primary, 'Main UI color'],
+        ['  --accent', t.accent, 'Secondary / highlights'],
+        ['  --danger', t.danger, 'Damage, errors'],
+        ['  --positive', t.positive, 'Healing, gains'],
+        ['  --panel-bg', t.panelBg, 'Panel background'],
+        ['  --panel-border', t.panelBorder, 'Panel borders'],
+        ['  --btn-bg', t.btnBg, 'Button fill'],
+        ['  --grid-color', t.gridColor, 'Canvas grid lines'],
+        ['  --node-fill', t.nodeFill, 'Building node fill'],
+        ['  --node-glow', t.nodeGlow, 'Building node glow'],
+        ['  --connection-color', t.connectionColor, 'Connection lines'],
+        ['  --bg-base', t.bgBase, 'Page background'],
+        ['  --bg-stars', t.bgStars, 'Star field tint'],
+        ['  --progress-start', t.progressGrad[0], 'Progress bar start'],
+        ['  --progress-end', t.progressGrad[1], 'Progress bar end'],
+        ['  --float-dmg', t.floatDmg, 'Floating damage text'],
+        ['  --float-heal', t.floatHeal, 'Floating heal text'],
+        ['  --float-currency', t.floatCurrency, 'Floating currency text'],
+        ['}'],
+    ];
+    return lines.map(l => {
+        if (l.length === 1) {
+            if (l[0].startsWith('/*')) return `<span class="cv-com">${l[0]}</span>`;
+            return l[0];
+        }
+        return `  <span class="cv-prop">${l[0]}</span>: <span class="cv-val">${l[1]}</span>; <span class="cv-com">/* ${l[2]} */</span>`;
+    }).join('\n');
+}
+
+// ── Draw grid + nodes + connections on canvas ──
+function drawGrid(t, canvas) {
+    if (!canvas) return;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+
+    // Background gradient
+    const bg = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W*0.7);
+    bg.addColorStop(0, t.bgStars);
+    bg.addColorStop(1, t.bgBase);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars
+    const starSeed = hashStr(t.id);
+    const rng = mulberry32(starSeed);
+    for (let i = 0; i < 120; i++) {
+        const sx = rng() * W, sy = rng() * H;
+        const sr = rng() * 1.2 + 0.3;
+        const sa = rng() * 0.5 + 0.2;
+        ctx.beginPath();
+        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${sa})`;
+        ctx.fill();
+    }
+
+    // Grid
+    ctx.strokeStyle = t.gridColor;
+    ctx.lineWidth = 0.5;
+    const gs = 32;
+    for (let x = gs; x < W; x += gs) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = gs; y < H; y += gs) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // Nodes (mock buildings)
+    const nodes = [
+        { x: W*0.30, y: H*0.40, r: 14, label: '⛏' },
+        { x: W*0.42, y: H*0.35, r: 16, label: '🏭' },
+        { x: W*0.36, y: H*0.55, r: 12, label: '🔗' },
+        { x: W*0.50, y: H*0.50, r: 18, label: '⚡' },
+        { x: W*0.46, y: H*0.65, r: 14, label: '⛏' },
+        { x: W*0.55, y: H*0.38, r: 12, label: '🔗' },
+        { x: W*0.38, y: H*0.72, r: 15, label: '🏭' },
+    ];
+
+    // Connections
+    const connections = [[0,1],[0,2],[1,3],[2,3],[2,4],[3,5],[4,6],[2,6]];
+    ctx.lineWidth = 1.5;
+    connections.forEach(([a,b]) => {
+        const na = nodes[a], nb = nodes[b];
+        ctx.beginPath();
+        ctx.moveTo(na.x, na.y);
+        ctx.lineTo(nb.x, nb.y);
+        ctx.strokeStyle = t.connectionColor;
+        ctx.stroke();
+        // animated dots
+        for (let p = 0.2; p <= 0.8; p += 0.3) {
+            const dx = na.x + (nb.x - na.x) * p;
+            const dy = na.y + (nb.y - na.y) * p;
+            ctx.beginPath();
+            ctx.arc(dx, dy, 2, 0, Math.PI*2);
+            ctx.fillStyle = hex2rgba(t.primary, 0.5);
+            ctx.fill();
+        }
+    });
+
+    // Nodes
+    nodes.forEach(n => {
+        // Glow
+        const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 2.5);
+        glow.addColorStop(0, hex2rgba(t.nodeGlow, 0.25));
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.fillRect(n.x - n.r*3, n.y - n.r*3, n.r*6, n.r*6);
+
+        // Circle
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+        ctx.fillStyle = t.nodeFill;
+        ctx.fill();
+        ctx.strokeStyle = t.nodeGlow;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Emoji
+        ctx.font = `${n.r}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(n.label, n.x, n.y + 1);
+    });
+
+    // Factory chimney glow accent on the big node
+    const bigNode = nodes[3];
+    const factGlow = ctx.createRadialGradient(bigNode.x, bigNode.y - 10, 0, bigNode.x, bigNode.y - 10, 40);
+    factGlow.addColorStop(0, hex2rgba(t.accent, 0.12));
+    factGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = factGlow;
+    ctx.fillRect(bigNode.x - 50, bigNode.y - 60, 100, 100);
+}
+
+// ── Utilities ──
+function hex2rgba(hex, alpha) {
+    if (hex.startsWith('rgba')) {
+        if (alpha !== undefined) {
+            return hex.replace(/[\d.]+\)$/, alpha + ')');
+        }
+        return hex;
+    }
+    let c = hex.replace('#', '');
+    if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+    const r = parseInt(c.substring(0,2),16);
+    const g = parseInt(c.substring(2,4),16);
+    const b = parseInt(c.substring(4,6),16);
+    return `rgba(${r},${g},${b},${alpha !== undefined ? alpha : 1})`;
+}
+
+function hashStr(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    return Math.abs(h);
+}
+
+function mulberry32(a) {
+    return function() {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+}
+
+// Redraw on resize
+window.addEventListener('resize', () => {
+    themes.forEach((t, i) => {
+        const canvas = document.querySelector(`#panel-${t.id} .mock-bg canvas`);
+        drawGrid(t, canvas);
+    });
+});
+</script>
+</body>
+</html>
