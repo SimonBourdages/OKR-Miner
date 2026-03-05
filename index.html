@@ -562,6 +562,7 @@
         <button onclick="game.startInfiniteMode()">♾️ INFINITE MODE</button>
         <button onclick="game.continueGame()">CONTINUE</button>
         <button onclick="game.clearSave()">CLEAR SAVE</button>
+        <div id="versionTag" style="margin-top:16px;color:#666;font-size:10px;letter-spacing:1px;"></div>
     </div>
 
     <div id="achievementPopup"></div>
@@ -657,6 +658,17 @@
     <script>
     (function() {
         'use strict';
+
+        // =========================================================
+        // VERSION
+        // =========================================================
+
+        var GAME_VERSION = '1.0.0';
+        var BUILD_DATE = '2026-03-05';
+
+        // Show version on menu
+        var vTag = document.getElementById('versionTag');
+        if (vTag) vTag.textContent = 'v' + GAME_VERSION + ' · ' + BUILD_DATE;
 
         // =========================================================
         // CONFIGURATION
