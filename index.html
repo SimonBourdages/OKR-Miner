@@ -1019,6 +1019,7 @@
             function endIntro() {
                 if (introDiv._ended) return;
                 introDiv._ended = true;
+                introDiv.style.pointerEvents = 'none';
                 introDiv.style.transition = 'opacity 0.8s';
                 introDiv.style.opacity = '0';
                 setTimeout(function() {
@@ -1338,6 +1339,8 @@
             document.getElementById('menu').style.display = 'none';
             document.getElementById('victoryScreen').style.display = 'none';
             document.getElementById('levelTransition').style.display = 'none';
+            var vidIntro = document.getElementById('videoIntro');
+            if (vidIntro) { vidIntro.style.display = 'none'; vidIntro.style.pointerEvents = 'none'; }
             document.getElementById('ui').style.display = 'block';
             document.getElementById('controls').style.display = 'flex';
             document.getElementById('buildings').style.display = 'flex';
