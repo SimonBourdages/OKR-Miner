@@ -5353,14 +5353,14 @@
 
             var body = '## ' + typeLabel + '\n\n';
             body += '### Description\n' + desc + '\n\n';
-            if (contact) {
-                body += '### Contact\n' + contact + '\n\n';
-            }
-            body += '### Game State\n```\n' + (this._bugGameState || 'N/A') + '\n```\n\n';
             if (this._bugScreenshotData) {
                 body += '### Screenshot\n';
                 body += '_A screenshot was captured but cannot be attached via URL. ';
                 body += 'The reporter can paste it from their clipboard._\n\n';
+            }
+            body += '### Game State\n```\n' + (this._bugGameState || 'N/A') + '\n```\n\n';
+            if (contact) {
+                body += '### Contact\n' + contact + '\n\n';
             }
             body += '---\n_Submitted via in-game bug reporter_';
 
