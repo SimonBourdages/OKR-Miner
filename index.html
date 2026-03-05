@@ -508,28 +508,23 @@
             <span class="stat-value" id="currencyDisplay">50</span>
         </div>
         <div class="stat-row">
-            <span class="stat-label">Total OKRs</span>
-            <span class="stat-value" id="totalOKRs">0</span>
-        </div>
-        <div class="stat-row" style="margin-top:6px;border-top:1px solid #234;padding-top:4px;">
-            <span class="stat-label">OKR/s</span>
-            <span class="stat-value" id="okrRate" style="color:#0f0;">0</span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-label">AC/s</span>
-            <span class="stat-value" id="acRate" style="color:#ff0;">0</span>
-        </div>
-        <div class="stat-row">
             <span class="stat-label">⚡ EL</span>
             <span class="stat-value" id="elDisplay" style="color:#ff9800;">0</span>
         </div>
-        <div class="stat-row">
-            <span class="stat-label">EL/s</span>
-            <span class="stat-value" id="elRate" style="color:#ff9800;">0</span>
-        </div>
-        <div class="stat-row" style="margin-top:4px;border-top:1px solid #234;padding-top:4px;">
-            <span class="stat-label">🔍 Zoom</span>
-            <span class="stat-value" id="zoomDisplay" style="color:#8cf;">100%</span>
+        <div style="margin-top:6px;border-top:1px solid #234;padding-top:4px;cursor:pointer;color:#888;font-size:10px;text-align:center;" onclick="var r=document.getElementById('ratesSection');r.style.display=r.style.display==='none'?'block':'none';">▼ Rates</div>
+        <div id="ratesSection" style="display:none;">
+            <div class="stat-row">
+                <span class="stat-label">OKR/s</span>
+                <span class="stat-value" id="okrRate" style="color:#0f0;">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">AC/s</span>
+                <span class="stat-value" id="acRate" style="color:#ff0;">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">EL/s</span>
+                <span class="stat-value" id="elRate" style="color:#ff9800;">0</span>
+            </div>
         </div>
     </div>
 
@@ -2458,7 +2453,6 @@
 
             document.getElementById('okrCount').textContent = this.formatNumber(Math.floor(this.state.totalOKRs));
             document.getElementById('currencyDisplay').textContent = this.formatNumber(Math.floor(this.state.currencies.ac));
-            document.getElementById('totalOKRs').textContent = this.formatNumber(Math.floor(this.state.totalOKRs));
             document.getElementById('okrRate').textContent = this.currentOkrRate.toFixed(1);
             document.getElementById('acRate').textContent = this.currentAcRate.toFixed(1);
 
