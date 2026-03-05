@@ -1244,6 +1244,7 @@
                     for (var i = 0; i < this.nodes.length; i++) {
                         if (!this.nodes[i].level) this.nodes[i].level = 1;
                         if (!this.nodes[i].hp) { this.nodes[i].hp = 100; this.nodes[i].maxHp = 100; }
+                        if (this.nodes[i].damageFlash === undefined) this.nodes[i].damageFlash = 0;
                     }
                     if (this.state.currencies.el === undefined) this.state.currencies.el = 0;
                 } catch (e) {
@@ -1499,7 +1500,8 @@
                 lastProduce: 0,
                 level: 1,
                 hp: 100,
-                maxHp: 100
+                maxHp: 100,
+                damageFlash: 0
             });
 
             this.addFloatingText(x, y - 20, '-' + b.cost + ' AC', '#ff0');
@@ -1742,6 +1744,7 @@
                         if (Math.sqrt(sdx * sdx + sdy * sdy) < 22) {
                             // Impact! Damage building and explode ship
                             nd.hp = Math.max(0, (nd.hp !== undefined ? nd.hp : 100) - 15);
+                            nd.damageFlash = 1.0;
                             this.addFloatingText(nd.x, nd.y - 25, '-15 HP!', '#f44', 14);
                             this.spawnParticles(ship.x, ship.y, '#ff4400', 12);
                             this.spawnParticles(ship.x, ship.y, '#ffcc00', 8);
@@ -1920,6 +1923,13 @@
                 }
             }
 
+            // Damage flash decay
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].damageFlash > 0) {
+                    this.nodes[i].damageFlash = Math.max(0, this.nodes[i].damageFlash - 0.03);
+                }
+            }
+
             // Random space events
             if (this.eventTimer > 0) {
                 this.eventTimer -= dt;
@@ -2023,7 +2033,14 @@
             var evt = SPACE_EVENTS[Math.floor(Math.random() * SPACE_EVENTS.length)];
 
             // Execute effect
+            var hpSnapshot = this.nodes.map(function(n) { return n.hp !== undefined ? n.hp : 100; });
             try { evt.effect(this); } catch(e) { /* safety */ }
+            for (var i = 0; i < this.nodes.length; i++) {
+                var curHp = this.nodes[i].hp !== undefined ? this.nodes[i].hp : 100;
+                if (curHp < hpSnapshot[i]) {
+                    this.nodes[i].damageFlash = 1.0;
+                }
+            }
 
             // Record in history
             this.eventHistory.push({
@@ -3918,10 +3935,11 @@
             var label = BUILDINGS[node.type].name + (lvl > 1 ? ' Lv.' + lvl : '');
             ctx.fillText(label, x, y + 7 * s);
 
-            // HP bar
+            // HP bar (show when damaged OR when damage flash is active)
             var hp = node.hp !== undefined ? node.hp : 100;
             var maxHp = node.maxHp || 100;
-            if (hp < maxHp) {
+            var flash = node.damageFlash || 0;
+            if (hp < maxHp || flash > 0) {
                 var barW = 30;
                 var barH = 4;
                 var barX = x - barW / 2;
@@ -3937,6 +3955,25 @@
                 ctx.strokeStyle = '#fff';
                 ctx.lineWidth = 0.5;
                 ctx.strokeRect(barX, barY, barW, barH);
+            }
+
+            // Damage flash overlays
+            if (flash > 0) {
+                var nodeRadius = (6 + lvl) * s;
+                ctx.save();
+                if (flash > 0.3) {
+                    // Red tint overlay, intensity scales with flash
+                    var redAlpha = (flash - 0.3) / 0.7 * 0.55;
+                    ctx.fillStyle = 'rgba(255, 0, 0, ' + redAlpha.toFixed(3) + ')';
+                    ctx.fillRect(x - nodeRadius, y - nodeRadius, nodeRadius * 2, nodeRadius * 2);
+                }
+                if (flash > 0.7) {
+                    // Bright white flash overlay
+                    var whiteAlpha = (flash - 0.7) / 0.3 * 0.7;
+                    ctx.fillStyle = 'rgba(255, 255, 255, ' + whiteAlpha.toFixed(3) + ')';
+                    ctx.fillRect(x - nodeRadius, y - nodeRadius, nodeRadius * 2, nodeRadius * 2);
+                }
+                ctx.restore();
             }
 
             // Disabled overlay
