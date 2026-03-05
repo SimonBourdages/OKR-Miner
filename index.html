@@ -558,6 +558,7 @@
         <button onclick="game.showAchievements()">🏆 Achievements</button>
         <button onclick="game.showEventHistory()">📜 Events</button>
         <button onclick="game.buyRepairBot()">🔧 Buy Repair Bot (<span id="repairBotCost">200</span> AC)</button>
+        <button onclick="game.openBugReport()">🐛 Report Bug</button>
         <div style="margin-top:4px;color:#0ff;font-size:10px;">Repair Bots: <span id="repairBotCount">0</span></div>
         <div style="margin-top:6px;color:#ff0;font-size:11px;">Next event: <span id="eventCountdown">--</span>s</div>
     </div>
@@ -566,7 +567,7 @@
 
     <div id="menu">
         <h1>OKR FARMING</h1>
-        <div class="subtitle">Idle Automation Game</div>
+        <div class="subtitle">Engine Building Game</div>
         <button onclick="game.newGame()">NEW GAME</button>
         <button onclick="game.startInfiniteMode()">♾️ INFINITE MODE</button>
         <button onclick="game.continueGame()">CONTINUE</button>
@@ -615,6 +616,44 @@
             <div class="ending-btn" onclick="game.endingRestart()">
                 <h3>🔄 New Game+</h3>
                 <p>Start over with bonuses.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bug Report Modal -->
+    <div id="bugReportModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:300;overflow-y:auto;padding:20px;">
+        <div style="max-width:600px;margin:0 auto;">
+            <h2 style="color:#ff9800;font-size:24px;text-align:center;margin-bottom:16px;">🐛 Bug Report / Suggestion</h2>
+            <div style="margin-bottom:12px;">
+                <label style="color:#8cf;font-size:12px;display:block;margin-bottom:4px;">Screenshot (auto-captured)</label>
+                <div style="border:1px solid #456;border-radius:6px;overflow:hidden;background:#111;">
+                    <img id="bugScreenshot" style="width:100%;display:block;" />
+                </div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="color:#8cf;font-size:12px;display:block;margin-bottom:4px;">Type</label>
+                <select id="bugType" style="width:100%;padding:8px;background:#111;color:#fff;border:1px solid #456;border-radius:4px;font-family:inherit;font-size:14px;">
+                    <option value="bug">🐛 Bug Report</option>
+                    <option value="feature">💡 Feature Request</option>
+                    <option value="improvement">✨ Improvement Suggestion</option>
+                </select>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="color:#8cf;font-size:12px;display:block;margin-bottom:4px;">Title *</label>
+                <input id="bugTitle" type="text" placeholder="Brief summary of the issue or idea" style="width:100%;padding:8px;background:#111;color:#fff;border:1px solid #456;border-radius:4px;font-family:inherit;font-size:14px;box-sizing:border-box;" />
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="color:#8cf;font-size:12px;display:block;margin-bottom:4px;">Description *</label>
+                <textarea id="bugDesc" rows="5" placeholder="What happened? What did you expect? Steps to reproduce..." style="width:100%;padding:8px;background:#111;color:#fff;border:1px solid #456;border-radius:4px;font-family:inherit;font-size:14px;resize:vertical;box-sizing:border-box;"></textarea>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="color:#8cf;font-size:12px;display:block;margin-bottom:4px;">Your contact (optional — email or name)</label>
+                <input id="bugContact" type="text" placeholder="e.g. your@email.com or @username" style="width:100%;padding:8px;background:#111;color:#fff;border:1px solid #456;border-radius:4px;font-family:inherit;font-size:14px;box-sizing:border-box;" />
+            </div>
+            <div id="bugGameState" style="margin-bottom:12px;padding:8px;background:#0a0a0a;border:1px solid #333;border-radius:4px;font-size:10px;color:#666;max-height:60px;overflow:hidden;"></div>
+            <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
+                <button onclick="game.submitBugReport()" style="background:#ff9800;color:#000;border:none;padding:10px 30px;font-family:inherit;font-size:14px;font-weight:bold;cursor:pointer;border-radius:6px;">Submit to GitHub</button>
+                <button onclick="game.closeBugReport()" style="background:#333;color:#fff;border:1px solid #666;padding:10px 30px;font-family:inherit;font-size:14px;cursor:pointer;border-radius:6px;">Cancel</button>
             </div>
         </div>
     </div>
@@ -4254,6 +4293,104 @@
 
         OKRFarmingGame.prototype.hideEventHistory = function() {
             document.getElementById('eventHistoryPanel').style.display = 'none';
+        };
+
+        // =========================================================
+        // BUG REPORT SYSTEM
+        // =========================================================
+
+        OKRFarmingGame.prototype.openBugReport = function() {
+            // Capture screenshot from canvas
+            try {
+                var dataUrl = this.canvas.toDataURL('image/png');
+                document.getElementById('bugScreenshot').src = dataUrl;
+                this._bugScreenshotData = dataUrl;
+            } catch (e) {
+                document.getElementById('bugScreenshot').src = '';
+                this._bugScreenshotData = null;
+            }
+
+            // Populate game state info
+            var stateInfo = 'Level: ' + (this.state ? this.state.currentLevel : '?');
+            stateInfo += ' | AC: ' + (this.state ? this.formatNumber(Math.floor(this.state.currencies.ac)) : '?');
+            stateInfo += ' | EL: ' + (this.state ? this.formatNumber(Math.floor(this.state.currencies.el)) : '?');
+            stateInfo += ' | OKRs: ' + (this.state ? this.formatNumber(Math.floor(this.state.okrsCollected)) : '?');
+            stateInfo += ' | Buildings: ' + this.nodes.length;
+            stateInfo += ' | Repair Bots: ' + this.repairBots.length;
+            stateInfo += ' | Ships: ' + this.ships.length;
+            stateInfo += ' | Infinite: ' + (this.infiniteMode ? 'Yes' : 'No');
+            stateInfo += ' | Browser: ' + navigator.userAgent.split(' ').slice(-2).join(' ');
+            document.getElementById('bugGameState').textContent = 'Game state: ' + stateInfo;
+            this._bugGameState = stateInfo;
+
+            // Clear inputs
+            document.getElementById('bugTitle').value = '';
+            document.getElementById('bugDesc').value = '';
+            document.getElementById('bugContact').value = '';
+            document.getElementById('bugType').value = 'bug';
+
+            document.getElementById('bugReportModal').style.display = 'block';
+        };
+
+        OKRFarmingGame.prototype.closeBugReport = function() {
+            document.getElementById('bugReportModal').style.display = 'none';
+        };
+
+        OKRFarmingGame.prototype.submitBugReport = function() {
+            var title = document.getElementById('bugTitle').value.trim();
+            var desc = document.getElementById('bugDesc').value.trim();
+            var contact = document.getElementById('bugContact').value.trim();
+            var type = document.getElementById('bugType').value;
+
+            if (!title) {
+                alert('Please enter a title.');
+                return;
+            }
+            if (!desc) {
+                alert('Please enter a description.');
+                return;
+            }
+
+            var typeEmoji = type === 'bug' ? '🐛' : type === 'feature' ? '💡' : '✨';
+            var typeLabel = type === 'bug' ? 'Bug Report' : type === 'feature' ? 'Feature Request' : 'Improvement';
+            var issueTitle = typeEmoji + ' [' + typeLabel + '] ' + title;
+
+            var body = '## ' + typeLabel + '\n\n';
+            body += '### Description\n' + desc + '\n\n';
+            if (contact) {
+                body += '### Contact\n' + contact + '\n\n';
+            }
+            body += '### Game State\n```\n' + (this._bugGameState || 'N/A') + '\n```\n\n';
+            if (this._bugScreenshotData) {
+                body += '### Screenshot\n';
+                body += '_A screenshot was captured but cannot be attached via URL. ';
+                body += 'The reporter can paste it from their clipboard._\n\n';
+            }
+            body += '---\n_Submitted via in-game bug reporter_';
+
+            // Build GitHub issue URL
+            var repoUrl = 'https://github.com/SimonBourdages/OKR-Miner';
+            var labels = type === 'bug' ? 'bug' : type === 'feature' ? 'enhancement' : 'enhancement';
+            var issueUrl = repoUrl + '/issues/new?title=' + encodeURIComponent(issueTitle)
+                + '&body=' + encodeURIComponent(body)
+                + '&labels=' + encodeURIComponent(labels);
+
+            // Copy screenshot to clipboard if available
+            if (this._bugScreenshotData) {
+                try {
+                    var img = this._bugScreenshotData;
+                    fetch(img).then(function(r) { return r.blob(); }).then(function(blob) {
+                        try {
+                            navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                        } catch(e) {}
+                    });
+                } catch(e) {}
+            }
+
+            // Open GitHub issue in new tab
+            window.open(issueUrl, '_blank');
+            this.closeBugReport();
+            this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2, 'Opening GitHub... paste screenshot with Ctrl+V!', '#0f0', 14);
         };
 
         // =========================================================
