@@ -1270,7 +1270,8 @@
             'collision':    { icon: '💥', name: 'Collateral Damage', desc: 'A building was destroyed during an upgrade collision' },
             'merge':        { icon: '🔄', name: 'Fusion!', desc: 'Merged two same-type buildings into a Legendary Lv.4' },
             'phished':      { icon: '🎣', name: 'Phished!', desc: 'Your Leadership clicked a phishing link. Instant game over.' },
-            'ai-takeover-loss': { icon: '🤖', name: 'Taken Over', desc: 'Lose the robot war after choosing Humans First' }
+            'ai-takeover-loss': { icon: '🤖', name: 'Taken Over', desc: 'Lose the robot war after choosing Humans First' },
+            'vpn':              { icon: '🔒', name: 'VPN Enabled', desc: 'Network Hub secured your connections. Particle flows disabled.' }
         };
 
         var BG_IMAGES = {
@@ -2918,7 +2919,7 @@
 
             // Achievement checks
             this.unlock('build-first');
-            if (type === 'multiplier') this.unlock('multiplier');
+            if (type === 'multiplier') { this.unlock('multiplier'); this.unlock('vpn'); }
 
             // Tutorial
             if (!this.tutorialShown['watch'] && this.nodes.length === 1) {
@@ -6632,6 +6633,13 @@
                     this.resourceFlowIcons.splice(i, 1);
                 }
             }
+
+            // VPN enabled: stop spawning new particles once a Network Hub exists
+            var hasMultiplier = false;
+            for (var mi = 0; mi < this.nodes.length; mi++) {
+                if (this.nodes[mi].type === 'multiplier') { hasMultiplier = true; break; }
+            }
+            if (hasMultiplier) return;
 
             // Don't spawn more than the pool limit
             if (this.resourceFlowIcons.length >= FLOW_ICON_MAX) return;
