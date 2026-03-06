@@ -670,18 +670,18 @@
 
     <div id="ui" style="display:none;">
         <div class="stat-row">
-            <span class="stat-label">OKR Review</span>
+            <span class="stat-label">Objective Review</span>
             <span class="stat-value" id="milestoneCount">1</span>
         </div>
         <div class="stat-row">
-            <span class="stat-label">OKRs</span>
+            <span class="stat-label">Key Results</span>
             <span class="stat-value"><span id="okrCount">0</span> → <span id="nextMilestone">50</span></span>
         </div>
         <div id="progressBarContainer">
             <div id="progressBar"></div>
         </div>
         <div class="stat-row">
-            <span class="stat-label">AC</span>
+            <span class="stat-label">HC</span>
             <span class="stat-value" id="currencyDisplay">50</span>
         </div>
         <div id="elRow" class="stat-row" style="display:none;">
@@ -691,11 +691,11 @@
         <div style="margin-top:6px;border-top:1px solid #234;padding-top:4px;cursor:pointer;color:#888;font-size:10px;text-align:center;" onclick="var r=document.getElementById('ratesSection');r.style.display=r.style.display==='none'?'block':'none';">▼ Rates</div>
         <div id="ratesSection" style="display:none;">
             <div class="stat-row">
-                <span class="stat-label">OKR/s</span>
+                <span class="stat-label">KR/s</span>
                 <span class="stat-value" id="okrRate" style="color:#0f0;">0</span>
             </div>
             <div class="stat-row">
-                <span class="stat-label">AC/s</span>
+                <span class="stat-label">HC/s</span>
                 <span class="stat-value" id="acRate" style="color:#ff0;">0</span>
             </div>
             <div id="elRateRow" class="stat-row" style="display:none;">
@@ -804,7 +804,7 @@
     <div id="victoryScreen">
         <h1>🏆 CONGRATULATIONS! 🏆</h1>
         <div class="vic-sub">All executives have reviewed every OKR.<br>The business is thriving. You did it!</div>
-        <div style="color:#ffd700;font-size:18px;margin:20px 0;">🌟 All OKR Reviews Complete 🌟</div>
+        <div style="color:#ffd700;font-size:18px;margin:20px 0;">🌟 All Objective Reviews Complete 🌟</div>
         <div class="endings">
             <div class="ending-btn" onclick="game.continueAfterVictory()">
                 <h3>▶ Keep Playing</h3>
@@ -885,7 +885,7 @@
             { okr: 50,      unlock: ['multiplier'], title: '✖️ Multiplier Unlocked!', desc: 'Multipliers boost ALL production by 1.5x each! Stack them for massive output.' },
             { okr: 500,     unlock: ['generator'], title: '⚡ Electricity Online!', desc: 'Buildings now require power! Generators produce electricity to keep everything running.', enableElectricity: true },
             { okr: 5000,    unlock: ['bank'], title: '🏦 Bank Unlocked!', desc: 'Banks earn interest on your AC. Smart money management pays off!' },
-            { okr: 50000,   unlock: ['synthesizer'], title: '⚛️ Synthesizer Unlocked!', desc: 'The ultimate OKR machine! Synthesizers produce 100 OKR/s but need lots of power.' },
+            { okr: 50000,   unlock: ['synthesizer'], title: '⚛️ Synthesizer Unlocked!', desc: 'The ultimate OKR machine! Synthesizers produce 100 KR/s but need lots of power.' },
             { okr: 500000,  unlock: [], title: '🛸 Spaceship Threat!', desc: 'Enemy ships are targeting your buildings! They deal damage on impact. Watch out!', enableShips: true },
             { okr: 1000000, unlock: [], title: '🔧 Repair Bots Available!', desc: 'Buy repair drones to automatically fix damaged buildings.', enableRepairBots: true },
             { okr: 5e6,     unlock: [], title: '☠️ OKR Thieves Incoming!', desc: 'Pirate ships will try to steal your OKRs from the factory! Click them to destroy!', enableThieves: true },
@@ -899,20 +899,26 @@
             { okr: 1e15,    unlock: [], title: '♾️ INFINITE BEYOND', desc: 'Beyond all measurement. You ARE the OKRs now.' }
         ];
 
+        function getPlayableRadius(state) {
+            if (!state) return 200;
+            var milestones = state.unlockedMilestones ? state.unlockedMilestones.length : 1;
+            return 200 + milestones * 20;
+        }
+
         var THEMES = {
             emerald: {
                 name: 'Emerald Matrix',
                 primary: '#00ff88', accent: '#88ffcc', danger: '#ff6644',
                 panelBg: 'rgba(0, 20, 10, 0.92)', panelBorder: '#00ff88',
                 gridColor: 'rgba(0, 255, 136, 0.04)',
-                bonus: 'okr', bonusDesc: '+1% OKR/s', bonusMult: 1.01
+                bonus: 'okr', bonusDesc: '+1% KR/s', bonusMult: 1.01
             },
             neon: {
                 name: 'Neon Synthwave',
                 primary: '#ff00ff', accent: '#00ffff', danger: '#ff3366',
                 panelBg: 'rgba(20, 0, 40, 0.92)', panelBorder: '#ff00ff',
                 gridColor: 'rgba(255, 0, 255, 0.04)',
-                bonus: 'ac', bonusDesc: '+1% AC/s', bonusMult: 1.01
+                bonus: 'ac', bonusDesc: '+1% HC/s', bonusMult: 1.01
             },
             solar: {
                 name: 'Solar Forge',
@@ -941,10 +947,10 @@
         var UPGRADE_POWER = { 1: 1.0, 2: 2.0, 3: 4.5 }; // multiplier on output
 
         var BUILDINGS = {
-            collector:   { name: 'Collector',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 AC/s',          symbol: '', metrics: ['ac'] },
-            processor:   { name: 'Processor',   cost: 150,  acPerSec: 0,   okrPerSec: 5,   elCost: 3,  color: '#2196f3', desc: '+5 OKR/s',         symbol: '', metrics: ['okr'] },
+            collector:   { name: 'Collector',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 HC/s',          symbol: '', metrics: ['ac'] },
+            processor:   { name: 'Processor',   cost: 150,  acPerSec: 0,   okrPerSec: 5,   elCost: 3,  color: '#2196f3', desc: '+5 KR/s',         symbol: '', metrics: ['okr'] },
             multiplier:  { name: 'Multiplier',  cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#9c27b0', desc: 'x1.5 all rates',   symbol: '', metrics: ['okr', 'ac', 'el', 'mult'], multiplier: 1.5 },
-            synthesizer: { name: 'Synthesizer', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 OKR/s',        symbol: '', metrics: ['okr'] },
+            synthesizer: { name: 'Synthesizer', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 KR/s',        symbol: '', metrics: ['okr'] },
             generator:   { name: 'Generator',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 EL/s', symbol: '', metrics: ['el'] },
             bank:        { name: 'Bank',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% AC interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
             repairbot:   { name: 'Repair Bot',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Heals lowest HP',  symbol: '', metrics: ['hp'], repairRate: 15 }
@@ -1132,23 +1138,23 @@
             { name: 'Energy Surge', desc: 'Electricity doubled!', type: 'positive', icon: '⚡', effect: function(g) { g.state.currencies.el*=2; } },
             { name: 'Repair Nanobots', desc: 'Heal all buildings 30 HP!', type: 'positive', icon: '🔧', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+30); } },
             { name: 'Production Boost', desc: '2x production for 10s!', type: 'positive', icon: '🚀', effect: function(g) { g._eventBuff={mult:2,timer:10}; } },
-            { name: 'Lucky Find', desc: 'Gain 50 AC!', type: 'positive', icon: '💰', effect: function(g) { g.state.currencies.ac+=50; } },
+            { name: 'Lucky Find', desc: 'Gain 50 HC!', type: 'positive', icon: '💰', effect: function(g) { g.state.currencies.ac+=50; } },
             { name: 'Hyperdrive', desc: '3x production for 5s!', type: 'positive', icon: '🚀', effect: function(g) { g._eventBuff={mult:3,timer:5}; } },
             { name: 'Shield Recharge', desc: 'Full heal all buildings!', type: 'positive', icon: '🛡️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100; } },
             { name: 'Trade Deal', desc: 'Gain 30% AC!', type: 'positive', icon: '💎', effect: function(g) { g.state.currencies.ac*=1.3; } },
             { name: 'Star Power', desc: 'Gain 100 electricity!', type: 'positive', icon: '⭐', effect: function(g) { g.state.currencies.el+=100; } },
             { name: 'Cosmic Windfall', desc: 'Gain 40% AC!', type: 'positive', icon: '💰', effect: function(g) { g.state.currencies.ac*=1.4; } },
-            { name: 'Resource Cache', desc: 'Gain 75 AC!', type: 'positive', icon: '📦', effect: function(g) { g.state.currencies.ac+=75; } },
+            { name: 'Resource Cache', desc: 'Gain 75 HC!', type: 'positive', icon: '📦', effect: function(g) { g.state.currencies.ac+=75; } },
             { name: 'Alien Trade', desc: 'Gain 3% bonus OKRs!', type: 'positive', icon: '👽', effect: function(g) { var bonus=g.state.totalOKRs*0.03;g.state.totalOKRs+=bonus; } },
             { name: 'Nova Harvest', desc: 'Gain 150 electricity!', type: 'positive', icon: '🌟', effect: function(g) { g.state.currencies.el+=150; } },
-            { name: 'Crystal Discovery', desc: 'Gain 100 AC!', type: 'positive', icon: '💎', effect: function(g) { g.state.currencies.ac+=100; } },
+            { name: 'Crystal Discovery', desc: 'Gain 100 HC!', type: 'positive', icon: '💎', effect: function(g) { g.state.currencies.ac+=100; } },
             { name: 'Deep Space Signal', desc: '2x production for 8s!', type: 'positive', icon: '📡', effect: function(g) { g._eventBuff={mult:2,timer:8}; } },
             { name: 'Friendly Fleet', desc: 'Heal all buildings 50 HP!', type: 'positive', icon: '🛸', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+50); } },
             { name: 'Tech Upgrade', desc: '1.5x production for 15s!', type: 'positive', icon: '🔧', effect: function(g) { g._eventBuff={mult:1.5,timer:15}; } },
-            { name: 'Supply Drop', desc: 'Gain 60 AC and 60 EL!', type: 'positive', icon: '📦', effect: function(g) { g.state.currencies.ac+=60;g.state.currencies.el+=60; } },
+            { name: 'Supply Drop', desc: 'Gain 60 HC and 60 EL!', type: 'positive', icon: '📦', effect: function(g) { g.state.currencies.ac+=60;g.state.currencies.el+=60; } },
             { name: 'Quantum Luck', desc: 'Gain 7% bonus OKRs!', type: 'positive', icon: '🍀', effect: function(g) { var bonus=g.state.totalOKRs*0.07;g.state.totalOKRs+=bonus; } },
-            { name: 'Galactic Aid', desc: 'Full heal and gain 30 AC!', type: 'positive', icon: '🌌', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100;g.state.currencies.ac+=30; } },
-            { name: 'Nebula Mining', desc: 'Gain 80 AC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac+=80; } },
+            { name: 'Galactic Aid', desc: 'Full heal and gain 30 HC!', type: 'positive', icon: '🌌', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100;g.state.currencies.ac+=30; } },
+            { name: 'Nebula Mining', desc: 'Gain 80 HC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac+=80; } },
             { name: 'Treasure Probe', desc: 'Gain 25% AC!', type: 'positive', icon: '🔭', effect: function(g) { g.state.currencies.ac*=1.25; } },
             { name: 'Solar Harvest', desc: 'Gain 200 electricity!', type: 'positive', icon: '☀️', effect: function(g) { g.state.currencies.el+=200; } },
             { name: 'Warp Bonus', desc: '4x production for 3s!', type: 'positive', icon: '🌀', effect: function(g) { g._eventBuff={mult:4,timer:3}; } },
@@ -1157,16 +1163,16 @@
             { name: 'Dark Energy Tap', desc: 'Gain 120 electricity!', type: 'positive', icon: '🌌', effect: function(g) { g.state.currencies.el+=120; } },
             { name: 'Gravity Assist', desc: 'Gain 15% AC!', type: 'positive', icon: '🪐', effect: function(g) { g.state.currencies.ac*=1.15; } },
             { name: 'Time Dilation', desc: '1.8x production for 12s!', type: 'positive', icon: '⏳', effect: function(g) { g._eventBuff={mult:1.8,timer:12}; } },
-            { name: 'Matter Conversion', desc: 'Gain 90 AC!', type: 'positive', icon: '🔬', effect: function(g) { g.state.currencies.ac+=90; } },
+            { name: 'Matter Conversion', desc: 'Gain 90 HC!', type: 'positive', icon: '🔬', effect: function(g) { g.state.currencies.ac+=90; } },
             { name: 'Flux Capacitor', desc: 'Gain 6% bonus OKRs!', type: 'positive', icon: '⚡', effect: function(g) { var bonus=g.state.totalOKRs*0.06;g.state.totalOKRs+=bonus; } },
-            { name: 'Antimatter Gift', desc: 'Gain 50 AC and 100 EL!', type: 'positive', icon: '🎁', effect: function(g) { g.state.currencies.ac+=50;g.state.currencies.el+=100; } },
+            { name: 'Antimatter Gift', desc: 'Gain 50 HC and 100 EL!', type: 'positive', icon: '🎁', effect: function(g) { g.state.currencies.ac+=50;g.state.currencies.el+=100; } },
             { name: 'Dimensional Pocket', desc: 'Heal all buildings 40 HP!', type: 'positive', icon: '🔮', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+40); } },
             { name: 'Asteroid Mining', desc: 'Gain 35% AC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac*=1.35; } },
             { name: 'Comet Tail Sweep', desc: 'Gain 2% bonus OKRs!', type: 'positive', icon: '☄️', effect: function(g) { var bonus=g.state.totalOKRs*0.02;g.state.totalOKRs+=bonus; } },
             { name: 'Pulsar Alignment', desc: 'Gain 180 electricity!', type: 'positive', icon: '📡', effect: function(g) { g.state.currencies.el+=180; } },
             { name: 'Cosmic Harmony', desc: 'Full heal and 1.5x for 10s!', type: 'positive', icon: '🌈', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100;g._eventBuff={mult:1.5,timer:10}; } },
             { name: 'Universe Expansion', desc: 'Gain 10% bonus OKRs!', type: 'positive', icon: '🌌', effect: function(g) { var bonus=g.state.totalOKRs*0.10;g.state.totalOKRs+=bonus; } },
-            { name: 'Infinity Spark', desc: 'Gain 200 AC!', type: 'positive', icon: '✨', effect: function(g) { g.state.currencies.ac+=200; } },
+            { name: 'Infinity Spark', desc: 'Gain 200 HC!', type: 'positive', icon: '✨', effect: function(g) { g.state.currencies.ac+=200; } },
             // === NEUTRAL EVENTS (81-100) ===
             { name: 'Space Whale Sighting', desc: 'A majestic space whale passes by!', type: 'neutral', icon: '🐋', effect: function(g) { g.state.currencies.ac*=1.03;g.state.currencies.el*=0.97; } },
             { name: 'Alien Broadcast', desc: 'Strange signals detected...', type: 'neutral', icon: '📡', effect: function(g) { g.state.currencies.ac+=10;g.state.currencies.el-=10;if(g.state.currencies.el<0)g.state.currencies.el=0; } },
@@ -1615,7 +1621,7 @@
             var curMult = 1;
             var curAc = 0;
             var curOkr = 0;
-            var curEl = 10; // Base 10 EL/s from OKR Factory
+            var curEl = 10; // Base 10 EL/s from KR Factory
             var curElDrain = 0;
             var curInterest = 0;
             for (var i = 0; i < this.nodes.length; i++) {
@@ -1660,10 +1666,10 @@
             var acDiff = newAcRate - currentAcRate;
 
             if (Math.abs(okrDiff) > 0.01) {
-                lines.push('<span style="color:#0f0">OKR/s: ' + currentOkrRate.toFixed(1) + ' → ' + newOkrRate.toFixed(1) + ' <b>(+' + okrDiff.toFixed(1) + ')</b></span>');
+                lines.push('<span style="color:#0f0">KR/s: ' + currentOkrRate.toFixed(1) + ' → ' + newOkrRate.toFixed(1) + ' <b>(+' + okrDiff.toFixed(1) + ')</b></span>');
             }
             if (Math.abs(acDiff) > 0.01) {
-                lines.push('<span style="color:#ff0">AC/s: ' + currentAcRate.toFixed(1) + ' → ' + newAcRate.toFixed(1) + ' <b>(+' + acDiff.toFixed(1) + ')</b></span>');
+                lines.push('<span style="color:#ff0">HC/s: ' + currentAcRate.toFixed(1) + ' → ' + newAcRate.toFixed(1) + ' <b>(+' + acDiff.toFixed(1) + ')</b></span>');
             }
             if (b.multiplier && !b.acPerSec && !b.okrPerSec) {
                 var multDisplay = (newMult / curMult).toFixed(2);
@@ -1676,7 +1682,7 @@
             }
             if (b.interestRate) {
                 var pct = (b.interestRate * UPGRADE_POWER[1] * 100).toFixed(1);
-                lines.push('<span style="color:#ffd700">Interest: +' + pct + '% AC/s</span>');
+                lines.push('<span style="color:#ffd700">Interest: +' + pct + '% HC/s</span>');
             }
             if (lines.length === 0) {
                 lines.push('<span style="color:#888">No change</span>');
@@ -2054,9 +2060,11 @@
                 return;
             }
 
-            // Don't place too close to edges (40px margin, 50px bottom for toolbar)
-            if (x < 20 || x > this.canvas.width - 20 || y < 20 || y > this.canvas.height - 50) {
-                this.addFloatingText(x, y - 20, 'Too close to edge!', '#f84');
+            // Check if outside circular playable area
+            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
+            var distFromCenter = Math.sqrt((x - fX) * (x - fX) + (y - fY) * (y - fY));
+            if (distFromCenter > playRadius) {
+                this.addFloatingText(x, y - 20, 'Outside play area!', '#f84');
                 return;
             }
 
@@ -2104,7 +2112,7 @@
                 spawnTime: Date.now()
             });
 
-            this.addFloatingText(x, y - 20, '-' + b.cost + ' AC', '#ff0');
+            this.addFloatingText(x, y - 20, '-' + b.cost + ' HC', '#ff0');
             this.addFloatingText(x, y - 40, b.name + ' placed!', b.color);
             this.spawnParticles(x, y, b.color, 10);
             this.triggerShake(4);
@@ -2161,7 +2169,7 @@
 
             // Visual feedback
             this.addFloatingText(node.x, node.y - 30, 'UPGRADED to Lv.' + nextLevel + '!', '#ffd700', 16);
-            this.addFloatingText(node.x, node.y - 50, '-' + upgradeCost + ' AC', '#ff0');
+            this.addFloatingText(node.x, node.y - 50, '-' + upgradeCost + ' HC', '#ff0');
             this.spawnParticles(node.x, node.y, '#ffd700', 15);
             this.triggerShake(6);
             this.playSound('complete');
@@ -2219,7 +2227,7 @@
             // Accumulate production from all buildings
             var acGain = 0;
             var okrGain = 0;
-            var elGain = 10; // Base 10 EL/s from OKR Factory
+            var elGain = 10; // Base 10 EL/s from KR Factory
             var elDrain = 0;
             var totalInterest = 0;
             for (var i = 0; i < this.nodes.length; i++) {
@@ -2473,7 +2481,7 @@
                 }
             }
 
-            // Thief ships — visible attack runs on OKR factory
+            // Thief ships — visible attack runs on KR Factory
             if (this.state.thievesEnabled) {
                 this.thiefSpawnTimer += dt;
                 var milestoneIdx = this.state.unlockedMilestones.length;
@@ -2613,14 +2621,14 @@
                     this.addFloatingText(
                         rn.x + (Math.random() - 0.5) * 20,
                         rn.y - 30,
-                        '+' + (bt.okrPerSec * lvlMult * mult).toFixed(1) + ' OKR',
+                        '+' + (bt.okrPerSec * lvlMult * mult).toFixed(1) + ' KR',
                         '#0f0', 11
                     );
                 } else if (bt.acPerSec > 0) {
                     this.addFloatingText(
                         rn.x + (Math.random() - 0.5) * 20,
                         rn.y - 30,
-                        '+' + (bt.acPerSec * lvlMult * mult).toFixed(1) + ' AC',
+                        '+' + (bt.acPerSec * lvlMult * mult).toFixed(1) + ' HC',
                         '#ff0', 11
                     );
                 } else if (bt.multiplier) {
@@ -2756,7 +2764,7 @@
             ctx.strokeRect(bannerX, bannerY, bannerW, bannerH);
 
             // Icon and type indicator
-            var typeLabel = b.type === 'positive' ? '▲ BOOST' : b.type === 'negative' ? '▼ HAZARD' : b.type === 'milestone' ? '★ OKR REVIEW' : '◆ EVENT';
+            var typeLabel = b.type === 'positive' ? '▲ BOOST' : b.type === 'negative' ? '▼ HAZARD' : b.type === 'milestone' ? '★ Objective Review' : '◆ EVENT';
             ctx.font = 'bold 10px Segoe UI';
             ctx.textAlign = 'left';
             ctx.fillStyle = b.color;
@@ -2820,6 +2828,10 @@
                     this.spawnParticles(cx, 100, '#ffd700', 30);
                     this.spawnParticles(cx, 100, '#0ff', 20);
                     this.playSound('complete');
+
+                    // Show radius increase
+                    var newRadius = getPlayableRadius(this.state);
+                    this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2 + 50, 'Play area expanded! Radius: ' + newRadius + 'px', '#0ff', 12);
 
                     this.trackEvent('milestone', i);
                     this.saveGame(true);
@@ -2984,7 +2996,7 @@
 
             // Grid scrolls with the world
             this.drawPixelGrid(ctx, w, h);
-            this.drawEdgeAsteroids(ctx, w, h);
+            this.drawAsteroidBelt(ctx, w, h);
 
             // Connections: MST chain linking all nodes to factory
             var fX = w / 2;
@@ -3074,13 +3086,13 @@
             // Build tooltip lines
             var lines = [];
             lines.push({ text: bt.symbol + ' ' + bt.name + ' Lv.' + lvl, color: bt.color, bold: true });
-            if (nodeOkr > 0) lines.push({ text: 'Producing: ' + nodeOkr.toFixed(1) + ' OKR/s', color: '#0f0' });
-            if (nodeAc > 0) lines.push({ text: 'Producing: ' + nodeAc.toFixed(1) + ' AC/s', color: '#ff0' });
+            if (nodeOkr > 0) lines.push({ text: 'Producing: ' + nodeOkr.toFixed(1) + ' KR/s', color: '#0f0' });
+            if (nodeAc > 0) lines.push({ text: 'Producing: ' + nodeAc.toFixed(1) + ' HC/s', color: '#ff0' });
             if (nodeMult > 0) lines.push({ text: 'Multiplier: x' + nodeMult.toFixed(2), color: '#c8f' });
             if (nodeEl > 0) lines.push({ text: 'Producing: +' + nodeEl.toFixed(1) + ' EL/s', color: '#ff9800' });
             if (nodeElCost > 0) lines.push({ text: 'Consuming: -' + nodeElCost.toFixed(1) + ' EL/s', color: '#ff9800' });
             if (nodeInterest > 0) {
-                lines.push({ text: 'Interest: ' + (nodeInterest * 100).toFixed(1) + '% AC/s', color: '#ffd700' });
+                lines.push({ text: 'Interest: ' + (nodeInterest * 100).toFixed(1) + '% HC/s', color: '#ffd700' });
             }
             var nodeRepair = bt.repairRate ? bt.repairRate * lvlMult : 0;
             if (nodeRepair > 0) lines.push({ text: 'Repairs: ' + nodeRepair.toFixed(1) + ' HP/s (flies to lowest)', color: '#0ff' });
@@ -3107,10 +3119,10 @@
                 lines.push({ text: '⬆ UPGRADE to Lv.' + nextLvl + '  (' + cost + ' AC)', color: canAfford ? '#0f0' : '#f44', bold: true });
 
                 if (bt.okrPerSec > 0) {
-                    lines.push({ text: 'OKR/s: ' + nodeOkr.toFixed(1) + ' → ' + nextOkr.toFixed(1), color: '#8f8' });
+                    lines.push({ text: 'KR/s: ' + nodeOkr.toFixed(1) + ' → ' + nextOkr.toFixed(1), color: '#8f8' });
                 }
                 if (bt.acPerSec > 0) {
-                    lines.push({ text: 'AC/s: ' + nodeAc.toFixed(1) + ' → ' + nextAc.toFixed(1), color: '#ff0' });
+                    lines.push({ text: 'HC/s: ' + nodeAc.toFixed(1) + ' → ' + nextAc.toFixed(1), color: '#ff0' });
                 }
                 if (bt.multiplier) {
                     lines.push({ text: 'Mult: x' + nodeMult.toFixed(2) + ' → x' + nextMult.toFixed(2), color: '#c8f' });
@@ -3476,11 +3488,13 @@
 
             var distToFactory = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var tooCloseToFactory = distToFactory < 60;
-            var tooCloseToEdge = mx < 20 || mx > this.canvas.width - 20 || my < 20 || my > this.canvas.height - 50;
+            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
+            var distFromCenter = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
+            var outsidePlayArea = distFromCenter > playRadius;
             var inBuildingPanel = (window.innerWidth > 768 && mx > this.canvas.width - 180) || (window.innerWidth <= 768 && mx < 110);
             var canAfford = this.state.currencies.ac >= b.cost;
 
-            var blocked = tooCloseToFactory || tooCloseToEdge || inBuildingPanel;
+            var blocked = tooCloseToFactory || outsidePlayArea || inBuildingPanel;
 
             var ringColor, ghostAlpha;
             if (blocked) {
@@ -3539,15 +3553,15 @@
             } else if (inTeamZone) {
                 ctx.fillStyle = '#f66';
                 ctx.fillText('Team area!', mx, my + 35);
-            } else if (tooCloseToEdge) {
+            } else if (outsidePlayArea) {
                 ctx.fillStyle = '#f66';
-                ctx.fillText('Too close to edge!', mx, my + 35);
+                ctx.fillText('Outside play area!', mx, my + 35);
             } else if (inBuildingPanel) {
                 ctx.fillStyle = '#f66';
                 ctx.fillText('Building panel!', mx, my + 35);
             } else if (!canAfford) {
                 ctx.fillStyle = '#f66';
-                ctx.fillText('Need ' + b.cost + ' AC', mx, my + 35);
+                ctx.fillText('Need ' + b.cost + ' HC', mx, my + 35);
             } else {
                 ctx.fillStyle = 'rgba(0, 255, 255, 0.7)';
                 ctx.fillText('Click to place ' + b.name, mx, my + 35);
@@ -3723,50 +3737,81 @@
         // DRAWING - EDGE ASTEROIDS
         // =========================================================
 
-        OKRFarmingGame.prototype.drawEdgeAsteroids = function(ctx, w, h) {
-            // Seed-based pseudo-random for consistent placement
-            var rng = function(seed) { seed = (seed * 16807 + 0) % 2147483647; return seed; };
-            var seed = 42;
-            var edgeMargin = 50;
-            var count = Math.floor((w + h) / 15); // roughly proportional to screen size
+        OKRFarmingGame.prototype.drawAsteroidBelt = function(ctx, w, h) {
+            var fX = w / 2;
+            var fY = h / 2;
+            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
+            var time = Date.now() * 0.0001; // slow rotation
 
             ctx.save();
-            for (var i = 0; i < count; i++) {
-                seed = rng(seed);
-                var side = seed % 4;
-                seed = rng(seed);
-                var pos = (seed % 1000) / 1000;
-                seed = rng(seed);
-                var offset = 5 + (seed % edgeMargin);
-                seed = rng(seed);
-                var size = 2 + (seed % 5);
 
-                var ax, ay;
-                if (side === 0) { ax = pos * w; ay = offset; }           // top
-                else if (side === 1) { ax = pos * w; ay = h - offset; }   // bottom
-                else if (side === 2) { ax = offset; ay = pos * h; }       // left
-                else { ax = w - offset; ay = pos * h; }                   // right
+            // Draw play area boundary ring
+            ctx.strokeStyle = 'rgba(0, 255, 136, 0.12)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([8, 8]);
+            ctx.beginPath();
+            ctx.arc(fX, fY, playRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
 
-                // Asteroid colors
+            // Dark overlay outside the circle
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, 0, w, h);
+            ctx.arc(fX, fY, playRadius, 0, Math.PI * 2, true); // cut out circle
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+            ctx.fill();
+            ctx.restore();
+
+            // Generate asteroids in the ring zone (playRadius to playRadius + 400)
+            var rng = function(seed) { seed = (seed * 16807 + 0) % 2147483647; return seed; };
+            var seed = 12345;
+            var asteroidCount = 200;
+            var innerR = playRadius + 10;
+            var outerR = playRadius + 400;
+
+            for (var i = 0; i < asteroidCount; i++) {
                 seed = rng(seed);
-                var shade = 40 + (seed % 40);
-                var color = 'rgb(' + shade + ',' + (shade - 5) + ',' + (shade - 10) + ')';
+                var angle = (seed % 10000) / 10000 * Math.PI * 2;
+                seed = rng(seed);
+                var dist = innerR + (seed % 1000) / 1000 * (outerR - innerR);
+                seed = rng(seed);
+                var size = 2 + (seed % 6);
+                seed = rng(seed);
+                var shade = 30 + (seed % 50);
+                seed = rng(seed);
+                var rotSpeed = 0.02 + (seed % 100) / 10000; // each asteroid orbits at slightly different speed
 
-                // Draw irregular asteroid (3-5 pixel rects overlapping)
+                // Rotate angle based on time and distance (closer = faster)
+                var orbitalSpeed = rotSpeed * (1 + (outerR - dist) / outerR * 0.5);
+                var rotAngle = angle + time * orbitalSpeed * 60;
+
+                var ax = fX + Math.cos(rotAngle) * dist;
+                var ay = fY + Math.sin(rotAngle) * dist;
+
+                // Skip if way off screen
+                if (ax < -50 || ax > w + 50 || ay < -50 || ay > h + 50) continue;
+
+                // Draw asteroid (irregular pixel blocks)
+                var color = 'rgb(' + shade + ',' + Math.max(0, shade - 8) + ',' + Math.max(0, shade - 15) + ')';
                 ctx.fillStyle = color;
                 ctx.fillRect(Math.floor(ax), Math.floor(ay), size, size);
                 ctx.fillRect(Math.floor(ax) - 1, Math.floor(ay) + 1, size - 1, size - 1);
                 if (size > 3) {
-                    seed = rng(seed);
                     ctx.fillRect(Math.floor(ax) + 1, Math.floor(ay) - 1, size - 2, size + 1);
                 }
 
-                // Occasional highlight
-                if (i % 7 === 0) {
-                    ctx.fillStyle = 'rgba(255,255,255,0.08)';
-                    ctx.fillRect(Math.floor(ax), Math.floor(ay), 2, 1);
+                // Occasional glint
+                if (i % 11 === 0) {
+                    var glint = Math.sin(time * 200 + i) * 0.5 + 0.5;
+                    if (glint > 0.7) {
+                        ctx.fillStyle = 'rgba(255,255,255,' + ((glint - 0.7) * 0.5).toFixed(2) + ')';
+                        ctx.fillRect(Math.floor(ax), Math.floor(ay), 2, 1);
+                    }
                 }
             }
+
             ctx.restore();
         };
 
@@ -3780,7 +3825,7 @@
         };
 
         // =========================================================
-        // DRAWING - OKR FACTORY
+        // DRAWING - KR Factory
         // =========================================================
 
         OKRFarmingGame.prototype.drawOKRFactory = function(ctx, cx, cy) {
@@ -3855,7 +3900,7 @@
             ctx.fillStyle = '#0ff';
             ctx.font = 'bold 11px Segoe UI';
             ctx.textAlign = 'center';
-            ctx.fillText('OKR FACTORY', cx, cy + 10 * s);
+            ctx.fillText('KR Factory', cx, cy + 10 * s);
         };
 
         // =========================================================
@@ -4311,7 +4356,7 @@
                         ctx.fillStyle = '#ffd700';
                         ctx.font = 'bold 9px Segoe UI';
                         ctx.textAlign = 'center';
-                        ctx.fillText('+450 OKR/s', x, y - 8 * s);
+                        ctx.fillText('+450 KR/s', x, y - 8 * s);
                     }
                     break;
 
@@ -5626,7 +5671,7 @@
                     if (rbRect) {
                         var rbLines = [
                             { text: '🔧 Repair Bot', color: '#00ff88', bold: true },
-                            { text: (document.getElementById('repairBotCost') || {textContent: '?'}).textContent + ' AC', color: '#ff0', bold: false },
+                            { text: (document.getElementById('repairBotCost') || {textContent: '?'}).textContent + ' HC', color: '#ff0', bold: false },
                             { text: 'Bots: ' + (document.getElementById('repairBotCount') || {textContent: '0'}).textContent, color: '#8f8', bold: false }
                         ];
                         var yLine = rbRect.top + 16;
@@ -6121,3 +6166,4 @@
     </script>
 </body>
 </html>
+
