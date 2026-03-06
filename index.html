@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -685,7 +685,7 @@
             <span class="stat-value" id="currencyDisplay">50</span>
         </div>
         <div id="elRow" class="stat-row" style="display:none;">
-            <span class="stat-label">⚡ EL</span>
+            <span class="stat-label">⚡ el</span>
             <span class="stat-value" id="elDisplay" style="color:#ff9800;">0</span>
         </div>
         <div style="margin-top:6px;border-top:1px solid #234;padding-top:4px;cursor:pointer;color:#888;font-size:10px;text-align:center;" onclick="var r=document.getElementById('ratesSection');r.style.display=r.style.display==='none'?'block':'none';">▼ Rates</div>
@@ -699,7 +699,7 @@
                 <span class="stat-value" id="acRate" style="color:#ff0;">0</span>
             </div>
             <div id="elRateRow" class="stat-row" style="display:none;">
-                <span class="stat-label">EL/s</span>
+                <span class="stat-label">$/s</span>
                 <span class="stat-value" id="elRate" style="color:#ff9800;">0</span>
             </div>
         </div>
@@ -883,7 +883,7 @@
         var MILESTONES = [
             { okr: 0,       unlock: ['collector', 'processor'], title: '🚀 Launch!', desc: 'Collectors generate AC. Processors generate OKRs. Build your empire!' },
             { okr: 50,      unlock: ['multiplier'], title: '✖️ Multiplier Unlocked!', desc: 'Multipliers boost ALL production by 1.5x each! Stack them for massive output.' },
-            { okr: 500,     unlock: ['generator'], title: '⚡ Electricity Online!', desc: 'Buildings now require power! Generators produce electricity to keep everything running.', enableElectricity: true },
+            { okr: 500,     unlock: ['generator'], title: '⚡ electricity Online!', desc: 'Buildings now require power! Generators produce electricity to keep everything running.', enableElectricity: true },
             { okr: 5000,    unlock: ['bank'], title: '🏦 Bank Unlocked!', desc: 'Banks earn interest on your AC. Smart money management pays off!' },
             { okr: 50000,   unlock: ['synthesizer'], title: '⚛️ Synthesizer Unlocked!', desc: 'The ultimate OKR machine! Synthesizers produce 100 KR/s but need lots of power.' },
             { okr: 500000,  unlock: [], title: '🛸 Spaceship Threat!', desc: 'Enemy ships are targeting your buildings! They deal damage on impact. Watch out!', enableShips: true },
@@ -925,7 +925,7 @@
                 primary: '#ff9900', accent: '#ffcc00', danger: '#ff3333',
                 panelBg: 'rgba(25, 12, 0, 0.92)', panelBorder: '#ff9900',
                 gridColor: 'rgba(255, 153, 0, 0.04)',
-                bonus: 'el', bonusDesc: '+1% EL/s', bonusMult: 1.01
+                bonus: 'el', bonusDesc: '+1% el/s', bonusMult: 1.01
             },
             arctic: {
                 name: 'Arctic Command',
@@ -950,8 +950,8 @@
             collector:   { name: 'Recruiter',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 HC/s',          symbol: '', metrics: ['ac'] },
             processor:   { name: 'Employee',   cost: 150,  acPerSec: 0,   okrPerSec: 5,   elCost: 3,  color: '#2196f3', desc: '+5 KR/s',         symbol: '', metrics: ['okr'] },
             multiplier:  { name: 'Multiplier',  cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#9c27b0', desc: 'x1.5 all rates',   symbol: '', metrics: ['okr', 'ac', 'el', 'mult'], multiplier: 1.5 },
-            synthesizer: { name: 'Synthesizer', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 KR/s',        symbol: '', metrics: ['okr'] },
-            generator:   { name: 'Generator',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 EL/s', symbol: '', metrics: ['el'] },
+            synthesizer: { name: 'AI', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 KR/s',        symbol: '', metrics: ['okr'] },
+            generator:   { name: 'Finances',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 el/s', symbol: '', metrics: ['el'] },
             bank:        { name: 'Bank',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% AC interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
             repairbot:   { name: 'Repair Bot',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Heals lowest HP',  symbol: '', metrics: ['hp'], repairRate: 15 }
         };
@@ -1103,7 +1103,7 @@
             { name: 'Radiation Leak', desc: 'Processors take 25 damage!', type: 'negative', icon: '☢️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='processor') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-25); } },
             { name: 'Ion Storm', desc: 'All buildings take 10 damage!', type: 'negative', icon: '🌪️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.max(0,g.nodes[i].hp-10); } },
             { name: 'Data Corruption', desc: 'Lose 5% total OKRs!', type: 'negative', icon: '⚠️', effect: function(g) { g.state.totalOKRs*=0.95; } },
-            { name: 'Fuel Shortage', desc: 'Electricity drops to 0!', type: 'negative', icon: '🔋', effect: function(g) { g.state.currencies.el=0; } },
+            { name: 'Fuel Shortage', desc: 'funding drops to 0!', type: 'negative', icon: '🔋', effect: function(g) { g.state.currencies.el=0; } },
             { name: 'Asteroid Impact', desc: 'Random building takes 50 damage!', type: 'negative', icon: '☄️', effect: function(g) { if(g.nodes.length>0){var r=Math.floor(Math.random()*g.nodes.length);g.nodes[r].hp=Math.max(0,g.nodes[r].hp-50);} } },
             { name: 'Trade Embargo', desc: 'Lose 20% AC!', type: 'negative', icon: '🚫', effect: function(g) { g.state.currencies.ac*=0.8; } },
             { name: 'Quantum Destabilization', desc: 'Multipliers take 40 damage!', type: 'negative', icon: '🔮', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='multiplier') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-40); } },
@@ -1117,7 +1117,7 @@
             { name: 'Wormhole Collapse', desc: 'Random building takes 45 damage!', type: 'negative', icon: '🌀', effect: function(g) { if(g.nodes.length>0){var r=Math.floor(Math.random()*g.nodes.length);g.nodes[r].hp=Math.max(0,g.nodes[r].hp-45);} } },
             { name: 'Dark Matter Surge', desc: 'Production at 60% for 6s!', type: 'negative', icon: '🌌', effect: function(g) { g._eventDebuff={mult:0.6,timer:6}; } },
             { name: 'Neutron Blast', desc: 'Generators take 20 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-20); } },
-            { name: 'Singularity Pulse', desc: 'Lose 8% AC and 8% EL!', type: 'negative', icon: '💀', effect: function(g) { g.state.currencies.ac*=0.92;g.state.currencies.el*=0.92; } },
+            { name: 'Singularity Pulse', desc: 'Lose 8% AC and 8% el!', type: 'negative', icon: '💀', effect: function(g) { g.state.currencies.ac*=0.92;g.state.currencies.el*=0.92; } },
             { name: 'Magnetar Flare', desc: 'Banks take 30 damage!', type: 'negative', icon: '🔥', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='bank') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-30); } },
             { name: 'Quasar Beam', desc: 'Lose 12% AC!', type: 'negative', icon: '💫', effect: function(g) { g.state.currencies.ac*=0.88; } },
             { name: 'Solar Wind', desc: 'Collectors take 15 damage!', type: 'negative', icon: '🌪️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='collector') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-15); } },
@@ -1135,7 +1135,7 @@
             // === POSITIVE EVENTS (41-80) ===
             { name: 'Stellar Bonus', desc: 'Gain 20% extra AC!', type: 'positive', icon: '⭐', effect: function(g) { g.state.currencies.ac*=1.2; } },
             { name: 'OKR Rain', desc: 'Gain 5% bonus OKRs!', type: 'positive', icon: '🌟', effect: function(g) { var bonus=g.state.totalOKRs*0.05;g.state.totalOKRs+=bonus; } },
-            { name: 'Energy Surge', desc: 'Electricity doubled!', type: 'positive', icon: '⚡', effect: function(g) { g.state.currencies.el*=2; } },
+            { name: 'Energy Surge', desc: 'funding doubled!', type: 'positive', icon: '⚡', effect: function(g) { g.state.currencies.el*=2; } },
             { name: 'Repair Nanobots', desc: 'Heal all buildings 30 HP!', type: 'positive', icon: '🔧', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+30); } },
             { name: 'Production Boost', desc: '2x production for 10s!', type: 'positive', icon: '🚀', effect: function(g) { g._eventBuff={mult:2,timer:10}; } },
             { name: 'Lucky Find', desc: 'Gain 50 HC!', type: 'positive', icon: '💰', effect: function(g) { g.state.currencies.ac+=50; } },
@@ -1151,7 +1151,7 @@
             { name: 'Deep Space Signal', desc: '2x production for 8s!', type: 'positive', icon: '📡', effect: function(g) { g._eventBuff={mult:2,timer:8}; } },
             { name: 'Friendly Fleet', desc: 'Heal all buildings 50 HP!', type: 'positive', icon: '🛸', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+50); } },
             { name: 'Tech Upgrade', desc: '1.5x production for 15s!', type: 'positive', icon: '🔧', effect: function(g) { g._eventBuff={mult:1.5,timer:15}; } },
-            { name: 'Supply Drop', desc: 'Gain 60 HC and 60 EL!', type: 'positive', icon: '📦', effect: function(g) { g.state.currencies.ac+=60;g.state.currencies.el+=60; } },
+            { name: 'Supply Drop', desc: 'Gain 60 HC and 60 el!', type: 'positive', icon: '📦', effect: function(g) { g.state.currencies.ac+=60;g.state.currencies.el+=60; } },
             { name: 'Quantum Luck', desc: 'Gain 7% bonus OKRs!', type: 'positive', icon: '🍀', effect: function(g) { var bonus=g.state.totalOKRs*0.07;g.state.totalOKRs+=bonus; } },
             { name: 'Galactic Aid', desc: 'Full heal and gain 30 HC!', type: 'positive', icon: '🌌', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100;g.state.currencies.ac+=30; } },
             { name: 'Nebula Mining', desc: 'Gain 80 HC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac+=80; } },
@@ -1165,7 +1165,7 @@
             { name: 'Time Dilation', desc: '1.8x production for 12s!', type: 'positive', icon: '⏳', effect: function(g) { g._eventBuff={mult:1.8,timer:12}; } },
             { name: 'Matter Conversion', desc: 'Gain 90 HC!', type: 'positive', icon: '🔬', effect: function(g) { g.state.currencies.ac+=90; } },
             { name: 'Flux Capacitor', desc: 'Gain 6% bonus OKRs!', type: 'positive', icon: '⚡', effect: function(g) { var bonus=g.state.totalOKRs*0.06;g.state.totalOKRs+=bonus; } },
-            { name: 'Antimatter Gift', desc: 'Gain 50 HC and 100 EL!', type: 'positive', icon: '🎁', effect: function(g) { g.state.currencies.ac+=50;g.state.currencies.el+=100; } },
+            { name: 'Antimatter Gift', desc: 'Gain 50 HC and 100 el!', type: 'positive', icon: '🎁', effect: function(g) { g.state.currencies.ac+=50;g.state.currencies.el+=100; } },
             { name: 'Dimensional Pocket', desc: 'Heal all buildings 40 HP!', type: 'positive', icon: '🔮', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+40); } },
             { name: 'Asteroid Mining', desc: 'Gain 35% AC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac*=1.35; } },
             { name: 'Comet Tail Sweep', desc: 'Gain 2% bonus OKRs!', type: 'positive', icon: '☄️', effect: function(g) { var bonus=g.state.totalOKRs*0.02;g.state.totalOKRs+=bonus; } },
@@ -1242,7 +1242,7 @@
             this.currentAcRate = 0;
             this.currentElRate = 0;
             this.currentInterestRate = 0;
-            this.brownout = false;
+            this.UNDERFUNDED = false;
 
             // Screen shake
             this.screenShake = { x: 0, y: 0, intensity: 0 };
@@ -1621,7 +1621,7 @@
             var curMult = 1;
             var curAc = 0;
             var curOkr = 0;
-            var curEl = 10; // Base 10 EL/s from Leadership
+            var curEl = 10; // Base 10 el/s from Leadership
             var curElDrain = 0;
             var curInterest = 0;
             for (var i = 0; i < this.nodes.length; i++) {
@@ -1678,7 +1678,7 @@
             var elDiff = newElRate - currentElRate;
             if (Math.abs(elDiff) > 0.01) {
                 var elColor = elDiff >= 0 ? '#ff9800' : '#f44';
-                lines.push('<span style="color:' + elColor + '">EL/s: ' + currentElRate.toFixed(1) + ' → ' + newElRate.toFixed(1) + ' <b>(' + (elDiff >= 0 ? '+' : '') + elDiff.toFixed(1) + ')</b></span>');
+                lines.push('<span style="color:' + elColor + '">$/s: ' + currentElRate.toFixed(1) + ' → ' + newElRate.toFixed(1) + ' <b>(' + (elDiff >= 0 ? '+' : '') + elDiff.toFixed(1) + ')</b></span>');
             }
             if (b.interestRate) {
                 var pct = (b.interestRate * UPGRADE_POWER[1] * 100).toFixed(1);
@@ -1911,7 +1911,7 @@
             this.currentAcRate = 0;
             this.currentElRate = 0;
             this.currentInterestRate = 0;
-            this.brownout = false;
+            this.UNDERFUNDED = false;
             this.resourceFlowIcons = [];
             this.flowSpawnTimers = {};
 
@@ -2091,9 +2091,9 @@
                 return;
             }
 
-            // Block placement if building uses EL and we have no electricity
+            // Block placement if building uses el and we have no electricity
             if (b.elCost && b.elCost > 0 && this.state.electricityEnabled && this.state.currencies.el <= 0 && this.currentElRate <= 0) {
-                this.addFloatingText(x, y, 'No electricity! Build a Generator first.', '#ff9800');
+                this.addFloatingText(x, y, 'No electricity! Build Finances first.', '#ff9800');
                 this.playSound('click');
                 return;
             }
@@ -2227,7 +2227,7 @@
             // Accumulate production from all buildings
             var acGain = 0;
             var okrGain = 0;
-            var elGain = 10; // Base 10 EL/s from Leadership
+            var elGain = 10; // Base 10 el/s from Leadership
             var elDrain = 0;
             var totalInterest = 0;
             for (var i = 0; i < this.nodes.length; i++) {
@@ -2258,11 +2258,11 @@
             if (theme && theme.bonus === 'okr') okrGain *= theme.bonusMult;
             if (theme && theme.bonus === 'el') elGain *= theme.bonusMult;
 
-            // Bank interest
-            var bankInterest = totalInterest * this.state.currencies.ac * dt;
-            this.state.currencies.ac += bankInterest;
+            // Bank interest — applies toel (funding)
+            var bankInterest = totalInterest * this.state.currencies.el * dt;
+            this.state.currencies.el += bankInterest;
 
-            // Electricity balance
+            // electricity balance
             if (this.state.electricityEnabled) {
                 this.state.currencies.el += (elGain - elDrain) * dt;
                 if (this.state.currencies.el < 0) this.state.currencies.el = 0;
@@ -2271,9 +2271,9 @@
                 elDrain = 0;
             }
 
-            // Brownout: if electricity is zero and there's drain, halve production
-            var brownout = this.state.electricityEnabled && (this.state.currencies.el <= 0 && elDrain > elGain);
-            if (brownout) {
+            // UNDERFUNDED: if electricity is zero and there's drain, halve production
+            var UNDERFUNDED = this.state.electricityEnabled && (this.state.currencies.el <= 0 && elDrain > elGain);
+            if (UNDERFUNDED) {
                 okrGain *= 0.5;
                 acGain *= 0.5;
             }
@@ -2292,7 +2292,7 @@
             this.currentAcRate = acGain;
             this.currentElRate = elGain - elDrain;
             this.currentInterestRate = totalInterest;
-            this.brownout = brownout;
+            this.UNDERFUNDED = UNDERFUNDED;
 
             this.state.currencies.ac += acGain * dt;
             this.state.totalOKRs += okrGain * dt;
@@ -2929,7 +2929,7 @@
             document.getElementById('okrRate').textContent = this.currentOkrRate.toFixed(1);
             document.getElementById('acRate').textContent = this.currentAcRate.toFixed(1);
 
-            // Show/hide EL rows based on electricity being enabled
+            // Show/hide el rows based on electricity being enabled
             var elEnabled = this.state.electricityEnabled;
             document.getElementById('elRow').style.display = elEnabled ? '' : 'none';
             document.getElementById('elRateRow').style.display = elEnabled ? '' : 'none';
@@ -2939,8 +2939,8 @@
                 var elRateEl = document.getElementById('elRate');
                 elRateEl.textContent = (this.currentElRate >= 0 ? '+' : '') + this.currentElRate.toFixed(1);
                 elRateEl.style.color = this.currentElRate >= 0 ? '#ff9800' : '#f44';
-                if (this.brownout) {
-                    elRateEl.textContent += ' ⚠ BROWNOUT';
+                if (this.UNDERFUNDED) {
+                    elRateEl.textContent += ' ⚠ UNDERFUNDED';
                 }
             }
 
@@ -3089,8 +3089,8 @@
             if (nodeOkr > 0) lines.push({ text: 'Producing: ' + nodeOkr.toFixed(1) + ' KR/s', color: '#0f0' });
             if (nodeAc > 0) lines.push({ text: 'Producing: ' + nodeAc.toFixed(1) + ' HC/s', color: '#ff0' });
             if (nodeMult > 0) lines.push({ text: 'Multiplier: x' + nodeMult.toFixed(2), color: '#c8f' });
-            if (nodeEl > 0) lines.push({ text: 'Producing: +' + nodeEl.toFixed(1) + ' EL/s', color: '#ff9800' });
-            if (nodeElCost > 0) lines.push({ text: 'Consuming: -' + nodeElCost.toFixed(1) + ' EL/s', color: '#ff9800' });
+            if (nodeEl > 0) lines.push({ text: 'Producing: +' + nodeEl.toFixed(1) + ' el/s', color: '#ff9800' });
+            if (nodeElCost > 0) lines.push({ text: 'Consuming: -' + nodeElCost.toFixed(1) + ' el/s', color: '#ff9800' });
             if (nodeInterest > 0) {
                 lines.push({ text: 'Interest: ' + (nodeInterest * 100).toFixed(1) + '% HC/s', color: '#ffd700' });
             }
@@ -3128,7 +3128,7 @@
                     lines.push({ text: 'Mult: x' + nodeMult.toFixed(2) + ' → x' + nextMult.toFixed(2), color: '#c8f' });
                 }
                 if (bt.elPerSec > 0) {
-                    lines.push({ text: 'EL/s: +' + nodeEl.toFixed(1) + ' → +' + nextEl.toFixed(1), color: '#ff9800' });
+                    lines.push({ text: '$/s: +' + nodeEl.toFixed(1) + ' → +' + nextEl.toFixed(1), color: '#ff9800' });
                 }
                 if (bt.elCost > 0) {
                     lines.push({ text: 'EL cost: -' + nodeElCost.toFixed(1) + ' → -' + nextElCost.toFixed(1), color: '#ff9800' });
@@ -4112,7 +4112,7 @@
                             var dr3 = 5.5 * s;
                             this._pxRect(ctx, x + Math.cos(da3) * dr3 - s * 0.3, y - s + Math.sin(da3) * dr3 - s * 0.3, s * 0.6, s * 0.6, '#00e5ff');
                         }
-                        // Electric arc effects
+                        // electric arc effects
                         if (Math.sin(age * 8) > 0.6) {
                             var arcOff = Math.sin(age * 13) * 2 * s;
                             this._pxRect(ctx, x + arcOff - s * 0.3, y - 4 * s, s * 0.6, 2 * s, 'rgba(144,202,249,0.7)');
@@ -4432,7 +4432,7 @@
                             ctx.stroke();
                         }
                         ctx.restore();
-                        // Electric arcs between stacks
+                        // electric arcs between stacks
                         if (Math.sin(age * 6) > 0.3) {
                             ctx.save();
                             ctx.strokeStyle = 'rgba(255,235,59,0.8)';
@@ -4513,13 +4513,13 @@
                         ctx.fillStyle = '#ffd700';
                         ctx.font = 'bold 9px Segoe UI';
                         ctx.textAlign = 'center';
-                        ctx.fillText('+' + (5 * UPGRADE_POWER[3]).toFixed(0) + ' EL/s', x, y - 11 * s);
+                        ctx.fillText('+' + (5 * UPGRADE_POWER[3]).toFixed(0) + ' el/s', x, y - 11 * s);
                     }
                     break;
 
                 case 'bank':
                     if (lvl === 1) {
-                        // Lv.1 — Gold/brass rectangular vault with $ sign and flipping coin
+                        // Lv.1 — Gold/brass rectangular vault withel sign and flipping coin
                         // Thick walls
                         this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 8 * s, '#b8860b');
                         this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 6 * s, '#daa520');
@@ -4527,7 +4527,7 @@
                         // Vault door
                         this._pxRect(ctx, x - 1 * s, y - 1 * s, 2 * s, 3 * s, '#b8860b');
                         this._pxRect(ctx, x - s * 0.3, y - s * 0.3, s * 0.6, s * 0.6, '#fff');
-                        // $ sign
+                        //el sign
                         ctx.fillStyle = '#ffd700';
                         ctx.font = 'bold 10px Segoe UI';
                         ctx.textAlign = 'center';
@@ -4616,7 +4616,7 @@
                             var cw3 = Math.abs(Math.cos(age * 3 + ci)) * 1.5 * s;
                             this._pxRect(ctx, cx3 - cw3 / 2, cy3 - s * 0.5, cw3, s, '#ffd700');
                         }
-                        // $$$ signs
+                        //el$$ signs
                         ctx.fillStyle = '#ffd700';
                         ctx.font = 'bold 11px Segoe UI';
                         ctx.textAlign = 'center';
@@ -5334,7 +5334,7 @@
                     ctx.arc(x, y, s, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
-                    // Triangle (▲) for EL
+                    // Triangle (▲) for el
                     ctx.beginPath();
                     ctx.moveTo(x, y - s);
                     ctx.lineTo(x + s, y + s);
@@ -5531,7 +5531,7 @@
             // Populate game state info
             var stateInfo = 'Milestones: ' + (this.state ? this.state.unlockedMilestones.length : '?');
             stateInfo += ' | AC: ' + (this.state ? this.formatNumber(Math.floor(this.state.currencies.ac)) : '?');
-            stateInfo += ' | EL: ' + (this.state ? this.formatNumber(Math.floor(this.state.currencies.el)) : '?');
+            stateInfo += ' | el: ' + (this.state ? this.formatNumber(Math.floor(this.state.currencies.el)) : '?');
             stateInfo += ' | OKRs: ' + (this.state ? this.formatNumber(Math.floor(this.state.totalOKRs)) : '?');
             stateInfo += ' | Buildings: ' + this.nodes.length;
             stateInfo += ' | Repair Bots: ' + this.repairBots.length;
@@ -6166,5 +6166,8 @@
     </script>
 </body>
 </html>
+
+
+
 
 
