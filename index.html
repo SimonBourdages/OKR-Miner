@@ -1633,10 +1633,16 @@
         };
 
         OKRFarmingGame.prototype.selectBuilding = function(type) {
-            this.selectedBuilding = type;
+            // Toggle: clicking same building deselects it
+            if (this.selectedBuilding === type) {
+                this.selectedBuilding = null;
+            } else {
+                this.selectedBuilding = type;
+            }
+            var sel = this.selectedBuilding;
             var btns = document.querySelectorAll('.building-btn');
             btns.forEach(function(b) {
-                var isSelected = b.getAttribute('data-type') === type;
+                var isSelected = sel && b.getAttribute('data-type') === sel;
                 b.classList.toggle('selected', isSelected);
             });
             this.playSound('click');
@@ -2142,6 +2148,7 @@
 
         OKRFarmingGame.prototype.placeBuilding = function(x, y) {
             var type = this.selectedBuilding;
+            if (!type) return; // nothing selected
             var b = BUILDINGS[type];
 
             if (this.state.currencies.ac < b.cost) {
@@ -3762,6 +3769,7 @@
             }
 
             var type = this.selectedBuilding;
+            if (!type) return; // nothing selected, no preview
             var b = BUILDINGS[type];
             if (!b) return;
 
