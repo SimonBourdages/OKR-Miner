@@ -67,6 +67,10 @@
    - Menu background now keeps the intro video element and shows the intro's first frame as a static background layer.
    - Intro overlay title/button styling is aligned with the main menu font sizing and color scheme.
 
+13. **Version timestamp timezone consistency**
+   - Menu version tag now formats build time from UTC into Pacific time using timezone-aware formatting.
+   - Added a fallback formatter that still outputs a PST timestamp if Intl timezone formatting is unavailable.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**

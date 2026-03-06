@@ -1120,7 +1120,37 @@
         // =========================================================
 
         var GAME_VERSION = '1.1.0';
-        var BUILD_DATE = '2026-03-05 23:15';
+        var BUILD_TIMESTAMP_UTC = '2026-03-05T23:15:00Z';
+        function formatBuildDatePST(isoString) {
+            var d = new Date(isoString);
+            if (isNaN(d.getTime())) return isoString + ' PST';
+            try {
+                var fmt = new Intl.DateTimeFormat('en-US', {
+                    timeZone: 'America/Los_Angeles',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    timeZoneName: 'short'
+                });
+                var parts = fmt.formatToParts(d);
+                var map = {};
+                for (var i = 0; i < parts.length; i++) map[parts[i].type] = parts[i].value;
+                var tz = map.timeZoneName || 'PST';
+                return map.year + '-' + map.month + '-' + map.day + ' ' + map.hour + ':' + map.minute + ' ' + tz;
+            } catch (e) {
+                var pst = new Date(d.getTime() - (8 * 60 * 60 * 1000));
+                var yyyy = pst.getUTCFullYear();
+                var mm = String(pst.getUTCMonth() + 1).padStart(2, '0');
+                var dd = String(pst.getUTCDate()).padStart(2, '0');
+                var hh = String(pst.getUTCHours()).padStart(2, '0');
+                var min = String(pst.getUTCMinutes()).padStart(2, '0');
+                return yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min + ' PST';
+            }
+        }
+        var BUILD_DATE = formatBuildDatePST(BUILD_TIMESTAMP_UTC);
 
         // Show version on menu
         var vTag = document.getElementById('versionTag');
