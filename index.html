@@ -3550,6 +3550,18 @@
                     }
                 }
 
+                // When KRs run out, AI buildings self-destruct
+                if (this.state.totalOKRs <= 0) {
+                    for (var ai = this.nodes.length - 1; ai >= 0; ai--) {
+                        if (this.nodes[ai].type === 'synthesizer') {
+                            this.spawnParticles(this.nodes[ai].x, this.nodes[ai].y, '#ff66ff', 20);
+                            this.addFloatingText(this.nodes[ai].x, this.nodes[ai].y - 20, 'AI SHUTDOWN', '#ff66ff', 12);
+                            this.triggerShake(5);
+                            this.nodes.splice(ai, 1);
+                        }
+                    }
+                }
+
                 // Remove dead buildings
                 for (var ri = this.nodes.length - 1; ri >= 0; ri--) {
                     if (this.nodes[ri].hp <= 0) {

@@ -170,6 +170,11 @@
             acGain *= 0.5;
         }
 
+        // Robot War: all KR production halted
+        if (state.robotWar) {
+            okrGain = 0;
+        }
+
         return {
             multiplier: mult,
             acGain: acGain,
