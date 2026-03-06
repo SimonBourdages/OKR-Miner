@@ -158,8 +158,8 @@
         @media (max-width: 768px) {
             #buildings {
                 position: fixed !important;
-                left: 0 !important;
-                right: auto !important;
+                right: 0 !important;
+                left: auto !important;
                 top: 50% !important;
                 transform: translateY(-50%) !important;
                 flex-direction: column !important;
@@ -168,9 +168,9 @@
                 padding: 4px !important;
                 gap: 4px !important;
                 background: rgba(0, 20, 10, 0.95) !important;
-                border-right: 1px solid #00ff88 !important;
+                border-left: 1px solid #00ff88 !important;
                 border-top: none !important;
-                width: 100px !important;
+                width: 90px !important;
                 z-index: 15 !important;
             }
 
@@ -207,7 +207,7 @@
                 padding: 6px 8px !important;
                 min-width: auto !important;
                 max-width: 160px !important;
-                left: 105px !important;
+                left: 10px !important;
             }
 
             #controls {
@@ -912,7 +912,7 @@
         var MILESTONES = [
             { okr: 0,       unlock: ['collector', 'processor'], title: '🚀 Launch!', desc: 'Collectors generate AC. Processors generate OKRs. Build your empire!' },
             { okr: 50,      unlock: ['multiplier'], title: '✖️ Multiplier Unlocked!', desc: 'Multipliers boost ALL production by 1.5x each! Stack them for massive output.' },
-            { okr: 500,     unlock: ['generator'], title: '⚡ electricity Online!', desc: 'Buildings now require power! Generators produce electricity to keep everything running.', enableElectricity: true },
+            { okr: 500,     unlock: ['generator'], title: '⚡ Funding Online!', desc: 'Buildings now require funding! Finances produce $ to keep everything running.', enableElectricity: true },
             { okr: 5000,    unlock: ['bank'], title: '🏦 Bank Unlocked!', desc: 'Banks earn interest on your AC. Smart money management pays off!' },
             { okr: 50000,   unlock: ['synthesizer'], title: '⚛️ Synthesizer Unlocked!', desc: 'The ultimate OKR machine! Synthesizers produce 100 KR/s but need lots of power.' },
             { okr: 500000,  unlock: [], title: '🛸 Spaceship Threat!', desc: 'Enemy ships are targeting your buildings! They deal damage on impact. Watch out!', enableShips: true },
@@ -1126,7 +1126,7 @@
             { name: 'Pirate Raid', desc: 'Lose 15% AC!', type: 'negative', icon: '🛸', effect: function(g) { g.state.currencies.ac*=0.85; } },
             { name: 'Cosmic Tax', desc: 'Lose 10% KRs!', type: 'negative', icon: '💀', effect: function(g) { g.state.totalOKRs*=0.9; } },
             { name: 'Black Hole Proximity', desc: 'Production halved for 10s!', type: 'negative', icon: '🌑', effect: function(g) { g._eventDebuff={mult:0.5,timer:10}; } },
-            { name: 'EMP Pulse', desc: 'Generators take 30 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-30); } },
+            { name: 'EMP Pulse', desc: 'Finances take 30 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-30); } },
             { name: 'Space Debris', desc: 'A random building destroyed!', type: 'negative', icon: '💥', effect: function(g) { if(g.nodes.length>0){var r=Math.floor(Math.random()*g.nodes.length);g.nodes[r].hp=0;} } },
             { name: 'Gravity Well', desc: 'Lose 5% of all currencies!', type: 'negative', icon: '🌀', effect: function(g) { g.state.currencies.ac*=0.95;g.state.currencies.el*=0.95; } },
             { name: 'Radiation Leak', desc: 'Processors take 25 damage!', type: 'negative', icon: '☢️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='processor') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-25); } },
@@ -1145,7 +1145,7 @@
             { name: 'Void Rupture', desc: 'Lose 25% electricity!', type: 'negative', icon: '🌑', effect: function(g) { g.state.currencies.el*=0.75; } },
             { name: 'Wormhole Collapse', desc: 'Random building takes 45 damage!', type: 'negative', icon: '🌀', effect: function(g) { if(g.nodes.length>0){var r=Math.floor(Math.random()*g.nodes.length);g.nodes[r].hp=Math.max(0,g.nodes[r].hp-45);} } },
             { name: 'Dark Matter Surge', desc: 'Production at 60% for 6s!', type: 'negative', icon: '🌌', effect: function(g) { g._eventDebuff={mult:0.6,timer:6}; } },
-            { name: 'Neutron Blast', desc: 'Generators take 20 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-20); } },
+            { name: 'Neutron Blast', desc: 'Finances take 20 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-20); } },
             { name: 'Singularity Pulse', desc: 'Lose 8% AC and 8% el!', type: 'negative', icon: '💀', effect: function(g) { g.state.currencies.ac*=0.92;g.state.currencies.el*=0.92; } },
             { name: 'Magnetar Flare', desc: 'Banks take 30 damage!', type: 'negative', icon: '🔥', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='bank') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-30); } },
             { name: 'Quasar Beam', desc: 'Lose 12% AC!', type: 'negative', icon: '💫', effect: function(g) { g.state.currencies.ac*=0.88; } },
@@ -1157,14 +1157,14 @@
             { name: 'Tidal Forces', desc: 'Production halved for 5s!', type: 'negative', icon: '🌊', effect: function(g) { g._eventDebuff={mult:0.5,timer:5}; } },
             { name: 'Micrometeorites', desc: 'All buildings take 8 damage!', type: 'negative', icon: '✨', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.max(0,g.nodes[i].hp-8); } },
             { name: 'Dust Storm', desc: 'Lose 15% electricity!', type: 'negative', icon: '🌫️', effect: function(g) { g.state.currencies.el*=0.85; } },
-            { name: 'Static Discharge', desc: 'Generators take 25 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-25); } },
+            { name: 'Static Discharge', desc: 'Finances take 25 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-25); } },
             { name: 'Power Surge', desc: 'Lose 40% electricity!', type: 'negative', icon: '💥', effect: function(g) { g.state.currencies.el*=0.6; } },
             { name: 'System Glitch', desc: 'Lose 4% KRs!', type: 'negative', icon: '⚠️', effect: function(g) { g.state.totalOKRs*=0.96; } },
             { name: 'Overload', desc: 'Multipliers take 25 damage!', type: 'negative', icon: '🔥', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='multiplier') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-25); } },
             // === POSITIVE EVENTS (41-80) ===
             { name: 'Stellar Bonus', desc: 'Gain 20% extra AC!', type: 'positive', icon: '⭐', effect: function(g) { g.state.currencies.ac*=1.2; } },
             { name: 'OKR Rain', desc: 'Gain 5% bonus KRs!', type: 'positive', icon: '🌟', effect: function(g) { var bonus=g.state.totalOKRs*0.05;g.state.totalOKRs+=bonus; } },
-            { name: 'Energy Surge', desc: 'funding doubled!', type: 'positive', icon: '⚡', effect: function(g) { g.state.currencies.el*=2; } },
+            { name: 'Energy Surge', desc: '$ doubled!', type: 'positive', icon: '⚡', effect: function(g) { g.state.currencies.el*=2; } },
             { name: 'Repair Nanobots', desc: 'Heal all buildings 30 HP!', type: 'positive', icon: '🔧', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+30); } },
             { name: 'Production Boost', desc: '2x production for 10s!', type: 'positive', icon: '🚀', effect: function(g) { g._eventBuff={mult:2,timer:10}; } },
             { name: 'Lucky Find', desc: 'Gain 50 HC!', type: 'positive', icon: '💰', effect: function(g) { g.state.currencies.ac+=50; } },
@@ -1189,7 +1189,7 @@
             { name: 'Warp Bonus', desc: '4x production for 3s!', type: 'positive', icon: '🌀', effect: function(g) { g._eventBuff={mult:4,timer:3}; } },
             { name: 'Stardust Rain', desc: 'Gain 4% bonus KRs!', type: 'positive', icon: '✨', effect: function(g) { var bonus=g.state.totalOKRs*0.04;g.state.totalOKRs+=bonus; } },
             { name: 'Photon Boost', desc: '2.5x production for 6s!', type: 'positive', icon: '💫', effect: function(g) { g._eventBuff={mult:2.5,timer:6}; } },
-            { name: 'Dark Energy Tap', desc: 'Gain 120 electricity!', type: 'positive', icon: '🌌', effect: function(g) { g.state.currencies.el+=120; } },
+            { name: 'Dark Energy Tap', desc: 'Gain 120 $!', type: 'positive', icon: '🌌', effect: function(g) { g.state.currencies.el+=120; } },
             { name: 'Gravity Assist', desc: 'Gain 15% AC!', type: 'positive', icon: '🪐', effect: function(g) { g.state.currencies.ac*=1.15; } },
             { name: 'Time Dilation', desc: '1.8x production for 12s!', type: 'positive', icon: '⏳', effect: function(g) { g._eventBuff={mult:1.8,timer:12}; } },
             { name: 'Matter Conversion', desc: 'Gain 90 HC!', type: 'positive', icon: '🔬', effect: function(g) { g.state.currencies.ac+=90; } },
@@ -2103,7 +2103,7 @@
                 this.addFloatingText(x, y - 20, 'Building panel area!', '#f84');
                 return;
             }
-            if (window.innerWidth <= 768 && x < 110) {
+            if (window.innerWidth <= 768 && x > this.canvas.width - 100) {
                 this.addFloatingText(x, y - 20, 'Building panel!', '#f84');
                 return;
             }
@@ -2123,7 +2123,7 @@
 
             // Block placement if building uses el and we have no electricity
             if (b.elCost && b.elCost > 0 && this.state.electricityEnabled && this.state.currencies.el <= 0 && this.currentElRate <= 0) {
-                this.addFloatingText(x, y, 'No electricity! Build Finances first.', '#ff9800');
+                this.addFloatingText(x, y, 'No funding! Build Finances first.', '#ff9800');
                 this.playSound('click');
                 return;
             }
@@ -3161,7 +3161,7 @@
                     lines.push({ text: '$/s: +' + nodeEl.toFixed(1) + ' → +' + nextEl.toFixed(1), color: '#ff9800' });
                 }
                 if (bt.elCost > 0) {
-                    lines.push({ text: 'EL cost: -' + nodeElCost.toFixed(1) + ' → -' + nextElCost.toFixed(1), color: '#ff9800' });
+                    lines.push({ text: '$ cost: -' + nodeElCost.toFixed(1) + ' → -' + nextElCost.toFixed(1), color: '#ff9800' });
                 }
                 if (bt.interestRate) {
                     lines.push({ text: 'Interest: ' + (nodeInterest * 100).toFixed(1) + '% → ' + (nextInterest * 100).toFixed(1) + '%', color: '#ffd700' });
@@ -3521,7 +3521,7 @@
             var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
             var distFromCenter = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var outsidePlayArea = distFromCenter > playRadius;
-            var inBuildingPanel = (window.innerWidth > 768 && mx > this.canvas.width - 180) || (window.innerWidth <= 768 && mx < 110);
+            var inBuildingPanel = (window.innerWidth > 768 && mx > this.canvas.width - 180) || (window.innerWidth <= 768 && mx > this.canvas.width - 100);
             var canAfford = this.state.currencies.ac >= b.cost;
 
             var blocked = tooCloseToFactory || outsidePlayArea || inBuildingPanel;
@@ -3784,10 +3784,15 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // Dark overlay outside the circle
+            // Dark overlay outside the circle — use world-space bounds
             ctx.save();
+            var worldLeft = (0 - this.camera.offsetX) / this.camera.zoom;
+            var worldTop = (0 - this.camera.offsetY) / this.camera.zoom;
+            var worldRight = (w - this.camera.offsetX) / this.camera.zoom;
+            var worldBottom = (h - this.camera.offsetY) / this.camera.zoom;
+            var margin = 500; // extra margin for safety
             ctx.beginPath();
-            ctx.rect(0, 0, w, h);
+            ctx.rect(worldLeft - margin, worldTop - margin, worldRight - worldLeft + margin * 2, worldBottom - worldTop + margin * 2);
             ctx.arc(fX, fY, playRadius, 0, Math.PI * 2, true); // cut out circle
             ctx.closePath();
             ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
@@ -3859,78 +3864,132 @@
         // =========================================================
 
         OKRFarmingGame.prototype.drawOKRFactory = function(ctx, cx, cy) {
-            var s = 4; // pixel scale
+            var s = 4;
+            var milestones = this.state ? this.state.unlockedMilestones.length : 1;
+            var stage = milestones <= 3 ? 1 : milestones <= 7 ? 2 : milestones <= 11 ? 3 : 4;
+            var pulse = Math.sin(Date.now() * 0.003) * 0.15 + 0.85;
+            var t = Date.now() * 0.001;
 
-            // Foundation / base platform
-            this._pxRect(ctx, cx - 10 * s, cy + 5 * s, 20 * s, 2 * s, '#3a3a3a');
-            this._pxRect(ctx, cx - 9 * s, cy + 4 * s, 18 * s, 1 * s, '#4a4a4a');
+            // KR fill progress toward next milestone
+            var nextM = null;
+            if (this.state) {
+                for (var i = 0; i < MILESTONES.length; i++) {
+                    if (this.state.unlockedMilestones.indexOf(i) === -1) { nextM = MILESTONES[i]; break; }
+                }
+            }
+            var fillPct = nextM ? Math.min(1, this.state.totalOKRs / nextM.okr) : 1;
 
-            // Main building body
-            this._pxRect(ctx, cx - 7 * s, cy - 6 * s, 14 * s, 10 * s, '#333');
-            this._pxRect(ctx, cx - 6 * s, cy - 5 * s, 12 * s, 8 * s, '#444');
+            ctx.save();
 
-            // Roof
-            this._pxRect(ctx, cx - 8 * s, cy - 7 * s, 16 * s, 1 * s, '#555');
-
-            // Chimneys
-            this._pxRect(ctx, cx - 5 * s, cy - 11 * s, 3 * s, 4 * s, '#666');
-            this._pxRect(ctx, cx + 2 * s, cy - 10 * s, 3 * s, 3 * s, '#666');
-            // Chimney tops
-            this._pxRect(ctx, cx - 6 * s, cy - 12 * s, 5 * s, 1 * s, '#777');
-            this._pxRect(ctx, cx + 1 * s, cy - 11 * s, 5 * s, 1 * s, '#777');
-
-            // Windows (pulsing glow)
-            var pulse = Math.sin(Date.now() * 0.003) * 0.3 + 0.7;
-            var wc = 'rgba(0, 255, 255, ' + pulse.toFixed(2) + ')';
-            this._pxRect(ctx, cx - 5 * s, cy - 4 * s, 2 * s, 2 * s, wc);
-            this._pxRect(ctx, cx - 2 * s, cy - 4 * s, 2 * s, 2 * s, wc);
-            this._pxRect(ctx, cx + 1 * s, cy - 4 * s, 2 * s, 2 * s, wc);
-            this._pxRect(ctx, cx + 4 * s, cy - 4 * s, 2 * s, 2 * s, wc);
-
-            // Second row of windows
-            var wc2 = 'rgba(0, 200, 255, ' + (pulse * 0.7).toFixed(2) + ')';
-            this._pxRect(ctx, cx - 5 * s, cy - 1 * s, 2 * s, 2 * s, wc2);
-            this._pxRect(ctx, cx + 4 * s, cy - 1 * s, 2 * s, 2 * s, wc2);
-
-            // Door
-            this._pxRect(ctx, cx - 1 * s, cy + 0 * s, 3 * s, 4 * s, '#222');
-            this._pxRect(ctx, cx + 1 * s, cy + 1 * s, 1 * s, 1 * s, '#0ff'); // doorknob
-
-            // Conveyor belt at base
-            var convPulse = (Date.now() * 0.005) % 1;
-            for (var ci = -8; ci < 8; ci++) {
-                var shade = ((ci + Math.floor(Date.now() * 0.01)) % 3 === 0) ? '#555' : '#3a3a3a';
-                this._pxRect(ctx, cx + ci * s, cy + 7 * s, s, s, shade);
+            if (stage === 1) {
+                // Small shuttle
+                this._pxRect(ctx, cx - 2*s, cy - 4*s, 4*s, 6*s, '#556');
+                this._pxRect(ctx, cx - 1*s, cy - 5*s, 2*s, 1*s, '#667');
+                // Cockpit
+                this._pxRect(ctx, cx - 1*s, cy - 3*s, 2*s, 2*s, 'rgba(0,200,255,' + pulse.toFixed(2) + ')');
+                // Engines
+                this._pxRect(ctx, cx - 3*s, cy + 1*s, 1*s, 2*s, '#f80');
+                this._pxRect(ctx, cx + 2*s, cy + 1*s, 1*s, 2*s, '#f80');
+                // Engine glow
+                ctx.fillStyle = 'rgba(255,150,50,' + (pulse * 0.4).toFixed(2) + ')';
+                ctx.beginPath(); ctx.arc(cx - 2.5*s, cy + 3*s, 2*s, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(cx + 2.5*s, cy + 3*s, 2*s, 0, Math.PI*2); ctx.fill();
+            } else if (stage === 2) {
+                // Mid cruiser
+                this._pxRect(ctx, cx - 5*s, cy - 3*s, 10*s, 6*s, '#445');
+                this._pxRect(ctx, cx - 4*s, cy - 5*s, 8*s, 2*s, '#556');
+                this._pxRect(ctx, cx - 3*s, cy - 6*s, 6*s, 1*s, '#667');
+                // Bridge
+                this._pxRect(ctx, cx - 2*s, cy - 4*s, 4*s, 2*s, 'rgba(0,200,255,' + pulse.toFixed(2) + ')');
+                // Cargo bays
+                this._pxRect(ctx, cx - 4*s, cy, 3*s, 2*s, '#333');
+                this._pxRect(ctx, cx + 1*s, cy, 3*s, 2*s, '#333');
+                // Engines (3)
+                for (var ei = -1; ei <= 1; ei++) {
+                    this._pxRect(ctx, cx + ei*3*s - s/2, cy + 3*s, s, 2*s, '#f80');
+                    ctx.fillStyle = 'rgba(255,150,50,' + (pulse*0.5).toFixed(2) + ')';
+                    ctx.beginPath(); ctx.arc(cx + ei*3*s, cy + 5.5*s, 1.5*s, 0, Math.PI*2); ctx.fill();
+                }
+                // Antenna
+                this._pxRect(ctx, cx, cy - 7*s, s*0.5, 2*s, '#aaa');
+                ctx.fillStyle = 'rgba(0,255,136,' + pulse.toFixed(2) + ')';
+                ctx.beginPath(); ctx.arc(cx, cy - 7.5*s, s*0.7, 0, Math.PI*2); ctx.fill();
+            } else if (stage === 3) {
+                // Large carrier
+                this._pxRect(ctx, cx - 8*s, cy - 4*s, 16*s, 8*s, '#3a3a4a');
+                this._pxRect(ctx, cx - 7*s, cy - 6*s, 14*s, 2*s, '#4a4a5a');
+                this._pxRect(ctx, cx - 5*s, cy - 7*s, 10*s, 1*s, '#5a5a6a');
+                // Bridge tower
+                this._pxRect(ctx, cx - 2*s, cy - 9*s, 4*s, 3*s, '#555');
+                this._pxRect(ctx, cx - 1*s, cy - 8*s, 2*s, 1*s, 'rgba(0,200,255,' + pulse.toFixed(2) + ')');
+                // Hangar bay (center bottom)
+                this._pxRect(ctx, cx - 3*s, cy + 2*s, 6*s, 3*s, '#222');
+                this._pxRect(ctx, cx - 2*s, cy + 2*s, 4*s, 1*s, 'rgba(255,200,0,0.3)');
+                // Side turrets
+                this._pxRect(ctx, cx - 9*s, cy - 2*s, 1*s, 2*s, '#888');
+                this._pxRect(ctx, cx + 8*s, cy - 2*s, 1*s, 2*s, '#888');
+                // Engines (4)
+                for (var ei = -2; ei <= 1; ei++) {
+                    this._pxRect(ctx, cx + ei*3*s + s, cy + 4*s, s, 2*s, '#f60');
+                    ctx.fillStyle = 'rgba(255,100,30,' + (pulse*0.5).toFixed(2) + ')';
+                    ctx.beginPath(); ctx.arc(cx + ei*3*s + 1.5*s, cy + 6.5*s, 1.5*s, 0, Math.PI*2); ctx.fill();
+                }
+                // Running lights
+                var blink = Math.sin(t*3) > 0;
+                if (blink) {
+                    ctx.fillStyle = '#f00';
+                    ctx.fillRect(cx - 8*s, cy - 5*s, s, s);
+                    ctx.fillStyle = '#0f0';
+                    ctx.fillRect(cx + 7*s, cy - 5*s, s, s);
+                }
+            } else {
+                // Flagship — massive with ring
+                this._pxRect(ctx, cx - 10*s, cy - 5*s, 20*s, 10*s, '#2a2a3a');
+                this._pxRect(ctx, cx - 9*s, cy - 7*s, 18*s, 2*s, '#3a3a4a');
+                this._pxRect(ctx, cx - 7*s, cy - 8*s, 14*s, 1*s, '#4a4a5a');
+                // Command tower
+                this._pxRect(ctx, cx - 3*s, cy - 11*s, 6*s, 4*s, '#555');
+                this._pxRect(ctx, cx - 2*s, cy - 10*s, 4*s, 2*s, 'rgba(0,200,255,' + pulse.toFixed(2) + ')');
+                // Ring structure
+                ctx.strokeStyle = 'rgba(255,215,0,' + (pulse*0.4).toFixed(2) + ')';
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(cx, cy, 12*s, 0, Math.PI*2); ctx.stroke();
+                // Glowing core
+                ctx.fillStyle = 'rgba(0,255,200,' + (pulse*0.3).toFixed(2) + ')';
+                ctx.beginPath(); ctx.arc(cx, cy, 3*s, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,' + (pulse*0.5).toFixed(2) + ')';
+                ctx.beginPath(); ctx.arc(cx, cy, 1.5*s, 0, Math.PI*2); ctx.fill();
+                // Engines (5)
+                for (var ei = -2; ei <= 2; ei++) {
+                    this._pxRect(ctx, cx + ei*3*s - s/2, cy + 5*s, s, 2*s, '#f60');
+                    ctx.fillStyle = 'rgba(255,100,30,' + (pulse*0.6).toFixed(2) + ')';
+                    ctx.beginPath(); ctx.arc(cx + ei*3*s, cy + 7.5*s, 1.5*s, 0, Math.PI*2); ctx.fill();
+                }
+                // Escort indicator dots
+                for (var di = 0; di < 4; di++) {
+                    var da = t + di * Math.PI/2;
+                    ctx.fillStyle = 'rgba(0,255,136,0.4)';
+                    ctx.beginPath(); ctx.arc(cx + Math.cos(da)*14*s, cy + Math.sin(da)*14*s, s, 0, Math.PI*2); ctx.fill();
+                }
             }
 
-            // Smoke from chimneys
-            var t = Date.now() * 0.002;
-            ctx.fillStyle = 'rgba(150, 150, 150, 0.25)';
-            ctx.beginPath();
-            ctx.arc(cx - 4 * s + Math.sin(t) * 5, cy - 14 * s - Math.abs(Math.sin(t * 1.3)) * 10, 3 * s, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(cx - 3 * s + Math.sin(t * 0.8) * 8, cy - 18 * s - Math.abs(Math.sin(t * 0.7)) * 6, 4 * s, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = 'rgba(150, 150, 150, 0.15)';
-            ctx.beginPath();
-            ctx.arc(cx + 3 * s + Math.sin(t * 0.7) * 4, cy - 13 * s - Math.abs(Math.sin(t * 0.9)) * 12, 2.5 * s, 0, Math.PI * 2);
-            ctx.fill();
+            // KR progress bar inside ship
+            var barW = (stage === 1 ? 4 : stage === 2 ? 8 : stage === 3 ? 14 : 18) * s;
+            var barH = s;
+            var barX = cx - barW/2;
+            var barY = cy + (stage <= 2 ? 0 : 1) * s;
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(barX, barY, barW, barH);
+            ctx.fillStyle = 'rgba(0,255,136,' + (0.5 + pulse*0.3).toFixed(2) + ')';
+            ctx.fillRect(barX, barY, barW * fillPct, barH);
 
-            // Glow around factory
-            ctx.save();
-            ctx.shadowColor = '#0ff';
-            ctx.shadowBlur = 15 + Math.sin(Date.now() * 0.002) * 5;
-            ctx.strokeStyle = 'rgba(0, 255, 255, 0.15)';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(cx - 8 * s, cy - 7 * s, 16 * s, 14 * s);
             ctx.restore();
 
             // Label
             ctx.fillStyle = '#0ff';
             ctx.font = 'bold 11px Segoe UI';
             ctx.textAlign = 'center';
-            ctx.fillText('Leadership', cx, cy + 10 * s);
+            ctx.fillText('Leadership', cx, cy + (stage <= 2 ? 8 : 10) * s);
         };
 
         // =========================================================
@@ -3977,56 +4036,308 @@
             switch (node.type) {
                 case 'collector':
                     if (lvl === 1) {
-                        // Lv.1 — small green funnel
-                        this._pxRect(ctx, x - 4 * s, y - 5 * s, 8 * s, 1 * s, '#1b5e20');
-                        this._pxRect(ctx, x - 3 * s, y - 4 * s, 6 * s, 1 * s, '#2e7d32');
-                        this._pxRect(ctx, x - 2 * s, y - 3 * s, 4 * s, 1 * s, '#388e3c');
-                        this._pxRect(ctx, x - 1 * s, y - 2 * s, 2 * s, 3 * s, '#4caf50');
-                        this._pxRect(ctx, x - 1 * s, y + 1 * s, 2 * s, 2 * s, '#2e7d32');
-                        this._pxRect(ctx, x - 2 * s, y + 3 * s, 4 * s, 1 * s, '#1b5e20');
-                        // Single spinning dot
-                        var ca1 = age * 2.5;
-                        var cd1x = x + Math.cos(ca1) * 3.5 * s;
-                        var cd1y = y - 1 * s + Math.sin(ca1) * 2 * s;
-                        this._pxRect(ctx, cd1x - s / 2, cd1y - s / 2, s, s, 'rgba(0,255,0,' + pulse.toFixed(2) + ')');
+                        // Lv.1 — Talent Beacon: small signal tower
+                        // Tower base
+                        this._pxRect(ctx, x - 2 * s, y + 2 * s, 4 * s, 2 * s, '#1b5e20');
+                        // Tower body
+                        this._pxRect(ctx, x - 1 * s, y - 4 * s, 2 * s, 6 * s, '#2e7d32');
+                        this._pxRect(ctx, x - s * 0.5, y - 5 * s, s, 1 * s, '#388e3c');
+                        // Beacon light at top
+                        this._pxRect(ctx, x - s * 0.5, y - 6 * s, s, s, 'rgba(0,255,100,' + pulse.toFixed(2) + ')');
+                        // Signal ring pulsing outward
+                        var sigR1 = (age * 2 % 3) * 2.5 * s;
+                        var sigA1 = 1 - (age * 2 % 3) / 3;
+                        ctx.strokeStyle = 'rgba(0,255,100,' + (sigA1 * 0.5).toFixed(2) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.arc(x, y - 6 * s, Math.max(sigR1, 1), 0, Math.PI * 2);
+                        ctx.stroke();
+                        // Ground detail
+                        this._pxRect(ctx, x - 3 * s, y + 4 * s, 6 * s, s, '#1b5e20');
                     } else if (lvl === 2) {
-                        // Lv.2 — wider funnel with side collectors
-                        // Glow circle behind
+                        // Lv.2 — Talent Beacon: taller tower with radar dish, two signal rings
                         ctx.save();
-                        ctx.fillStyle = 'rgba(102,187,106,0.12)';
+                        ctx.fillStyle = 'rgba(102,187,106,0.1)';
                         ctx.beginPath();
                         ctx.arc(x, y, 6 * s, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.restore();
-                        // Wider funnel
-                        this._pxRect(ctx, x - 5 * s, y - 6 * s, 10 * s, 1 * s, '#2e7d32');
-                        this._pxRect(ctx, x - 4 * s, y - 5 * s, 8 * s, 1 * s, '#43a047');
-                        this._pxRect(ctx, x - 3 * s, y - 4 * s, 6 * s, 1 * s, '#66bb6a');
-                        this._pxRect(ctx, x - 2 * s, y - 3 * s, 4 * s, 1 * s, '#81c784');
-                        this._pxRect(ctx, x - 1 * s, y - 2 * s, 2 * s, 4 * s, '#66bb6a');
-                        this._pxRect(ctx, x - 1 * s, y + 2 * s, 2 * s, 2 * s, '#43a047');
-                        this._pxRect(ctx, x - 3 * s, y + 4 * s, 6 * s, 1 * s, '#2e7d32');
-                        // Side antenna arms
-                        this._pxRect(ctx, x - 6 * s, y - 4 * s, 1 * s, 3 * s, '#81c784');
-                        this._pxRect(ctx, x + 5 * s, y - 4 * s, 1 * s, 3 * s, '#81c784');
-                        this._pxRect(ctx, x - 7 * s, y - 5 * s, 1 * s, 1 * s, '#66bb6a');
-                        this._pxRect(ctx, x + 6 * s, y - 5 * s, 1 * s, 1 * s, '#66bb6a');
-                        // Two spinning dots (opposite directions)
-                        var ca2a = age * 2.5;
-                        var ca2b = age * 2.5 + Math.PI;
-                        var cr2 = 4 * s;
-                        this._pxRect(ctx, x + Math.cos(ca2a) * cr2 - s / 2, y + Math.sin(ca2a) * cr2 - s / 2, s, s, 'rgba(129,199,132,' + pulse.toFixed(2) + ')');
-                        this._pxRect(ctx, x + Math.cos(ca2b) * cr2 - s / 2, y + Math.sin(ca2b) * cr2 - s / 2, s, s, 'rgba(102,187,106,' + pulse.toFixed(2) + ')');
+                        // Tower base
+                        this._pxRect(ctx, x - 3 * s, y + 2 * s, 6 * s, 2 * s, '#1b5e20');
+                        this._pxRect(ctx, x - 2 * s, y + 1 * s, 4 * s, 1 * s, '#2e7d32');
+                        // Tower body
+                        this._pxRect(ctx, x - 1 * s, y - 5 * s, 2 * s, 6 * s, '#388e3c');
+                        this._pxRect(ctx, x - s * 0.5, y - 6 * s, s, 1 * s, '#43a047');
+                        // Radar dish
+                        this._pxRect(ctx, x + 1 * s, y - 3 * s, 3 * s, s * 0.5, '#66bb6a');
+                        this._pxRect(ctx, x + 3 * s, y - 4 * s, s, 2 * s, '#81c784');
+                        // Beacon light
+                        this._pxRect(ctx, x - s * 0.5, y - 7 * s, s, s, 'rgba(0,255,100,' + pulse.toFixed(2) + ')');
+                        // Two signal rings
+                        for (var ri = 0; ri < 2; ri++) {
+                            var sigR2 = ((age * 2 + ri * 1.5) % 3) * 3 * s;
+                            var sigA2 = 1 - ((age * 2 + ri * 1.5) % 3) / 3;
+                            ctx.strokeStyle = 'rgba(0,255,100,' + (sigA2 * 0.4).toFixed(2) + ')';
+                            ctx.lineWidth = 1.2;
+                            ctx.beginPath();
+                            ctx.arc(x, y - 7 * s, Math.max(sigR2, 1), 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                        // Support struts
+                        this._pxRect(ctx, x - 3 * s, y - 1 * s, 1 * s, 3 * s, '#2e7d32');
+                        this._pxRect(ctx, x + 2 * s, y - 1 * s, 1 * s, 3 * s, '#2e7d32');
+                        // Ground platform
+                        this._pxRect(ctx, x - 4 * s, y + 4 * s, 8 * s, s, '#1b5e20');
                     } else {
-                        // Lv.3 — golden mega-hopper with satellite dishes
-                        // Pulsing glow halo
+                        // Lv.3 — Talent Beacon: large broadcast array, golden signal waves
                         ctx.save();
-                        ctx.fillStyle = 'rgba(255,215,0,' + (0.08 + Math.sin(age * 2) * 0.05).toFixed(3) + ')';
+                        ctx.fillStyle = 'rgba(255,215,0,' + (0.08 + Math.sin(age * 2) * 0.04).toFixed(3) + ')';
                         ctx.beginPath();
                         ctx.arc(x, y, 8 * s, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.restore();
-                        // Inner rotating energy ring
+                        // Grand base platform
+                        this._pxRect(ctx, x - 4 * s, y + 3 * s, 8 * s, 2 * s, '#1b5e20');
+                        this._pxRect(ctx, x - 3 * s, y + 2 * s, 6 * s, 1 * s, '#2e7d32');
+                        // Central tower
+                        this._pxRect(ctx, x - 1 * s, y - 6 * s, 2 * s, 8 * s, '#388e3c');
+                        this._pxRect(ctx, x - s * 0.5, y - 7 * s, s, 1 * s, '#43a047');
+                        // Left dish
+                        this._pxRect(ctx, x - 5 * s, y - 4 * s, 3 * s, s * 0.5, '#ffd700');
+                        this._pxRect(ctx, x - 6 * s, y - 5 * s, s, 2 * s, '#ffab00');
+                        // Right dish
+                        this._pxRect(ctx, x + 2 * s, y - 4 * s, 3 * s, s * 0.5, '#ffd700');
+                        this._pxRect(ctx, x + 5 * s, y - 5 * s, s, 2 * s, '#ffab00');
+                        // Golden beacon core
+                        this._pxRect(ctx, x - s * 0.5, y - 8 * s, s, s, 'rgba(255,215,0,' + pulse.toFixed(2) + ')');
+                        // Three golden signal waves
+                        for (var ri = 0; ri < 3; ri++) {
+                            var sigR3 = ((age * 2 + ri * 1.0) % 4) * 3 * s;
+                            var sigA3 = 1 - ((age * 2 + ri * 1.0) % 4) / 4;
+                            ctx.strokeStyle = 'rgba(255,215,0,' + (sigA3 * 0.5).toFixed(2) + ')';
+                            ctx.lineWidth = 1.5;
+                            ctx.beginPath();
+                            ctx.arc(x, y - 8 * s, Math.max(sigR3, 1), 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                        // Support frame
+                        this._pxRect(ctx, x - 4 * s, y - 2 * s, 1 * s, 4 * s, '#2e7d32');
+                        this._pxRect(ctx, x + 3 * s, y - 2 * s, 1 * s, 4 * s, '#2e7d32');
+                        this._pxRect(ctx, x - 5 * s, y - 1 * s, 10 * s, s * 0.5, '#2e7d32');
+                        // Data particles orbiting
+                        for (var dp = 0; dp < 3; dp++) {
+                            var dpA = age * 2.5 + dp * (Math.PI * 2 / 3);
+                            var dpR = 6 * s;
+                            this._pxRect(ctx, x + Math.cos(dpA) * dpR - s * 0.3, y - 4 * s + Math.sin(dpA) * dpR * 0.5 - s * 0.3, s * 0.6, s * 0.6, '#ffd700');
+                        }
+                    }
+                    break;
+
+                case 'processor':
+                    if (lvl === 1) {
+                        // Lv.1 — Work Station: small desk with monitor
+                        // Desk surface
+                        this._pxRect(ctx, x - 4 * s, y + 1 * s, 8 * s, s, '#5d4037');
+                        // Desk legs
+                        this._pxRect(ctx, x - 3 * s, y + 2 * s, s, 2 * s, '#4e342e');
+                        this._pxRect(ctx, x + 2 * s, y + 2 * s, s, 2 * s, '#4e342e');
+                        // Monitor stand
+                        this._pxRect(ctx, x - s * 0.5, y - 1 * s, s, 2 * s, '#616161');
+                        // Monitor frame
+                        this._pxRect(ctx, x - 3 * s, y - 4 * s, 6 * s, 3 * s, '#37474f');
+                        // Monitor screen (blue glow)
+                        this._pxRect(ctx, x - 2 * s, y - 3 * s, 4 * s, 2 * s, 'rgba(30,136,229,' + pulse.toFixed(2) + ')');
+                        // Screen content lines
+                        this._pxRect(ctx, x - 1.5 * s, y - 2.8 * s, 3 * s, s * 0.3, 'rgba(100,181,246,0.6)');
+                        this._pxRect(ctx, x - 1.5 * s, y - 2.2 * s, 2 * s, s * 0.3, 'rgba(100,181,246,0.4)');
+                        // Person silhouette (sitting)
+                        this._pxRect(ctx, x - s * 0.5, y - 1 * s, s, s, '#90a4ae');
+                        this._pxRect(ctx, x - s, y, s * 2, s, '#78909c');
+                    } else if (lvl === 2) {
+                        // Lv.2 — Work Station: dual monitors, chair, coffee cup
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(30,136,229,0.08)';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 6 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Desk surface
+                        this._pxRect(ctx, x - 5 * s, y + 1 * s, 10 * s, s, '#5d4037');
+                        // Desk legs
+                        this._pxRect(ctx, x - 4 * s, y + 2 * s, s, 2 * s, '#4e342e');
+                        this._pxRect(ctx, x + 3 * s, y + 2 * s, s, 2 * s, '#4e342e');
+                        // Chair back
+                        this._pxRect(ctx, x - s, y - 1 * s, 2 * s, 3 * s, '#455a64');
+                        this._pxRect(ctx, x - 1.5 * s, y - 2 * s, 3 * s, 1 * s, '#546e7a');
+                        // Left monitor
+                        this._pxRect(ctx, x - 5 * s, y - 5 * s, 4 * s, 3 * s, '#37474f');
+                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 2.5 * s, 2 * s, 'rgba(30,136,229,' + pulse.toFixed(2) + ')');
+                        this._pxRect(ctx, x - 3 * s, y - 1 * s, s * 0.5, 2 * s, '#616161');
+                        // Right monitor
+                        this._pxRect(ctx, x + 1 * s, y - 5 * s, 4 * s, 3 * s, '#37474f');
+                        this._pxRect(ctx, x + 2 * s, y - 4 * s, 2.5 * s, 2 * s, 'rgba(30,136,229,' + pulse.toFixed(2) + ')');
+                        this._pxRect(ctx, x + 3 * s, y - 1 * s, s * 0.5, 2 * s, '#616161');
+                        // Screen content
+                        this._pxRect(ctx, x - 3.5 * s, y - 3.8 * s, 2 * s, s * 0.3, 'rgba(100,181,246,0.5)');
+                        this._pxRect(ctx, x + 2.5 * s, y - 3.8 * s, 2 * s, s * 0.3, 'rgba(100,181,246,0.5)');
+                        // Person working
+                        this._pxRect(ctx, x - s * 0.5, y - 2 * s, s, s, '#90a4ae');
+                        this._pxRect(ctx, x - s, y - 1 * s, 2 * s, s, '#78909c');
+                        // Coffee cup
+                        this._pxRect(ctx, x + 4 * s, y, s, s, '#795548');
+                        this._pxRect(ctx, x + 4.5 * s, y - s * 0.3, s * 0.5, s * 0.3, '#795548');
+                        // Steam from coffee
+                        if (Math.sin(age * 3) > 0) {
+                            ctx.fillStyle = 'rgba(200,200,200,0.3)';
+                            ctx.beginPath();
+                            ctx.arc(x + 4.5 * s, y - s, s * 0.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        // Keyboard
+                        this._pxRect(ctx, x - 2 * s, y + 0.5 * s, 4 * s, s * 0.4, '#757575');
+                    } else {
+                        // Lv.3 — Work Station: triple monitor command center, holographic displays
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(30,136,229,' + (0.08 + Math.sin(age * 2) * 0.04).toFixed(3) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 8 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Grand desk
+                        this._pxRect(ctx, x - 6 * s, y + 1 * s, 12 * s, s, '#5d4037');
+                        this._pxRect(ctx, x - 5 * s, y + 2 * s, s, 2 * s, '#4e342e');
+                        this._pxRect(ctx, x + 4 * s, y + 2 * s, s, 2 * s, '#4e342e');
+                        // Ergonomic chair
+                        this._pxRect(ctx, x - s, y - 1 * s, 2 * s, 3 * s, '#37474f');
+                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 1 * s, '#455a64');
+                        // Three monitors
+                        this._pxRect(ctx, x - 6 * s, y - 6 * s, 4 * s, 3 * s, '#263238');
+                        this._pxRect(ctx, x - 5 * s, y - 5 * s, 2.5 * s, 2 * s, 'rgba(30,136,229,' + pulse.toFixed(2) + ')');
+                        this._pxRect(ctx, x - 2 * s, y - 7 * s, 4 * s, 4 * s, '#263238');
+                        this._pxRect(ctx, x - 1 * s, y - 6 * s, 2.5 * s, 2.5 * s, 'rgba(30,136,229,' + pulse.toFixed(2) + ')');
+                        this._pxRect(ctx, x + 2 * s, y - 6 * s, 4 * s, 3 * s, '#263238');
+                        this._pxRect(ctx, x + 3 * s, y - 5 * s, 2.5 * s, 2 * s, 'rgba(30,136,229,' + pulse.toFixed(2) + ')');
+                        // Monitor stands
+                        this._pxRect(ctx, x - 4 * s, y - 2 * s, s * 0.5, 3 * s, '#616161');
+                        this._pxRect(ctx, x, y - 2 * s, s * 0.5, 3 * s, '#616161');
+                        this._pxRect(ctx, x + 4 * s, y - 2 * s, s * 0.5, 3 * s, '#616161');
+                        // Screen content (code lines, charts)
+                        this._pxRect(ctx, x - 4.5 * s, y - 4.8 * s, 2 * s, s * 0.3, 'rgba(0,255,136,0.5)');
+                        this._pxRect(ctx, x - 4.5 * s, y - 4.2 * s, 1.5 * s, s * 0.3, 'rgba(0,255,136,0.3)');
+                        this._pxRect(ctx, x - 0.5 * s, y - 5.5 * s, 2 * s, s * 0.3, 'rgba(255,215,0,0.5)');
+                        this._pxRect(ctx, x + 3.5 * s, y - 4.8 * s, 2 * s, s * 0.3, 'rgba(0,229,255,0.5)');
+                        // Person at workstation
+                        this._pxRect(ctx, x - s * 0.5, y - 2 * s, s, s, '#b0bec5');
+                        this._pxRect(ctx, x - s, y - 1 * s, 2 * s, s, '#90a4ae');
+                        // Holographic projections above center monitor
+                        var holoA = age * 2;
+                        ctx.fillStyle = 'rgba(0,229,255,' + (0.2 + Math.sin(holoA) * 0.1).toFixed(2) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y - 9 * s, 1.5 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Floating data nodes
+                        for (var hn = 0; hn < 4; hn++) {
+                            var hnA = age * 1.5 + hn * (Math.PI / 2);
+                            var hnR = 2 * s;
+                            this._pxRect(ctx, x + Math.cos(hnA) * hnR - s * 0.2, y - 9 * s + Math.sin(hnA) * hnR - s * 0.2, s * 0.4, s * 0.4, '#00e5ff');
+                        }
+                        // Keyboard and mouse
+                        this._pxRect(ctx, x - 3 * s, y + 0.5 * s, 5 * s, s * 0.4, '#757575');
+                        this._pxRect(ctx, x + 3 * s, y + 0.5 * s, s, s * 0.5, '#757575');
+                    }
+                    break;
+
+                case 'multiplier':
+                    if (lvl === 1) {
+                        // Lv.1 — Network Hub: central circle with 4 radiating lines to dots
+                        // Central hub
+                        ctx.fillStyle = '#7b1fa2';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = 'rgba(206,147,255,' + pulse.toFixed(2) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // 4 connection lines and dots
+                        for (var ni = 0; ni < 4; ni++) {
+                            var na = ni * (Math.PI / 2);
+                            var nx = x + Math.cos(na) * 5 * s;
+                            var ny = y + Math.sin(na) * 5 * s;
+                            ctx.strokeStyle = 'rgba(171,71,188,' + pulse.toFixed(2) + ')';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(x + Math.cos(na) * 2 * s, y + Math.sin(na) * 2 * s);
+                            ctx.lineTo(nx, ny);
+                            ctx.stroke();
+                            this._pxRect(ctx, nx - s * 0.5, ny - s * 0.5, s, s, '#ce93d8');
+                        }
+                        // Sparkle on hub
+                        if (Math.sin(age * 5) > 0.3) {
+                            this._pxRect(ctx, x - s * 0.3, y - s * 0.3, s * 0.6, s * 0.6, '#fff');
+                        }
+                        ctx.fillStyle = 'rgba(206,147,255,0.7)';
+                        ctx.font = 'bold 9px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('x' + UPGRADE_POWER[1].toFixed(1), x, y - 6 * s);
+                    } else if (lvl === 2) {
+                        // Lv.2 — Network Hub: 6 connections with pulsing data flow
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(171,71,188,0.1)';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Central hub (larger)
+                        ctx.fillStyle = '#6a1b9a';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2.5 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#8e24aa';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1.5 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = 'rgba(206,147,255,' + pulse.toFixed(2) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y, s * 0.8, 0, Math.PI * 2);
+                        ctx.fill();
+                        // 6 connection lines and nodes
+                        for (var ni = 0; ni < 6; ni++) {
+                            var na = ni * (Math.PI / 3);
+                            var nx = x + Math.cos(na) * 6 * s;
+                            var ny = y + Math.sin(na) * 6 * s;
+                            ctx.strokeStyle = 'rgba(171,71,188,' + pulse.toFixed(2) + ')';
+                            ctx.lineWidth = 1.2;
+                            ctx.beginPath();
+                            ctx.moveTo(x + Math.cos(na) * 2.5 * s, y + Math.sin(na) * 2.5 * s);
+                            ctx.lineTo(nx, ny);
+                            ctx.stroke();
+                            this._pxRect(ctx, nx - s * 0.6, ny - s * 0.6, s * 1.2, s * 1.2, '#ab47bc');
+                            // Data flow pulse traveling along line
+                            var flowPos = (age * 2 + ni * 0.5) % 1;
+                            var fx = x + Math.cos(na) * (2.5 + flowPos * 3.5) * s;
+                            var fy = y + Math.sin(na) * (2.5 + flowPos * 3.5) * s;
+                            this._pxRect(ctx, fx - s * 0.3, fy - s * 0.3, s * 0.6, s * 0.6, '#e1bee7');
+                        }
+                        // Inner ring detail
+                        ctx.strokeStyle = 'rgba(206,147,255,0.3)';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 4 * s, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.fillStyle = 'rgba(206,147,255,0.8)';
+                        ctx.font = 'bold 9px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('x' + UPGRADE_POWER[2].toFixed(1), x, y - 8 * s);
+                    } else {
+                        // Lv.3 — Network Hub: 8 connections, orbiting data packets, golden glow
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255,215,0,' + (0.08 + Math.sin(age * 2) * 0.04).toFixed(3) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 9 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Rotating energy ring
                         ctx.save();
                         ctx.strokeStyle = 'rgba(255,215,0,0.3)';
                         ctx.lineWidth = 1.5;
@@ -4034,220 +4345,50 @@
                         ctx.arc(x, y, 5 * s, age * 1.5, age * 1.5 + Math.PI * 1.2);
                         ctx.stroke();
                         ctx.restore();
-                        // Massive golden funnel
-                        this._pxRect(ctx, x - 6 * s, y - 7 * s, 12 * s, 1 * s, '#ffd700');
-                        this._pxRect(ctx, x - 5 * s, y - 6 * s, 10 * s, 1 * s, '#2e7d32');
-                        this._pxRect(ctx, x - 4 * s, y - 5 * s, 8 * s, 1 * s, '#43a047');
-                        this._pxRect(ctx, x - 3 * s, y - 4 * s, 6 * s, 1 * s, '#66bb6a');
-                        this._pxRect(ctx, x - 2 * s, y - 3 * s, 4 * s, 2 * s, '#81c784');
-                        this._pxRect(ctx, x - 1 * s, y - 1 * s, 2 * s, 4 * s, '#66bb6a');
-                        this._pxRect(ctx, x - 2 * s, y + 3 * s, 4 * s, 1 * s, '#43a047');
-                        this._pxRect(ctx, x - 3 * s, y + 4 * s, 6 * s, 1 * s, '#ffd700');
-                        // Gold rim highlights
-                        this._pxRect(ctx, x - 6 * s, y - 7 * s, 1 * s, 1 * s, '#ffab00');
-                        this._pxRect(ctx, x + 5 * s, y - 7 * s, 1 * s, 1 * s, '#ffab00');
-                        // Satellite dishes
-                        this._pxRect(ctx, x - 8 * s, y - 5 * s, 2 * s, 1 * s, '#ffd700');
-                        this._pxRect(ctx, x - 8 * s, y - 4 * s, 1 * s, 2 * s, '#ffab00');
-                        this._pxRect(ctx, x + 6 * s, y - 5 * s, 2 * s, 1 * s, '#ffd700');
-                        this._pxRect(ctx, x + 7 * s, y - 4 * s, 1 * s, 2 * s, '#ffab00');
-                        // Three orbiting gold dots
-                        for (var ci = 0; ci < 3; ci++) {
-                            var ca3 = age * 2.2 + ci * (Math.PI * 2 / 3);
-                            var cr3 = 5.5 * s;
-                            this._pxRect(ctx, x + Math.cos(ca3) * cr3 - s / 2, y + Math.sin(ca3) * cr3 - s / 2, s, s, '#ffd700');
-                        }
-                    }
-                    break;
-
-                case 'processor':
-                    if (lvl === 1) {
-                        // Lv.1 — simple blue chip with 8 pins
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 6 * s, '#0d47a1');
-                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 4 * s, '#1565c0');
-                        this._pxRect(ctx, x - 1 * s, y - 1 * s, 2 * s, 2 * s, '#1e88e5');
-                        // 8 pins
-                        this._pxRect(ctx, x - 4 * s, y - 2 * s, 1 * s, 1 * s, '#64b5f6');
-                        this._pxRect(ctx, x - 4 * s, y + 1 * s, 1 * s, 1 * s, '#64b5f6');
-                        this._pxRect(ctx, x + 3 * s, y - 2 * s, 1 * s, 1 * s, '#64b5f6');
-                        this._pxRect(ctx, x + 3 * s, y + 1 * s, 1 * s, 1 * s, '#64b5f6');
-                        this._pxRect(ctx, x - 2 * s, y - 4 * s, 1 * s, 1 * s, '#64b5f6');
-                        this._pxRect(ctx, x + 1 * s, y - 4 * s, 1 * s, 1 * s, '#64b5f6');
-                        this._pxRect(ctx, x - 2 * s, y + 3 * s, 1 * s, 1 * s, '#64b5f6');
-                        this._pxRect(ctx, x + 1 * s, y + 3 * s, 1 * s, 1 * s, '#64b5f6');
-                        // Single center LED
-                        this._pxRect(ctx, x - s / 2, y - s / 2, s, s, 'rgba(100,181,246,' + pulse.toFixed(2) + ')');
-                    } else if (lvl === 2) {
-                        // Lv.2 — larger chip with 12 pins, heat sink, circuit traces
-                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 8 * s, '#0d47a1');
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 6 * s, '#1565c0');
-                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 4 * s, '#1e88e5');
-                        // Circuit traces inside
-                        this._pxRect(ctx, x - 2 * s, y, 4 * s, s * 0.5, '#64b5f6');
-                        this._pxRect(ctx, x, y - 2 * s, s * 0.5, 4 * s, '#64b5f6');
-                        this._pxRect(ctx, x - 1 * s, y - 1 * s, 1 * s, s * 0.5, '#90caf9');
-                        this._pxRect(ctx, x + s * 0.5, y + s * 0.5, 1 * s, s * 0.5, '#90caf9');
-                        // 12 pins (3 per side)
-                        for (var pi2 = -2; pi2 <= 2; pi2++) {
-                            if (pi2 === 0) continue;
-                            this._pxRect(ctx, x - 5 * s, y + pi2 * s, 1 * s, s * 0.7, '#64b5f6');
-                            this._pxRect(ctx, x + 4 * s, y + pi2 * s, 1 * s, s * 0.7, '#64b5f6');
-                            this._pxRect(ctx, x + pi2 * s, y - 5 * s, s * 0.7, 1 * s, '#64b5f6');
-                            this._pxRect(ctx, x + pi2 * s, y + 4 * s, s * 0.7, 1 * s, '#64b5f6');
-                        }
-                        // Heat sink fins on top
-                        for (var hf = -2; hf <= 2; hf++) {
-                            this._pxRect(ctx, x + hf * s, y - 6 * s, s * 0.5, 1 * s, '#b0bec5');
-                        }
-                        // Two blinking LEDs
-                        var pLed2 = Math.sin(age * 4) > 0 ? 1.0 : 0.3;
-                        this._pxRect(ctx, x - s, y - s / 2, s * 0.7, s * 0.7, 'rgba(100,181,246,' + pLed2.toFixed(2) + ')');
-                        this._pxRect(ctx, x + s * 0.3, y - s / 2, s * 0.7, s * 0.7, 'rgba(255,255,255,' + (1 - pLed2).toFixed(2) + ')');
-                    } else {
-                        // Lv.3 — quantum computer: stacked layers, holographic pattern, data particles
-                        // Blue glow behind
-                        ctx.save();
-                        ctx.fillStyle = 'rgba(30,136,229,' + (0.08 + Math.sin(age * 2) * 0.04).toFixed(3) + ')';
+                        // Central hub (golden core)
+                        ctx.fillStyle = '#6a1b9a';
                         ctx.beginPath();
-                        ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
+                        ctx.arc(x, y, 3 * s, 0, Math.PI * 2);
                         ctx.fill();
-                        ctx.restore();
-                        // Stacked layers (3D effect)
-                        this._pxRect(ctx, x - 4 * s, y - 5 * s + s, 8 * s, 8 * s, '#0a3370');
-                        this._pxRect(ctx, x - 4 * s, y - 5 * s, 8 * s, 8 * s, '#0d47a1');
-                        this._pxRect(ctx, x - 3 * s, y - 4 * s, 6 * s, 6 * s, '#1565c0');
-                        this._pxRect(ctx, x - 2 * s, y - 3 * s, 4 * s, 4 * s, '#1e88e5');
-                        // Holographic inner pattern
-                        for (var hx = -1; hx <= 1; hx++) {
-                            for (var hy = -1; hy <= 1; hy++) {
-                                var hBright = Math.sin(age * 5 + hx * 2 + hy * 3) > 0;
-                                if (hBright) {
-                                    this._pxRect(ctx, x + hx * s - s * 0.3, y - s + hy * s - s * 0.3, s * 0.6, s * 0.6, '#e3f2fd');
-                                }
-                            }
+                        ctx.fillStyle = '#ffd700';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = 'rgba(255,255,255,' + pulse.toFixed(2) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y, s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // 8 connection lines and gold nodes
+                        for (var ni = 0; ni < 8; ni++) {
+                            var na = ni * (Math.PI / 4);
+                            var nx = x + Math.cos(na) * 7 * s;
+                            var ny = y + Math.sin(na) * 7 * s;
+                            ctx.strokeStyle = 'rgba(255,215,0,' + (pulse * 0.6).toFixed(2) + ')';
+                            ctx.lineWidth = 1.5;
+                            ctx.beginPath();
+                            ctx.moveTo(x + Math.cos(na) * 3 * s, y + Math.sin(na) * 3 * s);
+                            ctx.lineTo(nx, ny);
+                            ctx.stroke();
+                            this._pxRect(ctx, nx - s * 0.7, ny - s * 0.7, s * 1.4, s * 1.4, '#ffd700');
+                            // Data flow
+                            var flowPos = (age * 2 + ni * 0.3) % 1;
+                            var fx = x + Math.cos(na) * (3 + flowPos * 4) * s;
+                            var fy = y + Math.sin(na) * (3 + flowPos * 4) * s;
+                            this._pxRect(ctx, fx - s * 0.3, fy - s * 0.3, s * 0.6, s * 0.6, '#fff');
                         }
-                        // White core
-                        this._pxRect(ctx, x - s * 0.5, y - s - s * 0.5, s, s, 'rgba(255,255,255,' + pulse.toFixed(2) + ')');
-                        // 16 pins (4 per side)
-                        for (var pi3 = -3; pi3 <= 3; pi3++) {
-                            if (pi3 === 0) continue;
-                            this._pxRect(ctx, x - 5 * s, y - s + pi3 * s * 0.8, 1 * s, s * 0.5, '#64b5f6');
-                            this._pxRect(ctx, x + 4 * s, y - s + pi3 * s * 0.8, 1 * s, s * 0.5, '#64b5f6');
-                            this._pxRect(ctx, x + pi3 * s * 0.8, y - 6 * s, s * 0.5, 1 * s, '#64b5f6');
-                            this._pxRect(ctx, x + pi3 * s * 0.8, y + 3 * s, s * 0.5, 1 * s, '#64b5f6');
-                        }
-                        // Orbiting data particles (cyan dots)
+                        // Orbiting data packets
                         for (var dp = 0; dp < 4; dp++) {
-                            var da3 = age * 3 + dp * (Math.PI / 2);
-                            var dr3 = 5.5 * s;
-                            this._pxRect(ctx, x + Math.cos(da3) * dr3 - s * 0.3, y - s + Math.sin(da3) * dr3 - s * 0.3, s * 0.6, s * 0.6, '#00e5ff');
+                            var dpA = age * 1.8 + dp * (Math.PI / 2);
+                            var dpR = 5 * s;
+                            var dpx = x + Math.cos(dpA) * dpR;
+                            var dpy = y + Math.sin(dpA) * dpR;
+                            this._pxRect(ctx, dpx - s * 0.4, dpy - s * 0.4, s * 0.8, s * 0.8, '#e1bee7');
                         }
-                        // electric arc effects
-                        if (Math.sin(age * 8) > 0.6) {
-                            var arcOff = Math.sin(age * 13) * 2 * s;
-                            this._pxRect(ctx, x + arcOff - s * 0.3, y - 4 * s, s * 0.6, 2 * s, 'rgba(144,202,249,0.7)');
-                        }
-                        if (Math.sin(age * 8 + 1.5) > 0.6) {
-                            var arcOff2 = Math.cos(age * 11) * 2 * s;
-                            this._pxRect(ctx, x - 3 * s, y - s + arcOff2 - s * 0.3, 2 * s, s * 0.6, 'rgba(144,202,249,0.7)');
-                        }
-                    }
-                    break;
-
-                case 'multiplier':
-                    if (lvl === 1) {
-                        // Lv.1 — small purple crystal
-                        this._pxRect(ctx, x - 1 * s, y - 5 * s, 2 * s, 1 * s, '#4a148c');
-                        this._pxRect(ctx, x - 2 * s, y - 4 * s, 4 * s, 1 * s, '#6a1b9a');
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 2 * s, '#8e24aa');
-                        this._pxRect(ctx, x - 3 * s, y - 1 * s, 6 * s, 2 * s, '#ab47bc');
-                        this._pxRect(ctx, x - 2 * s, y + 1 * s, 4 * s, 2 * s, '#8e24aa');
-                        this._pxRect(ctx, x - 1 * s, y + 3 * s, 2 * s, 1 * s, '#6a1b9a');
-                        // Occasional sparkle
-                        if (Math.sin(age * 5) > 0.3) {
-                            this._pxRect(ctx, x - s, y - 3 * s, s, s, '#fff');
-                        }
-                        if (Math.sin(age * 5 + 2) > 0.3) {
-                            this._pxRect(ctx, x + s, y + s, s, s, '#eee');
-                        }
-                        ctx.fillStyle = 'rgba(206,147,255,0.7)';
-                        ctx.font = 'bold 9px Segoe UI';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('x' + UPGRADE_POWER[1].toFixed(1), x, y - 6 * s);
-                    } else if (lvl === 2) {
-                        // Lv.2 — taller crystal with facets, satellite crystals
-                        // Taller layered diamond
-                        this._pxRect(ctx, x - 1 * s, y - 7 * s, 2 * s, 1 * s, '#6a1b9a');
-                        this._pxRect(ctx, x - 2 * s, y - 6 * s, 4 * s, 1 * s, '#8e24aa');
-                        this._pxRect(ctx, x - 3 * s, y - 5 * s, 6 * s, 1 * s, '#ab47bc');
-                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 2 * s, '#ce93d8');
-                        this._pxRect(ctx, x - 4 * s, y - 2 * s, 8 * s, 2 * s, '#ab47bc');
-                        this._pxRect(ctx, x - 3 * s, y, 6 * s, 2 * s, '#8e24aa');
-                        this._pxRect(ctx, x - 2 * s, y + 2 * s, 4 * s, 1 * s, '#6a1b9a');
-                        this._pxRect(ctx, x - 1 * s, y + 3 * s, 2 * s, 1 * s, '#4a148c');
-                        // Internal light refraction
-                        var refHue = ((age * 40) % 360);
-                        this._pxRect(ctx, x - s * 0.5, y - 2 * s, s, s, 'hsl(' + refHue + ',80%,70%)');
-                        // Multiple sparkles
-                        for (var ms2 = 0; ms2 < 4; ms2++) {
-                            if (Math.sin(age * 6 + ms2 * 1.7) > 0.2) {
-                                var sx2 = x + Math.cos(ms2 * 2.3) * 2.5 * s;
-                                var sy2 = y - s + Math.sin(ms2 * 1.8) * 3 * s;
-                                this._pxRect(ctx, sx2 - s * 0.3, sy2 - s * 0.3, s * 0.6, s * 0.6, '#fff');
-                            }
-                        }
-                        // Satellite crystals
-                        var sat2a = age * 1.5;
-                        var sat2r = 6 * s;
-                        for (var sc2 = 0; sc2 < 2; sc2++) {
-                            var sca = sat2a + sc2 * Math.PI;
-                            var scx = x + Math.cos(sca) * sat2r;
-                            var scy = y + Math.sin(sca) * sat2r;
-                            this._pxRect(ctx, scx - s * 0.5, scy - s, s, s * 0.5, '#ce93d8');
-                            this._pxRect(ctx, scx - s * 0.3, scy - s * 0.5, s * 0.6, s, '#ab47bc');
-                            this._pxRect(ctx, scx - s * 0.5, scy + s * 0.5, s, s * 0.5, '#ce93d8');
-                        }
-                        ctx.fillStyle = 'rgba(206,147,255,0.8)';
-                        ctx.font = 'bold 9px Segoe UI';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('x' + UPGRADE_POWER[2].toFixed(1), x, y - 8 * s);
-                    } else {
-                        // Lv.3 — cosmic prism with rainbow prismatic effect
-                        // Rainbow color cycling facets
-                        var prismHue = (age * 60) % 360;
-                        var prismC1 = 'hsl(' + prismHue + ',80%,60%)';
-                        var prismC2 = 'hsl(' + ((prismHue + 60) % 360) + ',80%,60%)';
-                        var prismC3 = 'hsl(' + ((prismHue + 120) % 360) + ',80%,60%)';
-                        var prismC4 = 'hsl(' + ((prismHue + 180) % 360) + ',80%,65%)';
-                        // Huge crystal
-                        this._pxRect(ctx, x - 1 * s, y - 8 * s, 2 * s, 1 * s, '#6a1b9a');
-                        this._pxRect(ctx, x - 2 * s, y - 7 * s, 4 * s, 1 * s, prismC1);
-                        this._pxRect(ctx, x - 3 * s, y - 6 * s, 6 * s, 1 * s, prismC2);
-                        this._pxRect(ctx, x - 4 * s, y - 5 * s, 8 * s, 2 * s, prismC3);
-                        this._pxRect(ctx, x - 5 * s, y - 3 * s, 10 * s, 2 * s, prismC4);
-                        this._pxRect(ctx, x - 5 * s, y - 1 * s, 10 * s, 2 * s, prismC3);
-                        this._pxRect(ctx, x - 4 * s, y + 1 * s, 8 * s, 2 * s, prismC2);
-                        this._pxRect(ctx, x - 3 * s, y + 3 * s, 6 * s, 1 * s, prismC1);
-                        this._pxRect(ctx, x - 2 * s, y + 4 * s, 4 * s, 1 * s, '#6a1b9a');
-                        this._pxRect(ctx, x - 1 * s, y + 5 * s, 2 * s, 1 * s, '#4a148c');
-                        // Bright white center core
-                        this._pxRect(ctx, x - s, y - s, 2 * s, 2 * s, 'rgba(255,255,255,' + pulse.toFixed(2) + ')');
-                        // 4 orbiting mini-crystals
-                        for (var mc3 = 0; mc3 < 4; mc3++) {
-                            var mca = age * 1.8 + mc3 * (Math.PI / 2);
-                            var mcr = 7 * s;
-                            var mcx = x + Math.cos(mca) * mcr;
-                            var mcy = y + Math.sin(mca) * mcr;
-                            var mcH = 'hsl(' + ((prismHue + mc3 * 90) % 360) + ',80%,65%)';
-                            this._pxRect(ctx, mcx - s * 0.3, mcy - s, s * 0.6, s * 0.5, mcH);
-                            this._pxRect(ctx, mcx - s * 0.5, mcy - s * 0.5, s, s, mcH);
-                            this._pxRect(ctx, mcx - s * 0.3, mcy + s * 0.5, s * 0.6, s * 0.5, mcH);
-                        }
-                        // Constant sparkle shower
-                        for (var sp3 = 0; sp3 < 6; sp3++) {
-                            if (Math.sin(age * 7 + sp3 * 1.1) > 0.0) {
-                                var spx = x + Math.cos(sp3 * 3.7 + age) * 4 * s;
-                                var spy = y + Math.sin(sp3 * 2.9 + age * 1.3) * 5 * s;
+                        // Sparkle shower
+                        for (var sp = 0; sp < 6; sp++) {
+                            if (Math.sin(age * 7 + sp * 1.1) > 0.0) {
+                                var spx = x + Math.cos(sp * 3.7 + age) * 4 * s;
+                                var spy = y + Math.sin(sp * 2.9 + age * 1.3) * 5 * s;
                                 this._pxRect(ctx, spx - s * 0.2, spy - s * 0.2, s * 0.5, s * 0.5, '#fff');
                             }
                         }
@@ -4260,522 +4401,546 @@
 
                 case 'synthesizer':
                     if (lvl === 1) {
-                        // Lv.1 — red reactor with pulsing core
-                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 8 * s, '#7f0000');
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 6 * s, '#b71c1c');
-                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 4 * s, '#e53935');
-                        // Core
-                        var rp1 = Math.sin(age * 4) * 0.3 + 0.7;
-                        this._pxRect(ctx, x - 1 * s, y - 1 * s, 2 * s, 2 * s, 'rgba(255,235,59,' + rp1.toFixed(2) + ')');
-                        // 4 vents
-                        this._pxRect(ctx, x - 5 * s, y - 1 * s, 1 * s, 2 * s, '#ff5252');
-                        this._pxRect(ctx, x + 4 * s, y - 1 * s, 1 * s, 2 * s, '#ff5252');
-                        this._pxRect(ctx, x - 1 * s, y - 5 * s, 2 * s, 1 * s, '#ff5252');
-                        this._pxRect(ctx, x - 1 * s, y + 4 * s, 2 * s, 1 * s, '#ff5252');
-                        // Single containment ring
-                        ctx.strokeStyle = 'rgba(255,82,82,' + (0.3 + rp1 * 0.3).toFixed(2) + ')';
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.arc(x, y, 5 * s, 0, Math.PI * 2);
-                        ctx.stroke();
-                    } else if (lvl === 2) {
-                        // Lv.2 — reinforced reactor with double border, 8 vents, cooling pipes
-                        this._pxRect(ctx, x - 5 * s, y - 5 * s, 10 * s, 10 * s, '#4e0000');
-                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 8 * s, '#7f0000');
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 6 * s, '#b71c1c');
-                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 4 * s, '#e53935');
-                        // Intensely pulsing core
-                        var rp2 = Math.sin(age * 5) * 0.4 + 0.6;
-                        this._pxRect(ctx, x - 1 * s, y - 1 * s, 2 * s, 2 * s, 'rgba(255,167,38,' + rp2.toFixed(2) + ')');
-                        this._pxRect(ctx, x - s * 0.4, y - s * 0.4, s * 0.8, s * 0.8, 'rgba(255,235,59,' + pulse.toFixed(2) + ')');
-                        // 8 vents (corners + sides)
-                        this._pxRect(ctx, x - 6 * s, y - 1 * s, 1 * s, 2 * s, '#ff5252');
-                        this._pxRect(ctx, x + 5 * s, y - 1 * s, 1 * s, 2 * s, '#ff5252');
-                        this._pxRect(ctx, x - 1 * s, y - 6 * s, 2 * s, 1 * s, '#ff5252');
-                        this._pxRect(ctx, x - 1 * s, y + 5 * s, 2 * s, 1 * s, '#ff5252');
-                        this._pxRect(ctx, x - 5 * s, y - 4 * s, 1 * s, 1 * s, '#ff8a80');
-                        this._pxRect(ctx, x + 4 * s, y - 4 * s, 1 * s, 1 * s, '#ff8a80');
-                        this._pxRect(ctx, x - 5 * s, y + 3 * s, 1 * s, 1 * s, '#ff8a80');
-                        this._pxRect(ctx, x + 4 * s, y + 3 * s, 1 * s, 1 * s, '#ff8a80');
-                        // Cooling pipes from corners
-                        this._pxRect(ctx, x - 6 * s, y - 6 * s, 1 * s, 2 * s, '#b0bec5');
-                        this._pxRect(ctx, x - 6 * s, y - 6 * s, 2 * s, 1 * s, '#b0bec5');
-                        this._pxRect(ctx, x + 5 * s, y - 6 * s, 1 * s, 2 * s, '#b0bec5');
-                        this._pxRect(ctx, x + 4 * s, y - 6 * s, 2 * s, 1 * s, '#b0bec5');
-                        this._pxRect(ctx, x - 6 * s, y + 4 * s, 1 * s, 2 * s, '#b0bec5');
-                        this._pxRect(ctx, x - 6 * s, y + 5 * s, 2 * s, 1 * s, '#b0bec5');
-                        this._pxRect(ctx, x + 5 * s, y + 4 * s, 1 * s, 2 * s, '#b0bec5');
-                        this._pxRect(ctx, x + 4 * s, y + 5 * s, 2 * s, 1 * s, '#b0bec5');
-                        // Two containment rings rotating opposite
-                        var ra2a = age * 1.5;
-                        var ra2b = -age * 1.2;
-                        ctx.strokeStyle = 'rgba(255,82,82,' + (0.3 + rp2 * 0.4).toFixed(2) + ')';
-                        ctx.lineWidth = 1.5;
-                        ctx.beginPath();
-                        ctx.arc(x, y, 6 * s, ra2a, ra2a + Math.PI * 1.4);
-                        ctx.stroke();
-                        ctx.strokeStyle = 'rgba(255,171,0,0.4)';
-                        ctx.beginPath();
-                        ctx.arc(x, y, 6.5 * s, ra2b, ra2b + Math.PI * 1.4);
-                        ctx.stroke();
-                        // Warning symbol
-                        ctx.fillStyle = 'rgba(255,200,0,0.7)';
-                        ctx.font = 'bold 10px Segoe UI';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('\u26A0', x, y - 7 * s);
-                    } else {
-                        // Lv.3 — stellar forge: miniature sun
-                        // Heat distortion wobble on core
-                        var wobX = Math.sin(age * 7) * s * 0.4;
-                        var wobY = Math.cos(age * 9) * s * 0.4;
-                        // Massive structure
-                        this._pxRect(ctx, x - 6 * s, y - 6 * s, 12 * s, 12 * s, '#4e0000');
-                        this._pxRect(ctx, x - 5 * s, y - 5 * s, 10 * s, 10 * s, '#7f0000');
-                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 8 * s, '#b71c1c');
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 6 * s, '#e53935');
-                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 4 * s, '#ff5252');
-                        // Blazing white-yellow core with wobble
-                        var rp3 = Math.sin(age * 6) * 0.3 + 0.7;
-                        this._pxRect(ctx, x - 1 * s + wobX, y - 1 * s + wobY, 2 * s, 2 * s, 'rgba(255,255,200,' + rp3.toFixed(2) + ')');
-                        this._pxRect(ctx, x - s * 0.4 + wobX, y - s * 0.4 + wobY, s * 0.8, s * 0.8, 'rgba(255,255,255,' + pulse.toFixed(2) + ')');
-                        // 8 energy beams radiating outward
-                        for (var eb = 0; eb < 8; eb++) {
-                            var ebA = eb * (Math.PI / 4) + age * 0.5;
-                            var ebX1 = x + Math.cos(ebA) * 3 * s;
-                            var ebY1 = y + Math.sin(ebA) * 3 * s;
-                            var ebX2 = x + Math.cos(ebA) * 5.5 * s;
-                            var ebY2 = y + Math.sin(ebA) * 5.5 * s;
-                            ctx.strokeStyle = 'rgba(255,235,59,' + (rp3 * 0.6).toFixed(2) + ')';
-                            ctx.lineWidth = 1.5;
-                            ctx.beginPath();
-                            ctx.moveTo(ebX1, ebY1);
-                            ctx.lineTo(ebX2, ebY2);
-                            ctx.stroke();
-                        }
-                        // Triple containment rings
-                        var ra3 = age * 1.2;
-                        ctx.save();
-                        // Outer gold ring
-                        ctx.strokeStyle = 'rgba(255,215,0,0.5)';
-                        ctx.lineWidth = 2;
-                        ctx.beginPath();
-                        ctx.arc(x, y, 7.5 * s, ra3, ra3 + Math.PI * 1.5);
-                        ctx.stroke();
-                        // Middle cyan ring
-                        ctx.strokeStyle = 'rgba(0,229,255,0.45)';
-                        ctx.lineWidth = 1.5;
-                        ctx.beginPath();
-                        ctx.arc(x, y, 7 * s, -ra3 * 0.8, -ra3 * 0.8 + Math.PI * 1.3);
-                        ctx.stroke();
-                        // Inner white ring
-                        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.arc(x, y, 6.5 * s, ra3 * 1.5, ra3 * 1.5 + Math.PI * 1.1);
-                        ctx.stroke();
-                        ctx.restore();
-                        // Plasma particles orbiting
-                        for (var pp3 = 0; pp3 < 5; pp3++) {
-                            var ppa = age * 2.5 + pp3 * (Math.PI * 2 / 5);
-                            var ppr = 6 * s;
-                            var ppx = x + Math.cos(ppa) * ppr;
-                            var ppy = y + Math.sin(ppa) * ppr;
-                            this._pxRect(ctx, ppx - s * 0.3, ppy - s * 0.3, s * 0.6, s * 0.6, 'rgba(255,235,59,0.8)');
-                        }
-                        // Rate label
-                        ctx.fillStyle = '#ffd700';
-                        ctx.font = 'bold 9px Segoe UI';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('+450 KR/s', x, y - 8 * s);
-                    }
-                    break;
-
-                case 'generator':
-                    if (lvl === 1) {
-                        // Lv.1 — Orange power plant with smokestack and turbine fan
-                        // Base building
-                        this._pxRect(ctx, x - 4 * s, y - 2 * s, 8 * s, 5 * s, '#e65100');
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 1 * s, '#f57c00');
-                        // Smokestack
-                        this._pxRect(ctx, x - 1 * s, y - 7 * s, 2 * s, 4 * s, '#bf360c');
-                        this._pxRect(ctx, x - 2 * s, y - 7 * s, 4 * s, 1 * s, '#e65100');
-                        // Smoke puffs
-                        var smokeOff = (age * 2) % 4;
-                        ctx.fillStyle = 'rgba(200,200,200,' + (0.3 + Math.sin(age * 3) * 0.15).toFixed(2) + ')';
-                        ctx.beginPath();
-                        ctx.arc(x, y - 8 * s - smokeOff * s, 1.5 * s, 0, Math.PI * 2);
-                        ctx.fill();
-                        // Turbine fan (rotating line)
-                        var fanAngle = age * 5;
-                        ctx.save();
-                        ctx.strokeStyle = '#ffb74d';
-                        ctx.lineWidth = 2;
-                        for (var fi = 0; fi < 3; fi++) {
-                            var fa = fanAngle + fi * (Math.PI * 2 / 3);
-                            ctx.beginPath();
-                            ctx.moveTo(x + 3 * s, y);
-                            ctx.lineTo(x + 3 * s + Math.cos(fa) * 2 * s, y + Math.sin(fa) * 2 * s);
-                            ctx.stroke();
-                        }
-                        ctx.restore();
-                        // Lightning bolt icon
-                        this._pxRect(ctx, x - s * 0.5, y - 1 * s, s, s * 0.5, '#ffeb3b');
-                        this._pxRect(ctx, x - s, y - s * 0.5, s * 1.5, s * 0.5, '#ffeb3b');
-                        this._pxRect(ctx, x - s * 0.5, y, s, s * 0.5, '#ffeb3b');
-                    } else if (lvl === 2) {
-                        // Lv.2 — Larger with two smokestacks, bigger turbine, electric arcs
-                        // Glow
-                        ctx.save();
-                        ctx.fillStyle = 'rgba(255,152,0,0.1)';
-                        ctx.beginPath();
-                        ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.restore();
-                        // Base building
-                        this._pxRect(ctx, x - 5 * s, y - 3 * s, 10 * s, 6 * s, '#e65100');
-                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 1 * s, '#f57c00');
-                        this._pxRect(ctx, x - 5 * s, y + 3 * s, 10 * s, 1 * s, '#bf360c');
-                        // Two smokestacks
-                        this._pxRect(ctx, x - 3 * s, y - 8 * s, 2 * s, 4 * s, '#bf360c');
-                        this._pxRect(ctx, x + 1 * s, y - 8 * s, 2 * s, 4 * s, '#bf360c');
-                        this._pxRect(ctx, x - 4 * s, y - 8 * s, 4 * s, 1 * s, '#e65100');
-                        this._pxRect(ctx, x, y - 8 * s, 4 * s, 1 * s, '#e65100');
-                        // Smoke
-                        for (var si2 = 0; si2 < 2; si2++) {
-                            var sx2 = x + (si2 === 0 ? -2 : 2) * s;
-                            var sOff2 = ((age * 2 + si2) % 5);
-                            ctx.fillStyle = 'rgba(200,200,200,' + (0.25 + Math.sin(age * 3 + si2) * 0.1).toFixed(2) + ')';
-                            ctx.beginPath();
-                            ctx.arc(sx2, y - 9 * s - sOff2 * s, 1.5 * s, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
-                        // Bigger turbine
-                        var fanAngle2 = age * 7;
-                        ctx.save();
-                        ctx.strokeStyle = '#ffb74d';
-                        ctx.lineWidth = 2.5;
-                        for (var fi2 = 0; fi2 < 4; fi2++) {
-                            var fa2 = fanAngle2 + fi2 * (Math.PI / 2);
-                            ctx.beginPath();
-                            ctx.moveTo(x, y);
-                            ctx.lineTo(x + Math.cos(fa2) * 3 * s, y + Math.sin(fa2) * 3 * s);
-                            ctx.stroke();
-                        }
-                        ctx.restore();
-                        // electric arcs between stacks
-                        if (Math.sin(age * 6) > 0.3) {
-                            ctx.save();
-                            ctx.strokeStyle = 'rgba(255,235,59,0.8)';
-                            ctx.lineWidth = 1.5;
-                            ctx.beginPath();
-                            ctx.moveTo(x - 2 * s, y - 7 * s);
-                            ctx.lineTo(x - s * 0.5, y - 6 * s + Math.sin(age * 10) * s);
-                            ctx.lineTo(x + s * 0.5, y - 7 * s);
-                            ctx.lineTo(x + 2 * s, y - 7 * s);
-                            ctx.stroke();
-                            ctx.restore();
-                        }
-                    } else {
-                        // Lv.3 — Massive plant with three stacks, golden turbine, lightning
-                        // Golden glow
-                        ctx.save();
-                        ctx.fillStyle = 'rgba(255,193,7,' + (0.1 + Math.sin(age * 2) * 0.06).toFixed(3) + ')';
-                        ctx.beginPath();
-                        ctx.arc(x, y, 9 * s, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.restore();
-                        // Base
-                        this._pxRect(ctx, x - 6 * s, y - 4 * s, 12 * s, 7 * s, '#e65100');
-                        this._pxRect(ctx, x - 5 * s, y - 5 * s, 10 * s, 1 * s, '#ff9800');
-                        this._pxRect(ctx, x - 6 * s, y + 3 * s, 12 * s, 1 * s, '#bf360c');
-                        // Three smokestacks
-                        for (var st3 = -1; st3 <= 1; st3++) {
-                            this._pxRect(ctx, x + st3 * 3 * s - s, y - 9 * s, 2 * s, 4 * s, '#bf360c');
-                            this._pxRect(ctx, x + st3 * 3 * s - 1.5 * s, y - 9 * s, 3 * s, 1 * s, '#e65100');
-                            // Smoke
-                            var sOff3 = ((age * 2 + st3 * 1.3) % 6);
-                            ctx.fillStyle = 'rgba(220,220,220,' + (0.2 + Math.sin(age * 3 + st3 * 2) * 0.1).toFixed(2) + ')';
-                            ctx.beginPath();
-                            ctx.arc(x + st3 * 3 * s, y - 10 * s - sOff3 * s, 2 * s, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
-                        // Golden turbine
-                        var fanAngle3 = age * 9;
-                        ctx.save();
-                        ctx.strokeStyle = '#ffd700';
-                        ctx.lineWidth = 3;
-                        for (var fi3 = 0; fi3 < 6; fi3++) {
-                            var fa3 = fanAngle3 + fi3 * (Math.PI / 3);
-                            ctx.beginPath();
-                            ctx.moveTo(x, y);
-                            ctx.lineTo(x + Math.cos(fa3) * 3.5 * s, y + Math.sin(fa3) * 3.5 * s);
-                            ctx.stroke();
-                        }
-                        ctx.restore();
-                        // Bright lightning bolts radiating outward
-                        for (var lb3 = 0; lb3 < 4; lb3++) {
-                            if (Math.sin(age * 8 + lb3 * 1.5) > 0.4) {
-                                var lba = lb3 * (Math.PI / 2) + age * 0.3;
-                                var lbx1 = x + Math.cos(lba) * 4 * s;
-                                var lby1 = y + Math.sin(lba) * 4 * s;
-                                var lbx2 = x + Math.cos(lba) * 7 * s;
-                                var lby2 = y + Math.sin(lba) * 7 * s;
-                                ctx.save();
-                                ctx.strokeStyle = 'rgba(255,235,59,0.9)';
-                                ctx.lineWidth = 2;
-                                ctx.beginPath();
-                                ctx.moveTo(lbx1, lby1);
-                                ctx.lineTo((lbx1 + lbx2) / 2 + Math.sin(age * 12) * s, (lby1 + lby2) / 2);
-                                ctx.lineTo(lbx2, lby2);
-                                ctx.stroke();
-                                ctx.restore();
-                            }
-                        }
-                        // Sparking particles
-                        for (var sp = 0; sp < 3; sp++) {
-                            var spa = age * 4 + sp * 2.1;
-                            var spr = 5 * s;
-                            var spx3 = x + Math.cos(spa) * spr;
-                            var spy3 = y + Math.sin(spa) * spr;
-                            this._pxRect(ctx, spx3 - s * 0.3, spy3 - s * 0.3, s * 0.6, s * 0.6, '#ffeb3b');
-                        }
-                        // Rate label
-                        ctx.fillStyle = '#ffd700';
-                        ctx.font = 'bold 9px Segoe UI';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('+' + (5 * UPGRADE_POWER[3]).toFixed(0) + ' el/s', x, y - 11 * s);
-                    }
-                    break;
-
-                case 'bank':
-                    if (lvl === 1) {
-                        // Lv.1 — Gold/brass rectangular vault withel sign and flipping coin
-                        // Thick walls
-                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 8 * s, '#b8860b');
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 6 * s, '#daa520');
-                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 4 * s, '#ffd700');
-                        // Vault door
-                        this._pxRect(ctx, x - 1 * s, y - 1 * s, 2 * s, 3 * s, '#b8860b');
-                        this._pxRect(ctx, x - s * 0.3, y - s * 0.3, s * 0.6, s * 0.6, '#fff');
-                        //el sign
-                        ctx.fillStyle = '#ffd700';
-                        ctx.font = 'bold 10px Segoe UI';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('$', x, y - 4.5 * s);
-                        // Flipping coin (width oscillates)
-                        var coinW = Math.abs(Math.cos(age * 3)) * 2 * s;
-                        this._pxRect(ctx, x - coinW / 2, y + 4 * s, coinW, 1.5 * s, '#ffd700');
-                        this._pxRect(ctx, x - coinW / 2 + s * 0.2, y + 4.2 * s, coinW - s * 0.4, s, '#daa520');
-                    } else if (lvl === 2) {
-                        // Lv.2 — Larger vault with columns, bigger coin, interest label
-                        // Glow
-                        ctx.save();
-                        ctx.fillStyle = 'rgba(255,215,0,0.08)';
-                        ctx.beginPath();
-                        ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.restore();
-                        // Building
-                        this._pxRect(ctx, x - 5 * s, y - 5 * s, 10 * s, 9 * s, '#b8860b');
-                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 7 * s, '#daa520');
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 5 * s, '#ffd700');
-                        // Columns on sides
-                        this._pxRect(ctx, x - 5 * s, y - 5 * s, 1 * s, 9 * s, '#daa520');
-                        this._pxRect(ctx, x + 4 * s, y - 5 * s, 1 * s, 9 * s, '#daa520');
-                        this._pxRect(ctx, x - 5 * s, y - 6 * s, 1 * s, 1 * s, '#ffd700');
-                        this._pxRect(ctx, x + 4 * s, y - 6 * s, 1 * s, 1 * s, '#ffd700');
-                        // Vault door
-                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 4 * s, '#b8860b');
-                        this._pxRect(ctx, x - 1 * s, y - 1 * s, 2 * s, 2 * s, '#8b6914');
-                        // Door handle
-                        ctx.save();
-                        ctx.strokeStyle = '#ffd700';
-                        ctx.lineWidth = 1.5;
-                        ctx.beginPath();
-                        ctx.arc(x, y, 1 * s, 0, Math.PI * 2);
-                        ctx.stroke();
-                        ctx.restore();
-                        // Bigger flipping coin
-                        var coinW2 = Math.abs(Math.cos(age * 3)) * 3 * s;
-                        this._pxRect(ctx, x - coinW2 / 2, y + 4.5 * s, coinW2, 2 * s, '#ffd700');
-                        this._pxRect(ctx, x - coinW2 / 2 + s * 0.3, y + 4.8 * s, coinW2 - s * 0.6, 1.2 * s, '#daa520');
-                        // Interest percentage label
-                        ctx.fillStyle = '#ffd700';
-                        ctx.font = 'bold 9px Segoe UI';
-                        ctx.textAlign = 'center';
-                        ctx.fillText((0.02 * UPGRADE_POWER[2] * 100).toFixed(0) + '%', x, y - 6.5 * s);
-                    } else {
-                        // Lv.3 — Grand temple bank with pillars, coin stack, golden glow
-                        // Golden glow
-                        ctx.save();
-                        ctx.fillStyle = 'rgba(255,215,0,' + (0.1 + Math.sin(age * 2) * 0.06).toFixed(3) + ')';
-                        ctx.beginPath();
-                        ctx.arc(x, y, 9 * s, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.restore();
-                        // Grand building
-                        this._pxRect(ctx, x - 6 * s, y - 6 * s, 12 * s, 11 * s, '#b8860b');
-                        this._pxRect(ctx, x - 5 * s, y - 5 * s, 10 * s, 9 * s, '#daa520');
-                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 8 * s, 7 * s, '#ffd700');
-                        // Roof triangle
-                        this._pxRect(ctx, x - 4 * s, y - 7 * s, 8 * s, 1 * s, '#ffd700');
-                        this._pxRect(ctx, x - 3 * s, y - 8 * s, 6 * s, 1 * s, '#daa520');
-                        this._pxRect(ctx, x - 2 * s, y - 9 * s, 4 * s, 1 * s, '#b8860b');
-                        // Pillars (4)
-                        for (var pi = -2; pi <= 2; pi++) {
-                            if (pi === 0) continue;
-                            this._pxRect(ctx, x + pi * 2 * s - s * 0.4, y - 6 * s, s * 0.8, 10 * s, '#daa520');
-                            this._pxRect(ctx, x + pi * 2 * s - s * 0.6, y - 7 * s, s * 1.2, 1 * s, '#ffd700');
-                        }
-                        // Vault door with pulsing light
-                        this._pxRect(ctx, x - 2 * s, y - 3 * s, 4 * s, 5 * s, '#8b6914');
-                        this._pxRect(ctx, x - 1.5 * s, y - 2.5 * s, 3 * s, 4 * s, '#6b5310');
-                        var vaultPulse = Math.sin(age * 3) * 0.3 + 0.5;
-                        ctx.save();
-                        ctx.fillStyle = 'rgba(255,215,0,' + vaultPulse.toFixed(2) + ')';
-                        ctx.beginPath();
-                        ctx.arc(x, y - s * 0.5, s * 0.8, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.restore();
-                        // Rotating stack of coins
-                        for (var ci = 0; ci < 3; ci++) {
-                            var coinAngle = age * 2 + ci * (Math.PI * 2 / 3);
-                            var coinR = 6 * s;
-                            var cx3 = x + Math.cos(coinAngle) * coinR;
-                            var cy3 = y + Math.sin(coinAngle) * coinR;
-                            var cw3 = Math.abs(Math.cos(age * 3 + ci)) * 1.5 * s;
-                            this._pxRect(ctx, cx3 - cw3 / 2, cy3 - s * 0.5, cw3, s, '#ffd700');
-                        }
-                        //el$$ signs
-                        ctx.fillStyle = '#ffd700';
-                        ctx.font = 'bold 11px Segoe UI';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('$$$', x, y - 10 * s);
-                    }
-                    break;
-
-                case 'repairbot':
-                    if (lvl === 1) {
-                        // Lv.1 — Small cyan robot body, wrench arm, single antenna
-                        // Body
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 5 * s, '#006064');
-                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 3 * s, '#00acc1');
-                        // Head
-                        this._pxRect(ctx, x - 2 * s, y - 5 * s, 4 * s, 2 * s, '#00bcd4');
+                        // Lv.1 — Robot Worker: small robot body
+                        // Head (box)
+                        this._pxRect(ctx, x - 2 * s, y - 5 * s, 4 * s, 3 * s, '#b71c1c');
+                        this._pxRect(ctx, x - 1.5 * s, y - 4 * s, 3 * s, 1.5 * s, '#e53935');
                         // Eyes
-                        this._pxRect(ctx, x - 1 * s, y - 4.5 * s, s * 0.8, s * 0.8, '#fff');
-                        this._pxRect(ctx, x + 0.5 * s, y - 4.5 * s, s * 0.8, s * 0.8, '#fff');
+                        this._pxRect(ctx, x - 1 * s, y - 4.5 * s, s * 0.8, s * 0.8, 'rgba(255,235,59,' + pulse.toFixed(2) + ')');
+                        this._pxRect(ctx, x + 0.5 * s, y - 4.5 * s, s * 0.8, s * 0.8, 'rgba(255,235,59,' + pulse.toFixed(2) + ')');
+                        // Neck
+                        this._pxRect(ctx, x - s * 0.5, y - 2 * s, s, s, '#7f0000');
+                        // Body
+                        this._pxRect(ctx, x - 2.5 * s, y - 1 * s, 5 * s, 4 * s, '#b71c1c');
+                        this._pxRect(ctx, x - 1.5 * s, y, 3 * s, 2 * s, '#e53935');
+                        // Arms
+                        this._pxRect(ctx, x - 3.5 * s, y - 1 * s, 1 * s, 3 * s, '#7f0000');
+                        this._pxRect(ctx, x + 2.5 * s, y - 1 * s, 1 * s, 3 * s, '#7f0000');
+                        // Legs
+                        this._pxRect(ctx, x - 1.5 * s, y + 3 * s, s, 2 * s, '#7f0000');
+                        this._pxRect(ctx, x + 0.5 * s, y + 3 * s, s, 2 * s, '#7f0000');
                         // Antenna
-                        this._pxRect(ctx, x, y - 6 * s, s * 0.5, 1.5 * s, '#00e5ff');
-                        this._pxRect(ctx, x - s * 0.3, y - 6.5 * s, s, s, '#0ff');
-                        // Wrench arm
-                        this._pxRect(ctx, x + 3 * s, y - 2 * s, 2 * s, s * 0.6, '#90a4ae');
-                        this._pxRect(ctx, x + 4.5 * s, y - 2.8 * s, s * 0.8, s * 2, '#78909c');
-                        // Legs
-                        this._pxRect(ctx, x - 2 * s, y + 2 * s, s, 2 * s, '#006064');
-                        this._pxRect(ctx, x + 1 * s, y + 2 * s, s, 2 * s, '#006064');
-                        // Repair spark
-                        if (Math.random() < 0.08) {
-                            ctx.fillStyle = '#0ff';
-                            ctx.fillRect(x + 5 * s + (Math.random() - 0.5) * 2 * s, y - 3 * s + (Math.random() - 0.5) * 2 * s, s * 0.6, s * 0.6);
-                        }
+                        this._pxRect(ctx, x, y - 6 * s, s * 0.4, s, '#ff5252');
+                        this._pxRect(ctx, x - s * 0.3, y - 6.5 * s, s * 0.6, s * 0.5, '#ff5252');
                     } else if (lvl === 2) {
-                        // Lv.2 — Larger, two arms with tools, radar dish
-                        // Glow
+                        // Lv.2 — Robot Worker: larger with visor, articulated arms, chest display
                         ctx.save();
-                        ctx.fillStyle = 'rgba(0,229,255,0.08)';
+                        ctx.fillStyle = 'rgba(229,57,53,0.08)';
                         ctx.beginPath();
-                        ctx.arc(x, y, 6 * s, 0, Math.PI * 2);
+                        ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.restore();
-                        // Body
-                        this._pxRect(ctx, x - 4 * s, y - 3 * s, 8 * s, 6 * s, '#006064');
-                        this._pxRect(ctx, x - 3 * s, y - 2 * s, 6 * s, 4 * s, '#00acc1');
-                        // Chest panel
-                        this._pxRect(ctx, x - 1 * s, y - 1 * s, 2 * s, 2 * s, '#00e5ff');
                         // Head
-                        this._pxRect(ctx, x - 2.5 * s, y - 6 * s, 5 * s, 3 * s, '#00bcd4');
-                        this._pxRect(ctx, x - 1.5 * s, y - 5 * s, 3 * s, 1.5 * s, '#00e5ff');
-                        // Eyes
-                        this._pxRect(ctx, x - 1 * s, y - 5.5 * s, s * 0.8, s * 0.8, '#fff');
-                        this._pxRect(ctx, x + 0.5 * s, y - 5.5 * s, s * 0.8, s * 0.8, '#fff');
-                        // Radar dish
-                        this._pxRect(ctx, x - 1 * s, y - 8 * s, 2 * s, s * 0.5, '#0ff');
-                        this._pxRect(ctx, x - 0.3 * s, y - 7.5 * s, s * 0.6, 1.5 * s, '#00acc1');
-                        // Left arm - wrench
-                        this._pxRect(ctx, x - 5 * s, y - 2 * s, 1.5 * s, s * 0.6, '#90a4ae');
-                        this._pxRect(ctx, x - 6 * s, y - 3 * s, s, s * 2.5, '#78909c');
-                        // Right arm - welder
-                        this._pxRect(ctx, x + 4 * s, y - 2 * s, 1.5 * s, s * 0.6, '#90a4ae');
-                        this._pxRect(ctx, x + 5 * s, y - 3 * s, s * 0.6, s * 2, '#ff9800');
+                        this._pxRect(ctx, x - 2.5 * s, y - 6 * s, 5 * s, 3 * s, '#b71c1c');
+                        this._pxRect(ctx, x - 2 * s, y - 5 * s, 4 * s, 2 * s, '#e53935');
+                        // Visor (single glowing bar)
+                        var visorPulse = Math.sin(age * 4) * 0.3 + 0.7;
+                        this._pxRect(ctx, x - 1.5 * s, y - 5 * s, 3 * s, s * 0.8, 'rgba(255,235,59,' + visorPulse.toFixed(2) + ')');
+                        // Antenna
+                        this._pxRect(ctx, x - s * 0.3, y - 7.5 * s, s * 0.6, 1.5 * s, '#ff5252');
+                        this._pxRect(ctx, x - s * 0.5, y - 8 * s, s, s * 0.5, '#ff8a80');
+                        // Neck
+                        this._pxRect(ctx, x - s * 0.5, y - 3 * s, s, s, '#7f0000');
+                        // Body (wider)
+                        this._pxRect(ctx, x - 3.5 * s, y - 2 * s, 7 * s, 5 * s, '#b71c1c');
+                        this._pxRect(ctx, x - 2.5 * s, y - 1 * s, 5 * s, 3 * s, '#e53935');
+                        // Chest display
+                        this._pxRect(ctx, x - 1 * s, y - 0.5 * s, 2 * s, 1.5 * s, 'rgba(0,229,255,' + visorPulse.toFixed(2) + ')');
+                        // Articulated arms (bent at elbow)
+                        this._pxRect(ctx, x - 4.5 * s, y - 2 * s, 1 * s, 2.5 * s, '#7f0000');
+                        this._pxRect(ctx, x - 5 * s, y + 0.5 * s, s, 2 * s, '#7f0000');
+                        this._pxRect(ctx, x - 5.5 * s, y + 2 * s, s, s, '#ff5252');
+                        this._pxRect(ctx, x + 3.5 * s, y - 2 * s, 1 * s, 2.5 * s, '#7f0000');
+                        this._pxRect(ctx, x + 4 * s, y + 0.5 * s, s, 2 * s, '#7f0000');
+                        this._pxRect(ctx, x + 4.5 * s, y + 2 * s, s, s, '#ff5252');
                         // Legs
-                        this._pxRect(ctx, x - 2.5 * s, y + 3 * s, 1.5 * s, 2 * s, '#006064');
-                        this._pxRect(ctx, x + 1 * s, y + 3 * s, 1.5 * s, 2 * s, '#006064');
-                        // Repair beam effect
-                        if (Math.random() < 0.12) {
-                            ctx.strokeStyle = 'rgba(0,229,255,0.5)';
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(x + 5.5 * s, y - 2 * s);
-                            ctx.lineTo(x + 5.5 * s + (Math.random() - 0.5) * 4 * s, y - 2 * s + Math.random() * 4 * s);
-                            ctx.stroke();
-                        }
+                        this._pxRect(ctx, x - 2 * s, y + 3 * s, 1.5 * s, 2.5 * s, '#7f0000');
+                        this._pxRect(ctx, x + 0.5 * s, y + 3 * s, 1.5 * s, 2.5 * s, '#7f0000');
+                        this._pxRect(ctx, x - 2.5 * s, y + 5 * s, 2 * s, s * 0.5, '#4e0000');
+                        this._pxRect(ctx, x + 0.5 * s, y + 5 * s, 2 * s, s * 0.5, '#4e0000');
                     } else {
-                        // Lv.3 — Big mech with multiple tool arms, golden wrench, pulsing heal aura
-                        // Pulsing heal aura
+                        // Lv.3 — Robot Worker: advanced mech with glowing eyes, tool arms, energy core
                         ctx.save();
-                        ctx.fillStyle = 'rgba(0,229,255,' + (0.06 + Math.sin(age * 3) * 0.04).toFixed(3) + ')';
+                        ctx.fillStyle = 'rgba(229,57,53,' + (0.08 + Math.sin(age * 2) * 0.04).toFixed(3) + ')';
                         ctx.beginPath();
                         ctx.arc(x, y, 9 * s, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.restore();
                         // Energy ring
                         ctx.save();
-                        ctx.strokeStyle = 'rgba(0,229,255,0.3)';
+                        ctx.strokeStyle = 'rgba(255,82,82,0.3)';
                         ctx.lineWidth = 1.5;
                         ctx.beginPath();
                         ctx.arc(x, y, 7 * s, age * 2, age * 2 + Math.PI * 1.2);
                         ctx.stroke();
                         ctx.restore();
-                        // Body
-                        this._pxRect(ctx, x - 5 * s, y - 4 * s, 10 * s, 8 * s, '#004d40');
-                        this._pxRect(ctx, x - 4 * s, y - 3 * s, 8 * s, 6 * s, '#00796b');
-                        this._pxRect(ctx, x - 3 * s, y - 2 * s, 6 * s, 4 * s, '#00acc1');
-                        // Chest core
-                        var corePulse = Math.sin(age * 4) * 0.3 + 0.7;
+                        // Head (angular mech helmet)
+                        this._pxRect(ctx, x - 3 * s, y - 7 * s, 6 * s, 3 * s, '#7f0000');
+                        this._pxRect(ctx, x - 2.5 * s, y - 6 * s, 5 * s, 2 * s, '#b71c1c');
+                        // Glowing eyes
+                        var eyeGlow = Math.sin(age * 4) * 0.3 + 0.7;
+                        ctx.fillStyle = 'rgba(255,235,59,' + eyeGlow.toFixed(2) + ')';
+                        ctx.fillRect(x - 2 * s, y - 6 * s, s * 1.2, s * 0.8);
+                        ctx.fillRect(x + 0.8 * s, y - 6 * s, s * 1.2, s * 0.8);
+                        // Antenna array
+                        this._pxRect(ctx, x - s * 0.3, y - 9 * s, s * 0.6, 2 * s, '#ff5252');
+                        this._pxRect(ctx, x - 2 * s, y - 8 * s, s * 0.5, s, '#ff8a80');
+                        this._pxRect(ctx, x + 1.5 * s, y - 8 * s, s * 0.5, s, '#ff8a80');
+                        // Neck
+                        this._pxRect(ctx, x - s, y - 4 * s, 2 * s, s, '#4e0000');
+                        // Body (massive)
+                        this._pxRect(ctx, x - 4 * s, y - 3 * s, 8 * s, 6 * s, '#7f0000');
+                        this._pxRect(ctx, x - 3 * s, y - 2 * s, 6 * s, 4 * s, '#b71c1c');
+                        // Energy core in chest
+                        var corePulse = Math.sin(age * 5) * 0.3 + 0.7;
                         ctx.fillStyle = 'rgba(0,229,255,' + corePulse.toFixed(2) + ')';
-                        ctx.fillRect(x - 1.5 * s, y - 1.5 * s, 3 * s, 3 * s);
-                        // Head
-                        this._pxRect(ctx, x - 3 * s, y - 7 * s, 6 * s, 3 * s, '#00838f');
-                        this._pxRect(ctx, x - 2 * s, y - 6 * s, 4 * s, 2 * s, '#00bcd4');
-                        // Eyes (glowing)
-                        ctx.fillStyle = 'rgba(255,215,0,' + corePulse.toFixed(2) + ')';
-                        ctx.fillRect(x - 1.5 * s, y - 6 * s, s, s);
-                        ctx.fillRect(x + 0.5 * s, y - 6 * s, s, s);
-                        // Golden antenna
-                        this._pxRect(ctx, x - 0.3 * s, y - 9 * s, s * 0.6, 2 * s, '#ffd700');
-                        this._pxRect(ctx, x - s, y - 9.5 * s, 2 * s, s, '#ffd700');
-                        // Multiple tool arms
-                        this._pxRect(ctx, x - 6 * s, y - 3 * s, 1.5 * s, s * 0.8, '#90a4ae');
-                        this._pxRect(ctx, x - 7.5 * s, y - 4 * s, s * 1.2, s * 3, '#ffd700');
-                        this._pxRect(ctx, x + 5 * s, y - 3 * s, 1.5 * s, s * 0.8, '#90a4ae');
-                        this._pxRect(ctx, x + 6.5 * s, y - 4 * s, s * 1.2, s * 3, '#ff9800');
-                        this._pxRect(ctx, x - 6 * s, y + 1 * s, 1.5 * s, s * 0.6, '#78909c');
-                        this._pxRect(ctx, x + 5 * s, y + 1 * s, 1.5 * s, s * 0.6, '#78909c');
-                        // Legs
-                        this._pxRect(ctx, x - 3 * s, y + 4 * s, 2 * s, 3 * s, '#004d40');
-                        this._pxRect(ctx, x + 1 * s, y + 4 * s, 2 * s, 3 * s, '#004d40');
-                        this._pxRect(ctx, x - 4 * s, y + 6.5 * s, 3 * s, s, '#006064');
-                        this._pxRect(ctx, x + 1 * s, y + 6.5 * s, 3 * s, s, '#006064');
-                        // Orbiting repair drones
-                        for (var di = 0; di < 3; di++) {
-                            var droneA = age * 2.5 + di * (Math.PI * 2 / 3);
-                            var droneR = 7 * s;
-                            var drX = x + Math.cos(droneA) * droneR;
-                            var drY = y + Math.sin(droneA) * droneR;
-                            this._pxRect(ctx, drX - s * 0.5, drY - s * 0.5, s, s, '#0ff');
-                            this._pxRect(ctx, drX - s * 0.2, drY - s * 0.8, s * 0.4, s * 0.3, '#00e5ff');
+                        ctx.beginPath();
+                        ctx.arc(x, y - 0.5 * s, 1.5 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = 'rgba(255,255,255,' + (corePulse * 0.6).toFixed(2) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y - 0.5 * s, 0.7 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Tool arm left (wrench)
+                        this._pxRect(ctx, x - 5 * s, y - 3 * s, 1 * s, 3 * s, '#4e0000');
+                        this._pxRect(ctx, x - 6 * s, y, s * 1.2, 3 * s, '#ffd700');
+                        this._pxRect(ctx, x - 6.5 * s, y + 2.5 * s, s * 0.8, s, '#daa520');
+                        this._pxRect(ctx, x - 5.5 * s, y + 2.5 * s, s * 0.8, s, '#daa520');
+                        // Tool arm right (welder)
+                        this._pxRect(ctx, x + 4 * s, y - 3 * s, 1 * s, 3 * s, '#4e0000');
+                        this._pxRect(ctx, x + 5 * s, y, s * 1.2, 3 * s, '#ff5252');
+                        this._pxRect(ctx, x + 5 * s, y + 3 * s, s * 1.2, s * 0.5, '#ff9800');
+                        // Welding spark
+                        if (Math.sin(age * 8) > 0.5) {
+                            ctx.fillStyle = 'rgba(255,235,59,0.8)';
+                            ctx.beginPath();
+                            ctx.arc(x + 5.5 * s, y + 4 * s, s * 0.6, 0, Math.PI * 2);
+                            ctx.fill();
                         }
+                        // Legs (heavy mech)
+                        this._pxRect(ctx, x - 3 * s, y + 3 * s, 2 * s, 3 * s, '#4e0000');
+                        this._pxRect(ctx, x + 1 * s, y + 3 * s, 2 * s, 3 * s, '#4e0000');
+                        this._pxRect(ctx, x - 3.5 * s, y + 5.5 * s, 3 * s, s, '#7f0000');
+                        this._pxRect(ctx, x + 0.5 * s, y + 5.5 * s, 3 * s, s, '#7f0000');
+                        // Rate label
+                        ctx.fillStyle = '#ffd700';
+                        ctx.font = 'bold 9px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('+450 KR/s', x, y - 10 * s);
+                    }
+                    break;
+
+                case 'generator':
+                    if (lvl === 1) {
+                        // Lv.1 — Investment Satellite: small satellite with solar panels
+                        // Central body
+                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 3 * s, '#e65100');
+                        this._pxRect(ctx, x - 1.5 * s, y - 1 * s, 3 * s, 1.5 * s, '#f57c00');
+                        // Solar panels (left)
+                        this._pxRect(ctx, x - 5 * s, y - 1.5 * s, 3 * s, 2 * s, '#1565c0');
+                        this._pxRect(ctx, x - 4.5 * s, y - 1 * s, 2 * s, 1 * s, '#1e88e5');
+                        // Solar panels (right)
+                        this._pxRect(ctx, x + 2 * s, y - 1.5 * s, 3 * s, 2 * s, '#1565c0');
+                        this._pxRect(ctx, x + 2.5 * s, y - 1 * s, 2 * s, 1 * s, '#1e88e5');
+                        // Panel connectors
+                        this._pxRect(ctx, x - 2 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
+                        this._pxRect(ctx, x + 2 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
+                        // Antenna
+                        this._pxRect(ctx, x - s * 0.3, y - 3 * s, s * 0.5, s, '#bbb');
+                        // $ symbol
+                        ctx.fillStyle = 'rgba(255,215,0,' + pulse.toFixed(2) + ')';
+                        ctx.font = 'bold 9px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('$', x, y + 3.5 * s);
+                    } else if (lvl === 2) {
+                        // Lv.2 — Investment Satellite: larger with dish, rotating panels
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255,152,0,0.1)';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Central body (larger)
+                        this._pxRect(ctx, x - 2.5 * s, y - 2.5 * s, 5 * s, 4 * s, '#e65100');
+                        this._pxRect(ctx, x - 2 * s, y - 1.5 * s, 4 * s, 2 * s, '#f57c00');
+                        // Rotating solar panels
+                        var panelAngle = Math.sin(age * 0.5) * 0.3;
+                        // Left panels
+                        this._pxRect(ctx, x - 6 * s, y - 2 * s, 3.5 * s, 3 * s, '#1565c0');
+                        this._pxRect(ctx, x - 5.5 * s, y - 1.5 * s, 2.5 * s, 2 * s, '#1e88e5');
+                        // Right panels
+                        this._pxRect(ctx, x + 2.5 * s, y - 2 * s, 3.5 * s, 3 * s, '#1565c0');
+                        this._pxRect(ctx, x + 3 * s, y - 1.5 * s, 2.5 * s, 2 * s, '#1e88e5');
+                        // Connectors
+                        this._pxRect(ctx, x - 2.5 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
+                        this._pxRect(ctx, x + 2.5 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
+                        // Dish antenna
+                        this._pxRect(ctx, x - 1.5 * s, y - 5 * s, 3 * s, s * 0.5, '#ddd');
+                        this._pxRect(ctx, x - s * 0.3, y - 4.5 * s, s * 0.5, 2 * s, '#bbb');
+                        // Status lights
+                        this._pxRect(ctx, x - 1 * s, y + 1 * s, s * 0.5, s * 0.5, 'rgba(0,255,0,' + pulse.toFixed(2) + ')');
+                        this._pxRect(ctx, x + 0.5 * s, y + 1 * s, s * 0.5, s * 0.5, 'rgba(255,100,0,' + pulse.toFixed(2) + ')');
+                        // $ broadcast
+                        ctx.fillStyle = 'rgba(255,215,0,' + pulse.toFixed(2) + ')';
+                        ctx.font = 'bold 10px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('$$', x, y + 4 * s);
+                        // Signal waves from dish
+                        var sigWR = ((age * 2) % 3) * 2 * s;
+                        var sigWA = 1 - ((age * 2) % 3) / 3;
+                        ctx.strokeStyle = 'rgba(255,215,0,' + (sigWA * 0.3).toFixed(2) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.arc(x, y - 5 * s, Math.max(sigWR, 1), -Math.PI * 0.8, -Math.PI * 0.2);
+                        ctx.stroke();
+                    } else {
+                        // Lv.3 — Investment Satellite: full space station broadcasting $
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255,193,7,' + (0.1 + Math.sin(age * 2) * 0.06).toFixed(3) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 9 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Main station body
+                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 5 * s, '#e65100');
+                        this._pxRect(ctx, x - 2.5 * s, y - 2 * s, 5 * s, 3 * s, '#ff9800');
+                        // Upper module
+                        this._pxRect(ctx, x - 2 * s, y - 5 * s, 4 * s, 2 * s, '#f57c00');
+                        this._pxRect(ctx, x - 1.5 * s, y - 4 * s, 3 * s, 1 * s, '#ffb74d');
+                        // Solar array left
+                        this._pxRect(ctx, x - 8 * s, y - 2 * s, 5 * s, 3 * s, '#0d47a1');
+                        this._pxRect(ctx, x - 7.5 * s, y - 1.5 * s, 4 * s, 2 * s, '#1565c0');
+                        this._pxRect(ctx, x - 7 * s, y - 1 * s, 3 * s, 1 * s, '#1e88e5');
+                        // Solar array right
+                        this._pxRect(ctx, x + 3 * s, y - 2 * s, 5 * s, 3 * s, '#0d47a1');
+                        this._pxRect(ctx, x + 3.5 * s, y - 1.5 * s, 4 * s, 2 * s, '#1565c0');
+                        this._pxRect(ctx, x + 4 * s, y - 1 * s, 3 * s, 1 * s, '#1e88e5');
+                        // Panel connectors
+                        this._pxRect(ctx, x - 3 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
+                        this._pxRect(ctx, x + 3 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
+                        // Communication dishes
+                        this._pxRect(ctx, x - 1 * s, y - 7 * s, 2 * s, s * 0.5, '#ffd700');
+                        this._pxRect(ctx, x - s * 0.3, y - 6.5 * s, s * 0.5, 1.5 * s, '#daa520');
+                        this._pxRect(ctx, x + 2 * s, y - 6 * s, 1.5 * s, s * 0.5, '#ffd700');
+                        // Broadcasting $ signals
+                        for (var bi = 0; bi < 3; bi++) {
+                            var bR = ((age * 2 + bi * 1.0) % 4) * 2.5 * s;
+                            var bA = 1 - ((age * 2 + bi * 1.0) % 4) / 4;
+                            ctx.strokeStyle = 'rgba(255,215,0,' + (bA * 0.4).toFixed(2) + ')';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.arc(x, y - 7 * s, Math.max(bR, 1), 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                        // $ symbols floating outward
+                        for (var di = 0; di < 3; di++) {
+                            var dA = age * 1.5 + di * (Math.PI * 2 / 3);
+                            var dR = 6 * s;
+                            ctx.fillStyle = 'rgba(255,215,0,' + (pulse * 0.6).toFixed(2) + ')';
+                            ctx.font = 'bold 8px Segoe UI';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('$', x + Math.cos(dA) * dR, y + Math.sin(dA) * dR);
+                        }
+                        // Status LEDs
+                        this._pxRect(ctx, x - 1 * s, y + 1 * s, s * 0.5, s * 0.5, 'rgba(0,255,0,' + pulse.toFixed(2) + ')');
+                        this._pxRect(ctx, x, y + 1 * s, s * 0.5, s * 0.5, 'rgba(0,200,255,' + pulse.toFixed(2) + ')');
+                        this._pxRect(ctx, x + 1 * s, y + 1 * s, s * 0.5, s * 0.5, 'rgba(255,100,0,' + pulse.toFixed(2) + ')');
+                        // Rate label
+                        ctx.fillStyle = '#ffd700';
+                        ctx.font = 'bold 9px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('+' + (5 * UPGRADE_POWER[3]).toFixed(0) + ' el/s', x, y - 9 * s);
+                    }
+                    break;
+
+                case 'bank':
+                    if (lvl === 1) {
+                        // Lv.1 — Investment Fund: small line chart going up
+                        // Chart background
+                        this._pxRect(ctx, x - 4 * s, y - 3 * s, 8 * s, 6 * s, '#1a1a2e');
+                        this._pxRect(ctx, x - 3.5 * s, y - 2.5 * s, 7 * s, 5 * s, '#16213e');
+                        // Chart frame
+                        this._pxRect(ctx, x - 3.5 * s, y + 2 * s, 7 * s, s * 0.3, '#daa520');
+                        this._pxRect(ctx, x - 3.5 * s, y - 2.5 * s, s * 0.3, 4.5 * s, '#daa520');
+                        // Rising line chart
+                        ctx.strokeStyle = '#4caf50';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.moveTo(x - 3 * s, y + 1.5 * s);
+                        ctx.lineTo(x - 1.5 * s, y + 0.5 * s);
+                        ctx.lineTo(x, y - 0.5 * s);
+                        ctx.lineTo(x + 1 * s, y);
+                        ctx.lineTo(x + 2.5 * s, y - 2 * s);
+                        ctx.stroke();
+                        // Arrow tip at end
+                        this._pxRect(ctx, x + 2.5 * s, y - 2.5 * s, s * 0.6, s * 0.6, '#4caf50');
+                        // $ at peak
+                        ctx.fillStyle = '#ffd700';
+                        ctx.font = 'bold 8px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('$', x + 3 * s, y - 2 * s);
+                        // Flipping coin below
+                        var coinW = Math.abs(Math.cos(age * 3)) * 2 * s;
+                        this._pxRect(ctx, x - coinW / 2, y + 3.5 * s, coinW, 1.5 * s, '#ffd700');
+                    } else if (lvl === 2) {
+                        // Lv.2 — Investment Fund: larger chart with multiple lines
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255,215,0,0.08)';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Chart background
+                        this._pxRect(ctx, x - 5 * s, y - 4 * s, 10 * s, 8 * s, '#1a1a2e');
+                        this._pxRect(ctx, x - 4.5 * s, y - 3.5 * s, 9 * s, 7 * s, '#16213e');
+                        // Chart frame (golden)
+                        this._pxRect(ctx, x - 4.5 * s, y + 3 * s, 9 * s, s * 0.3, '#daa520');
+                        this._pxRect(ctx, x - 4.5 * s, y - 3.5 * s, s * 0.3, 6.5 * s, '#daa520');
+                        // Grid lines
+                        for (var gi = 0; gi < 3; gi++) {
+                            this._pxRect(ctx, x - 4 * s, y - 1 * s + gi * 1.5 * s, 8 * s, s * 0.15, 'rgba(255,255,255,0.1)');
+                        }
+                        // Primary line (green, uptrend)
+                        ctx.strokeStyle = '#4caf50';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.moveTo(x - 4 * s, y + 2.5 * s);
+                        ctx.lineTo(x - 2 * s, y + 1 * s);
+                        ctx.lineTo(x - 0.5 * s, y);
+                        ctx.lineTo(x + 1 * s, y - 1 * s);
+                        ctx.lineTo(x + 3 * s, y - 3 * s);
+                        ctx.stroke();
+                        // Secondary line (cyan)
+                        ctx.strokeStyle = '#00bcd4';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(x - 4 * s, y + 2 * s);
+                        ctx.lineTo(x - 2 * s, y + 1.5 * s);
+                        ctx.lineTo(x, y + 0.5 * s);
+                        ctx.lineTo(x + 2 * s, y - 0.5 * s);
+                        ctx.lineTo(x + 3.5 * s, y - 1.5 * s);
+                        ctx.stroke();
+                        // $ at peak
+                        ctx.fillStyle = 'rgba(255,215,0,' + pulse.toFixed(2) + ')';
+                        ctx.font = 'bold 10px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('$', x + 3.5 * s, y - 3.5 * s);
+                        // Interest percentage label
+                        ctx.fillStyle = '#ffd700';
+                        ctx.font = 'bold 9px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText((0.02 * UPGRADE_POWER[2] * 100).toFixed(0) + '%', x, y - 5.5 * s);
+                    } else {
+                        // Lv.3 — Investment Fund: full dashboard with charts, golden frame, dividends
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255,215,0,' + (0.1 + Math.sin(age * 2) * 0.06).toFixed(3) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 9 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Dashboard background
+                        this._pxRect(ctx, x - 6 * s, y - 5 * s, 12 * s, 10 * s, '#1a1a2e');
+                        this._pxRect(ctx, x - 5.5 * s, y - 4.5 * s, 11 * s, 9 * s, '#16213e');
+                        // Golden frame
+                        this._pxRect(ctx, x - 6 * s, y - 5 * s, 12 * s, s * 0.4, '#ffd700');
+                        this._pxRect(ctx, x - 6 * s, y + 4.5 * s, 12 * s, s * 0.4, '#ffd700');
+                        this._pxRect(ctx, x - 6 * s, y - 5 * s, s * 0.4, 10 * s, '#ffd700');
+                        this._pxRect(ctx, x + 5.5 * s, y - 5 * s, s * 0.4, 10 * s, '#ffd700');
+                        // Main chart area (left panel)
+                        this._pxRect(ctx, x - 5 * s, y - 4 * s, 6 * s, 5 * s, '#0d1b2a');
+                        // Rising bar chart
+                        for (var bi = 0; bi < 5; bi++) {
+                            var barH = (bi + 1) * 0.8 * s;
+                            var barColor = bi < 3 ? '#4caf50' : '#ffd700';
+                            this._pxRect(ctx, x - 4.5 * s + bi * 1.2 * s, y + 0.5 * s - barH, s, barH, barColor);
+                        }
+                        // Right panel: line chart
+                        this._pxRect(ctx, x + 1.5 * s, y - 4 * s, 3.5 * s, 5 * s, '#0d1b2a');
+                        ctx.strokeStyle = '#4caf50';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(x + 2 * s, y);
+                        ctx.lineTo(x + 3 * s, y - 1 * s);
+                        ctx.lineTo(x + 3.5 * s, y - 0.5 * s);
+                        ctx.lineTo(x + 4.5 * s, y - 3 * s);
+                        ctx.stroke();
+                        // Bottom ticker area
+                        this._pxRect(ctx, x - 5 * s, y + 2 * s, 10 * s, 2 * s, '#0a0a1a');
+                        // Scrolling ticker text
+                        var tickerPhase = (age * 30) % 100;
+                        ctx.fillStyle = '#4caf50';
+                        ctx.font = '7px Segoe UI';
+                        ctx.textAlign = 'left';
+                        ctx.fillText('\u25B2 +12%', x - 4 * s, y + 3.3 * s);
+                        ctx.fillStyle = '#ffd700';
+                        ctx.fillText('$$$', x + 1 * s, y + 3.3 * s);
+                        // Pulsing golden $ signs floating above
+                        var vaultPulse = Math.sin(age * 3) * 0.3 + 0.7;
+                        ctx.fillStyle = 'rgba(255,215,0,' + vaultPulse.toFixed(2) + ')';
+                        ctx.font = 'bold 11px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('$$$', x, y - 6 * s);
+                        // Orbiting dividend coins
+                        for (var ci = 0; ci < 3; ci++) {
+                            var coinAngle = age * 2 + ci * (Math.PI * 2 / 3);
+                            var coinR = 7 * s;
+                            var cx3 = x + Math.cos(coinAngle) * coinR;
+                            var cy3 = y + Math.sin(coinAngle) * coinR;
+                            var cw3 = Math.abs(Math.cos(age * 3 + ci)) * 1.5 * s;
+                            this._pxRect(ctx, cx3 - cw3 / 2, cy3 - s * 0.5, cw3, s, '#ffd700');
+                        }
+                    }
+                    break;
+
+                case 'repairbot':
+                    if (lvl === 1) {
+                        // Lv.1 — Pizza Party: pizza box
+                        // Box base
+                        this._pxRect(ctx, x - 4 * s, y - 1 * s, 8 * s, 4 * s, '#e8d5b7');
+                        this._pxRect(ctx, x - 3.5 * s, y - 0.5 * s, 7 * s, 3 * s, '#d4a574');
+                        // Box lid
+                        this._pxRect(ctx, x - 4 * s, y - 2 * s, 8 * s, 1 * s, '#f0e0c8');
+                        this._pxRect(ctx, x - 3.5 * s, y - 1.5 * s, 7 * s, s * 0.5, '#e8d5b7');
+                        // Pizza circle on top (visible through)
+                        ctx.fillStyle = '#e65100';
+                        ctx.beginPath();
+                        ctx.arc(x, y + 0.5 * s, 2.5 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Cheese
+                        ctx.fillStyle = '#ffd54f';
+                        ctx.beginPath();
+                        ctx.arc(x, y + 0.5 * s, 2 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Pepperoni dots
+                        this._pxRect(ctx, x - s, y, s * 0.6, s * 0.6, '#c62828');
+                        this._pxRect(ctx, x + 0.5 * s, y - 0.2 * s, s * 0.6, s * 0.6, '#c62828');
+                        this._pxRect(ctx, x - 0.2 * s, y + 1.2 * s, s * 0.6, s * 0.6, '#c62828');
+                        // Steam
+                        if (Math.sin(age * 3) > 0) {
+                            ctx.fillStyle = 'rgba(200,200,200,0.3)';
+                            ctx.beginPath();
+                            ctx.arc(x - s, y - 3 * s, s * 0.5, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.arc(x + s, y - 3.5 * s, s * 0.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        // Label
+                        ctx.fillStyle = '#ff5722';
+                        ctx.font = '7px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('PIZZA', x, y - 3 * s);
+                    } else if (lvl === 2) {
+                        // Lv.2 — Pizza Party: open box with slices visible, steam
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255,87,34,0.08)';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Open box bottom
+                        this._pxRect(ctx, x - 5 * s, y, 10 * s, 4 * s, '#d4a574');
+                        this._pxRect(ctx, x - 4.5 * s, y + 0.5 * s, 9 * s, 3 * s, '#e8d5b7');
+                        // Open lid (tilted back)
+                        this._pxRect(ctx, x - 5 * s, y - 3 * s, 10 * s, 3 * s, '#f0e0c8');
+                        this._pxRect(ctx, x - 4.5 * s, y - 2.5 * s, 9 * s, 2 * s, '#e8d5b7');
+                        // Pizza inside box
+                        ctx.fillStyle = '#e65100';
+                        ctx.beginPath();
+                        ctx.arc(x, y + 2 * s, 3.5 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Cheese
+                        ctx.fillStyle = '#ffd54f';
+                        ctx.beginPath();
+                        ctx.arc(x, y + 2 * s, 3 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Slice lines
+                        ctx.strokeStyle = '#e65100';
+                        ctx.lineWidth = 0.8;
+                        for (var si = 0; si < 4; si++) {
+                            var sa = si * (Math.PI / 2);
+                            ctx.beginPath();
+                            ctx.moveTo(x, y + 2 * s);
+                            ctx.lineTo(x + Math.cos(sa) * 3 * s, y + 2 * s + Math.sin(sa) * 3 * s);
+                            ctx.stroke();
+                        }
+                        // Pepperoni
+                        this._pxRect(ctx, x - 1.5 * s, y + 1 * s, s * 0.7, s * 0.7, '#c62828');
+                        this._pxRect(ctx, x + 1 * s, y + 0.8 * s, s * 0.7, s * 0.7, '#c62828');
+                        this._pxRect(ctx, x - 0.5 * s, y + 2.8 * s, s * 0.7, s * 0.7, '#c62828');
+                        this._pxRect(ctx, x + 1.5 * s, y + 2.5 * s, s * 0.7, s * 0.7, '#c62828');
+                        this._pxRect(ctx, x - 1 * s, y + 1.8 * s, s * 0.7, s * 0.7, '#c62828');
+                        // Steam wisps
+                        for (var st = 0; st < 3; st++) {
+                            var stX = x + (st - 1) * 2 * s;
+                            var stOff = Math.sin(age * 2 + st) * s;
+                            ctx.fillStyle = 'rgba(200,200,200,' + (0.2 + Math.sin(age * 3 + st) * 0.1).toFixed(2) + ')';
+                            ctx.beginPath();
+                            ctx.arc(stX + stOff * 0.3, y - 4 * s - Math.abs(Math.sin(age + st)) * 2 * s, s * 0.6, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        // Soda cup
+                        this._pxRect(ctx, x + 4 * s, y + 1 * s, 1.5 * s, 2.5 * s, '#e53935');
+                        this._pxRect(ctx, x + 4 * s, y + 0.5 * s, 1.5 * s, s * 0.5, '#fff');
+                        this._pxRect(ctx, x + 4.5 * s, y - 0.5 * s, s * 0.3, 1 * s, '#90a4ae');
+                    } else {
+                        // Lv.3 — Pizza Party: full party setup with balloons, confetti
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255,87,34,' + (0.06 + Math.sin(age * 3) * 0.04).toFixed(3) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 9 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Party table
+                        this._pxRect(ctx, x - 6 * s, y + 1 * s, 12 * s, s, '#5d4037');
+                        this._pxRect(ctx, x - 5 * s, y + 2 * s, s, 3 * s, '#4e342e');
+                        this._pxRect(ctx, x + 4 * s, y + 2 * s, s, 3 * s, '#4e342e');
+                        // Multiple pizza boxes
+                        this._pxRect(ctx, x - 5 * s, y - 1 * s, 4 * s, 2 * s, '#d4a574');
+                        this._pxRect(ctx, x - 4.5 * s, y - 0.5 * s, 3 * s, 1 * s, '#ffd54f');
+                        this._pxRect(ctx, x + 1 * s, y - 1 * s, 4 * s, 2 * s, '#d4a574');
+                        this._pxRect(ctx, x + 1.5 * s, y - 0.5 * s, 3 * s, 1 * s, '#ffd54f');
+                        // Pepperoni on pizzas
+                        this._pxRect(ctx, x - 3.5 * s, y - 0.3 * s, s * 0.5, s * 0.5, '#c62828');
+                        this._pxRect(ctx, x - 2.5 * s, y + 0.2 * s, s * 0.5, s * 0.5, '#c62828');
+                        this._pxRect(ctx, x + 2.5 * s, y - 0.3 * s, s * 0.5, s * 0.5, '#c62828');
+                        this._pxRect(ctx, x + 3.5 * s, y + 0.2 * s, s * 0.5, s * 0.5, '#c62828');
+                        // Soda cups
+                        this._pxRect(ctx, x - s, y - 1 * s, s, 2 * s, '#e53935');
+                        this._pxRect(ctx, x - s, y - 1.5 * s, s, s * 0.5, '#fff');
+                        this._pxRect(ctx, x + 5 * s, y - 1 * s, s, 2 * s, '#1565c0');
+                        this._pxRect(ctx, x + 5 * s, y - 1.5 * s, s, s * 0.5, '#fff');
+                        // Balloons (3 different colors)
+                        var balloonColors = ['#e53935', '#ffd700', '#4caf50'];
+                        for (var bi = 0; bi < 3; bi++) {
+                            var bx = x + (bi - 1) * 3 * s;
+                            var bBob = Math.sin(age * 2 + bi * 2) * s;
+                            ctx.fillStyle = balloonColors[bi];
+                            ctx.beginPath();
+                            ctx.arc(bx, y - 5 * s + bBob, 1.5 * s, 0, Math.PI * 2);
+                            ctx.fill();
+                            // Balloon string
+                            ctx.strokeStyle = '#999';
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(bx, y - 3.5 * s + bBob);
+                            ctx.lineTo(bx, y - 1.5 * s);
+                            ctx.stroke();
+                        }
+                        // Confetti particles
+                        var confettiColors = ['#ff5252', '#ffd700', '#69f0ae', '#40c4ff', '#ff4081'];
+                        for (var ci = 0; ci < 8; ci++) {
+                            var cAngle = age * 1.5 + ci * 1.3;
+                            var cDist = 4 * s + Math.sin(age + ci * 2) * 2 * s;
+                            var cx2 = x + Math.cos(cAngle) * cDist;
+                            var cy2 = y - 3 * s + Math.sin(cAngle * 0.7 + ci) * 3 * s;
+                            this._pxRect(ctx, cx2 - s * 0.2, cy2 - s * 0.2, s * 0.5, s * 0.5, confettiColors[ci % 5]);
+                        }
+                        // Party banner
+                        ctx.fillStyle = 'rgba(255,215,0,' + pulse.toFixed(2) + ')';
+                        ctx.font = 'bold 8px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('\u{1F389} PARTY!', x, y - 8 * s);
                     }
                     break;
             }
