@@ -2704,19 +2704,43 @@
             } // end thievesEnabled
 
             // Robot War (PATH B — humans first)
+            // Escalates as player approaches milestone 7 (5M KR). Game over before they can pass it.
             if (this.state.robotWar) {
+                var warCeiling = 5e6; // can't pass this milestone
+                var progress = Math.min(1, this.state.totalOKRs / warCeiling);
+                // Aggression scales with progress: calm at 0%, devastating at 90%+
+                var aggression = progress * progress; // quadratic escalation
+                var attackRate = Math.max(0.1, 1.5 - aggression * 1.4); // 1.5s → 0.1s
+                var damage = Math.floor(10 + aggression * 60); // 10 → 70 damage per hit
+                var krSteal = 0.02 + aggression * 0.15; // 2% → 17% KR stolen per hit
+
                 this._robotWarTimer = (this._robotWarTimer || 0) + dt;
-                var spawnRate = Math.max(0.3, 2 - this._robotWarTimer * 0.05);
-                if (this._robotWarTimer > spawnRate) {
+                if (this._robotWarTimer > attackRate) {
                     this._robotWarTimer = 0;
                     if (this.nodes.length > 0) {
+                        // Attack random building
                         var target = this.nodes[Math.floor(Math.random() * this.nodes.length)];
-                        target.hp = Math.max(0, (target.hp || 100) - 25);
-                        this.spawnParticles(target.x, target.y, '#f44', 8);
-                        this.addFloatingText(target.x, target.y - 20, '-25 HP', '#f44', 12);
-                        this.triggerShake(3);
+                        target.hp = Math.max(0, (target.hp || 100) - damage);
+                        this.spawnParticles(target.x, target.y, '#f44', 6 + Math.floor(aggression * 12));
+                        this.addFloatingText(target.x, target.y - 20, '-' + damage + ' HP', '#f44', 12);
+                        this.triggerShake(2 + aggression * 8);
                     }
-                    this.state.totalOKRs = Math.max(0, this.state.totalOKRs * 0.95);
+                    // Steal KRs
+                    this.state.totalOKRs = Math.max(0, this.state.totalOKRs * (1 - krSteal));
+
+                    // Warning messages at thresholds
+                    if (progress > 0.3 && !this._warWarn1) {
+                        this._warWarn1 = true;
+                        this.eventBanner = { icon: '', text: '⚠️ MACHINES ESCALATING', desc: 'The robots are getting stronger...', color: '#f44', type: 'negative', timer: 4 };
+                    }
+                    if (progress > 0.6 && !this._warWarn2) {
+                        this._warWarn2 = true;
+                        this.eventBanner = { icon: '', text: '🔥 CRITICAL THREAT', desc: 'Your empire is crumbling under the assault!', color: '#f44', type: 'negative', timer: 4 };
+                    }
+                    if (progress > 0.85 && !this._warWarn3) {
+                        this._warWarn3 = true;
+                        this.eventBanner = { icon: '', text: '💀 TOTAL WAR', desc: 'There is no stopping them now...', color: '#f00', type: 'negative', timer: 5 };
+                    }
                 }
 
                 // Remove dead buildings
@@ -2727,8 +2751,8 @@
                     }
                 }
 
-                // Check game over: no buildings and no KRs
-                if (this.nodes.length === 0 && this.state.totalOKRs <= 0) {
+                // Game over: no buildings left
+                if (this.nodes.length === 0) {
                     this.running = false;
                     document.getElementById('gameOverScreen').style.display = 'flex';
                     this.stopMusic();
