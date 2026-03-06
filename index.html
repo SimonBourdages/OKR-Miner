@@ -1516,6 +1516,7 @@
             this.repairBotCost = 200;
             this.resourceFlowIcons = [];
             this.flowSpawnTimers = {};
+            this.aiStrikeShots = [];
             this.eventTimer = 10 + Math.random() * 15;
             this.activeEvent = null;
             this.eventBanner = null;
@@ -2690,6 +2691,7 @@
             this.UNDERFUNDED = false;
             this.resourceFlowIcons = [];
             this.flowSpawnTimers = {};
+            this.aiStrikeShots = [];
             this._lastComputedEdges = null;
             this.hideUpgradeUnlockVideo();
             this.hideAiTakeoverVideo();
@@ -3199,6 +3201,13 @@
                 if (p.life <= 0) this.particles.splice(i, 1);
             }
 
+            // Update AI strike shot visuals
+            for (var i = this.aiStrikeShots.length - 1; i >= 0; i--) {
+                var shot = this.aiStrikeShots[i];
+                shot.life -= dt;
+                if (shot.life <= 0) this.aiStrikeShots.splice(i, 1);
+            }
+
             // Update floating texts
             for (var i = this.floatingTexts.length - 1; i >= 0; i--) {
                 var ft = this.floatingTexts[i];
@@ -3473,13 +3482,21 @@
 
                         var target = this.nodes[targetIdx];
                         if (target) {
-                            target.hp = Math.max(0, (target.hp || 100) - damage);
+                            target.hp = 0; // AI laser strikes now destroy buildings instantly in robot uprising mode.
                             target.damageFlash = 1.0;
+                            this.aiStrikeShots.push({
+                                fromX: attacker.x,
+                                fromY: attacker.y,
+                                toX: target.x,
+                                toY: target.y,
+                                life: 0.22,
+                                maxLife: 0.22
+                            });
                             this.spawnParticles(attacker.x, attacker.y, '#ff66ff', 8);
-                            this.spawnParticles(target.x, target.y, '#f44', 6 + Math.floor(aggression * 12));
+                            this.spawnParticles(target.x, target.y, '#f44', 12 + Math.floor(aggression * 12));
                             this.addFloatingText(attacker.x, attacker.y - 18, 'AI STRIKE', '#ff66ff', 10);
-                            this.addFloatingText(target.x, target.y - 20, '-' + damage + ' HP', '#f44', 12);
-                            this.triggerShake(2 + aggression * 8);
+                            this.addFloatingText(target.x, target.y - 20, 'DESTROYED!', '#f44', 12);
+                            this.triggerShake(4 + aggression * 9);
                         }
 
                         if (!this._warAiStrikeWarned) {
@@ -4148,6 +4165,7 @@
             this.drawShips(ctx);
             try { this.drawRepairDrones(ctx); } catch(e) {}
             try { this.drawCompetitorShips(ctx); } catch(e) {}
+            try { this.drawAiStrikeShots(ctx); } catch(e) {}
             this.drawFloatingTexts(ctx);
 
             } finally { ctx.restore(); } // end camera transform
@@ -4573,6 +4591,35 @@
                 ctx.fillStyle = 'rgba(255, 0, 100, ' + (0.05 + Math.sin(thief.age * 4) * 0.05).toFixed(3) + ')';
                 ctx.beginPath();
                 ctx.arc(thief.x, thief.y, 25, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        };
+
+        OKRFarmingGame.prototype.drawAiStrikeShots = function(ctx) {
+            if (!this.aiStrikeShots || this.aiStrikeShots.length === 0) return;
+
+            for (var i = 0; i < this.aiStrikeShots.length; i++) {
+                var shot = this.aiStrikeShots[i];
+                var lifeRatio = shot.maxLife > 0 ? (shot.life / shot.maxLife) : 0;
+                if (lifeRatio <= 0) continue;
+
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, Math.min(1, lifeRatio));
+                ctx.strokeStyle = '#ff66ff';
+                ctx.lineWidth = 2 + lifeRatio * 2;
+                ctx.shadowColor = '#ff66ff';
+                ctx.shadowBlur = 12;
+                ctx.beginPath();
+                ctx.moveTo(shot.fromX, shot.fromY);
+                ctx.lineTo(shot.toX, shot.toY);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Impact flash on the target side
+                ctx.fillStyle = 'rgba(255, 80, 200, ' + (0.25 + lifeRatio * 0.65).toFixed(2) + ')';
+                ctx.beginPath();
+                ctx.arc(shot.toX, shot.toY, 4 + (1 - lifeRatio) * 10, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
             }

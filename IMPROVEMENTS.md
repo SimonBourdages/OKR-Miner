@@ -87,6 +87,10 @@
    - Connection-edge generation now adds one extra direct Leadership branch per Network Hub.
    - Extra branches target the next closest buildings first to increase visible network branching.
 
+18. **Robot uprising AI strike escalation**
+   - Added visible AI laser-shot VFX from attacking AI buildings to their targets during Humans First robot uprising.
+   - AI strike hits now instantly destroy targeted non-AI buildings, accelerating collapse in the no-equal-rights branch.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**
