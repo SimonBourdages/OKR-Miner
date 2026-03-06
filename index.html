@@ -5769,8 +5769,8 @@
         // =========================================================
 
         OKRFarmingGame.prototype.cycleSoundMode = function() {
-            var modes = ['all', 'music', 'sfx', 'none'];
-            var labels = { all: '🔊 All Sound', music: '🎵 Music Only', sfx: '🔔 SFX Only', none: '🔇 Muted' };
+            var modes = ['all', 'sfx', 'none'];
+            var labels = { all: '🔊 All Sound', sfx: '🔔 SFX Only', none: '🔇 Muted' };
             var idx = modes.indexOf(this.soundMode);
             idx = (idx + 1) % modes.length;
             this.soundMode = modes[idx];
