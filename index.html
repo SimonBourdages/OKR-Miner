@@ -128,6 +128,42 @@
             gap: 8px;
         }
 
+        @media (max-width: 768px) {
+            #buildings {
+                position: fixed !important;
+                right: 0 !important;
+                left: 0 !important;
+                bottom: 45px !important;
+                top: auto !important;
+                transform: none !important;
+                flex-direction: row !important;
+                overflow-x: auto !important;
+                padding: 6px !important;
+                gap: 6px !important;
+                background: rgba(0, 20, 10, 0.95) !important;
+                border-top: 1px solid #00ff88 !important;
+            }
+
+            #buildings .building-btn {
+                min-width: 120px !important;
+                flex-shrink: 0 !important;
+                font-size: 10px !important;
+                padding: 6px 8px !important;
+            }
+
+            #ui {
+                font-size: 11px !important;
+                padding: 8px 10px !important;
+                min-width: auto !important;
+            }
+
+            #repairBotPanel {
+                bottom: auto !important;
+                top: 10px !important;
+                right: 10px !important;
+            }
+        }
+
         .building-btn {
             background: rgba(0, 20, 10, 0.9);
             border: 2px solid #00ff88;
@@ -628,7 +664,7 @@
             <span class="stat-label">AC</span>
             <span class="stat-value" id="currencyDisplay">50</span>
         </div>
-        <div class="stat-row">
+        <div id="elRow" class="stat-row" style="display:none;">
             <span class="stat-label">⚡ EL</span>
             <span class="stat-value" id="elDisplay" style="color:#ff9800;">0</span>
         </div>
@@ -642,7 +678,7 @@
                 <span class="stat-label">AC/s</span>
                 <span class="stat-value" id="acRate" style="color:#ff0;">0</span>
             </div>
-            <div class="stat-row">
+            <div id="elRateRow" class="stat-row" style="display:none;">
                 <span class="stat-label">EL/s</span>
                 <span class="stat-value" id="elRate" style="color:#ff9800;">0</span>
             </div>
@@ -2004,6 +2040,12 @@
                 return;
             }
 
+            // Don't place in the building panel area (right 180px on desktop)
+            if (window.innerWidth > 768 && x > this.canvas.width - 180) {
+                this.addFloatingText(x, y - 20, 'Building panel area!', '#f84');
+                return;
+            }
+
             this.placeBuilding(x, y);
         };
 
@@ -2851,12 +2893,19 @@
             document.getElementById('okrRate').textContent = this.currentOkrRate.toFixed(1);
             document.getElementById('acRate').textContent = this.currentAcRate.toFixed(1);
 
-            document.getElementById('elDisplay').textContent = this.formatNumber(Math.floor(this.state.currencies.el));
-            var elRateEl = document.getElementById('elRate');
-            elRateEl.textContent = (this.currentElRate >= 0 ? '+' : '') + this.currentElRate.toFixed(1);
-            elRateEl.style.color = this.currentElRate >= 0 ? '#ff9800' : '#f44';
-            if (this.brownout) {
-                elRateEl.textContent += ' ⚠ BROWNOUT';
+            // Show/hide EL rows based on electricity being enabled
+            var elEnabled = this.state.electricityEnabled;
+            document.getElementById('elRow').style.display = elEnabled ? '' : 'none';
+            document.getElementById('elRateRow').style.display = elEnabled ? '' : 'none';
+
+            if (elEnabled) {
+                document.getElementById('elDisplay').textContent = this.formatNumber(Math.floor(this.state.currencies.el));
+                var elRateEl = document.getElementById('elRate');
+                elRateEl.textContent = (this.currentElRate >= 0 ? '+' : '') + this.currentElRate.toFixed(1);
+                elRateEl.style.color = this.currentElRate >= 0 ? '#ff9800' : '#f44';
+                if (this.brownout) {
+                    elRateEl.textContent += ' ⚠ BROWNOUT';
+                }
             }
 
             // Event countdown
@@ -2911,6 +2960,7 @@
 
             // Grid scrolls with the world
             this.drawPixelGrid(ctx, w, h);
+            this.drawEdgeAsteroids(ctx, w, h);
 
             // Connections: MST chain linking all nodes to factory
             var fX = w / 2;
@@ -3403,9 +3453,10 @@
             var distToFactory = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var tooCloseToFactory = distToFactory < 60;
             var tooCloseToEdge = mx < 40 || mx > this.canvas.width - 40 || my < 40 || my > this.canvas.height - 40;
+            var inBuildingPanel = window.innerWidth > 768 && mx > this.canvas.width - 180;
             var canAfford = this.state.currencies.ac >= b.cost;
 
-            var blocked = tooCloseToFactory || tooCloseToEdge;
+            var blocked = tooCloseToFactory || tooCloseToEdge || inBuildingPanel;
 
             var ringColor, ghostAlpha;
             if (blocked) {
@@ -3467,6 +3518,9 @@
             } else if (tooCloseToEdge) {
                 ctx.fillStyle = '#f66';
                 ctx.fillText('Too close to edge!', mx, my + 35);
+            } else if (inBuildingPanel) {
+                ctx.fillStyle = '#f66';
+                ctx.fillText('Building panel!', mx, my + 35);
             } else if (!canAfford) {
                 ctx.fillStyle = '#f66';
                 ctx.fillText('Need ' + b.cost + ' AC', mx, my + 35);
@@ -3639,6 +3693,57 @@
                 ctx.lineTo(w, y);
                 ctx.stroke();
             }
+        };
+
+        // =========================================================
+        // DRAWING - EDGE ASTEROIDS
+        // =========================================================
+
+        OKRFarmingGame.prototype.drawEdgeAsteroids = function(ctx, w, h) {
+            // Seed-based pseudo-random for consistent placement
+            var rng = function(seed) { seed = (seed * 16807 + 0) % 2147483647; return seed; };
+            var seed = 42;
+            var edgeMargin = 50;
+            var count = Math.floor((w + h) / 15); // roughly proportional to screen size
+
+            ctx.save();
+            for (var i = 0; i < count; i++) {
+                seed = rng(seed);
+                var side = seed % 4;
+                seed = rng(seed);
+                var pos = (seed % 1000) / 1000;
+                seed = rng(seed);
+                var offset = 5 + (seed % edgeMargin);
+                seed = rng(seed);
+                var size = 2 + (seed % 5);
+
+                var ax, ay;
+                if (side === 0) { ax = pos * w; ay = offset; }           // top
+                else if (side === 1) { ax = pos * w; ay = h - offset; }   // bottom
+                else if (side === 2) { ax = offset; ay = pos * h; }       // left
+                else { ax = w - offset; ay = pos * h; }                   // right
+
+                // Asteroid colors
+                seed = rng(seed);
+                var shade = 40 + (seed % 40);
+                var color = 'rgb(' + shade + ',' + (shade - 5) + ',' + (shade - 10) + ')';
+
+                // Draw irregular asteroid (3-5 pixel rects overlapping)
+                ctx.fillStyle = color;
+                ctx.fillRect(Math.floor(ax), Math.floor(ay), size, size);
+                ctx.fillRect(Math.floor(ax) - 1, Math.floor(ay) + 1, size - 1, size - 1);
+                if (size > 3) {
+                    seed = rng(seed);
+                    ctx.fillRect(Math.floor(ax) + 1, Math.floor(ay) - 1, size - 2, size + 1);
+                }
+
+                // Occasional highlight
+                if (i % 7 === 0) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                    ctx.fillRect(Math.floor(ax), Math.floor(ay), 2, 1);
+                }
+            }
+            ctx.restore();
         };
 
         // =========================================================
