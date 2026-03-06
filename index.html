@@ -3855,8 +3855,8 @@
                     this.trackEvent('milestone', i);
                     this.saveGame(true);
 
-                    // Special: AI choice at milestone 5 (index 4)
-                    if (i === 4 && !this.state.aiChoice) {
+                    // Special: AI choice at milestone 6 (index 5)
+                    if (i === 5 && !this.state.aiChoice) {
                         this.running = false;
                         document.getElementById('aiChoiceDialog').style.display = 'block';
                     }
@@ -3873,7 +3873,7 @@
         };
 
         // =========================================================
-        // AI CHOICE BRANCHING (Milestone 5)
+        // AI CHOICE BRANCHING (Milestone 6)
         // =========================================================
 
         OKRFarmingGame.prototype.chooseAIPath = function(choice) {
