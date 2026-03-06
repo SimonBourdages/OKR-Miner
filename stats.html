@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKR Miner — Analytics Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 100%);
+            border-bottom: 2px solid #00ff88;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 {
+            color: #00ff88;
+            font-size: 28px;
+            text-shadow: 0 0 10px #00ff88;
+            letter-spacing: 3px;
+        }
+        .header a {
+            color: #8cf;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .header a:hover { text-decoration: underline; }
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: #111;
+            border-bottom: 1px solid #234;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #888;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .tab:hover { color: #ccc; }
+        .tab.active { color: #00ff88; border-bottom-color: #00ff88; }
+        .content { padding: 30px; max-width: 1200px; margin: 0 auto; }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #234;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 4px;
+        }
+        .card .label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        th {
+            background: #1a1a2e;
+            color: #00ff88;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #1a1a2e;
+            font-size: 13px;
+        }
+        tr:hover { background: rgba(0, 255, 136, 0.03); }
+        .source-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .source-local { background: #1b5e20; color: #69f0ae; }
+        .source-cloud { background: #0d47a1; color: #64b5f6; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .empty-state h2 { color: #444; margin-bottom: 10px; }
+        .config-section {
+            background: #111;
+            border: 1px solid #234;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .config-section h3 { color: #ffd700; margin-bottom: 10px; }
+        .config-section input {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a2e;
+            border: 1px solid #345;
+            color: #e0e0e0;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        .config-section button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .config-section button:hover { background: #33ffaa; }
+        .status { margin-top: 10px; font-size: 12px; }
+        .status.ok { color: #69f0ae; }
+        .status.err { color: #f44; }
+        #panel-local, #panel-cloud, #panel-config { display: none; }
+        #panel-local.active, #panel-cloud.active, #panel-config.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 OKR MINER ANALYTICS</h1>
+        <a href="./index.html">← Back to Game</a>
+    </div>
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('local')">📱 Local Stats</div>
+        <div class="tab" onclick="switchTab('cloud')">☁️ SharePoint Data</div>
+        <div class="tab" onclick="switchTab('config')">⚙️ Settings</div>
+    </div>
+    <div class="content">
+        <div id="panel-local" class="active"></div>
+        <div id="panel-cloud"></div>
+        <div id="panel-config">
+            <div class="config-section">
+                <h3>SharePoint GET Endpoint</h3>
+                <p style="color:#999;font-size:13px;margin-bottom:12px;">
+                    To load analytics from SharePoint, create a second Power Automate flow with an
+                    "When an HTTP request is received" trigger (GET method) that queries your SharePoint list
+                    and returns the items as JSON. Paste the flow URL below.
+                </p>
+                <input type="text" id="getEndpoint" placeholder="https://your-power-automate-get-flow-url...">
+                <button onclick="saveEndpoint()">Save & Test</button>
+                <div id="configStatus" class="status"></div>
+            </div>
+            <div class="config-section" style="margin-top:16px;">
+                <h3>How to Create the GET Flow</h3>
+                <ol style="color:#ccc;font-size:13px;line-height:1.8;padding-left:20px;">
+                    <li>Go to <a href="https://make.powerautomate.com" target="_blank" style="color:#8cf;">make.powerautomate.com</a></li>
+                    <li>Create → Instant cloud flow → Skip</li>
+                    <li>Add trigger: <b>"When an HTTP request is received"</b></li>
+                    <li>Set Method to <b>GET</b></li>
+                    <li>Add action: <b>"Get items"</b> from your SharePoint list</li>
+                    <li>Add action: <b>"Response"</b> → Status 200 → Body = output of Get items</li>
+                    <li>Add header: <code>Access-Control-Allow-Origin: *</code></li>
+                    <li>Save → copy the HTTP GET URL → paste above</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var ANALYTICS_KEY = 'okrMinerAnalytics';
+        var GET_ENDPOINT_KEY = 'okrMinerGetEndpoint';
+
+        function switchTab(name) {
+            var tabs = document.querySelectorAll('.tab');
+            for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+            document.getElementById('panel-local').classList.remove('active');
+            document.getElementById('panel-cloud').classList.remove('active');
+            document.getElementById('panel-config').classList.remove('active');
+            if (name === 'local') { tabs[0].classList.add('active'); document.getElementById('panel-local').classList.add('active'); renderLocal(); }
+            if (name === 'cloud') { tabs[1].classList.add('active'); document.getElementById('panel-cloud').classList.add('active'); loadCloud(); }
+            if (name === 'config') { tabs[2].classList.add('active'); document.getElementById('panel-config').classList.add('active'); loadConfig(); }
+        }
+
+        function formatNumber(n) {
+            if (n >= 1e15) return (n / 1e15).toFixed(1) + 'Q';
+            if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
+            if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+            if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+            return String(Math.round(n));
+        }
+
+        function formatDuration(secs) {
+            var m = Math.floor(secs / 60);
+            var s = Math.floor(secs % 60);
+            return m + 'm ' + s + 's';
+        }
+
+        function renderLocal() {
+            var panel = document.getElementById('panel-local');
+            try {
+                var raw = localStorage.getItem(ANALYTICS_KEY);
+                if (!raw) { panel.innerHTML = '<div class="empty-state"><h2>No Local Data</h2><p>Play a game first to generate analytics.</p></div>'; return; }
+                var data = JSON.parse(raw);
+                var agg = data.aggregated || {};
+                var sessions = data.sessions || [];
+
+                var html = '<h2 style="color:#00ff88;margin-bottom:20px;">Aggregated Stats <span class="source-badge source-local">LOCAL</span></h2>';
+                html += '<div class="card-grid">';
+                html += card(agg.totalSessions || 0, 'Total Sessions');
+                html += card(formatDuration(agg.totalPlayTime || 0), 'Total Play Time');
+                html += card(agg.normalModeSessions || 0, 'Normal Games');
+                html += card(agg.infiniteModeSessions || 0, 'Infinite Games');
+                html += card(formatNumber(agg.highestOKRs || 0), 'Highest KRs');
+                html += card(agg.highestMilestone || 0, 'Best Milestone');
+                html += card(formatNumber(agg.peakOKRRate || 0) + '/s', 'Peak KR Rate');
+                html += card(formatNumber(agg.peakACRate || 0) + '/s', 'Peak HC Rate');
+                html += card(agg.totalBuildingsPlaced || 0, 'Buildings Placed');
+                html += card(agg.totalUpgradesDone || 0, 'Upgrades Done');
+                html += card(agg.totalShipsDestroyed || 0, 'Ships Destroyed');
+                html += card(agg.totalThievesDestroyed || 0, 'Competitors Killed');
+                html += '</div>';
+
+                if (sessions.length > 0) {
+                    html += '<h3 style="color:#8cf;margin:20px 0 10px;">Recent Sessions</h3>';
+                    html += '<table><tr><th>Date</th><th>Duration</th><th>Mode</th><th>Milestones</th><th>Total KRs</th><th>Buildings</th><th>Theme</th><th>End</th></tr>';
+                    var recent = sessions.slice(-20).reverse();
+                    for (var i = 0; i < recent.length; i++) {
+                        var s = recent[i];
+                        html += '<tr>';
+                        html += '<td>' + (s.startTime ? new Date(s.startTime).toLocaleDateString() : '—') + '</td>';
+                        html += '<td>' + formatDuration(s.duration || 0) + '</td>';
+                        html += '<td>' + (s.mode || 'normal') + '</td>';
+                        html += '<td>' + (s.finalMilestones || 0) + '</td>';
+                        html += '<td>' + formatNumber(s.finalOKRs || 0) + '</td>';
+                        html += '<td>' + (s.buildingsPlaced || 0) + '</td>';
+                        html += '<td>' + (s.theme || '—') + '</td>';
+                        html += '<td>' + (s.endReason || '—') + '</td>';
+                        html += '</tr>';
+                    }
+                    html += '</table>';
+                }
+
+                panel.innerHTML = html;
+            } catch(e) {
+                panel.innerHTML = '<div class="empty-state"><h2>Error</h2><p>' + e.message + '</p></div>';
+            }
+        }
+
+        function card(value, label) {
+            return '<div class="card"><div class="value">' + value + '</div><div class="label">' + label + '</div></div>';
+        }
+
+        function loadCloud() {
+            var panel = document.getElementById('panel-cloud');
+            var endpoint = localStorage.getItem(GET_ENDPOINT_KEY);
+            if (!endpoint) {
+                panel.innerHTML = '<div class="empty-state"><h2>SharePoint Not Configured</h2><p>Go to ⚙️ Settings and paste your Power Automate GET flow URL.</p></div>';
+                return;
+            }
+            panel.innerHTML = '<div class="empty-state"><h2>Loading...</h2><p>Fetching data from SharePoint...</p></div>';
+            fetch(endpoint)
+                .then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function(data) {
+                    var items = Array.isArray(data) ? data : (data.value || data.items || [data]);
+                    if (items.length === 0) {
+                        panel.innerHTML = '<div class="empty-state"><h2>No Data Yet</h2><p>Play a game and end the session to generate analytics.</p></div>';
+                        return;
+                    }
+
+                    var totalSessions = items.length;
+                    var totalDuration = 0;
+                    var maxOKRs = 0;
+                    var maxMilestones = 0;
+                    var maxOKRRate = 0;
+                    for (var i = 0; i < items.length; i++) {
+                        var it = items[i];
+                        totalDuration += Number(it.duration || it.Duration || 0);
+                        var okrs = Number(it.totalOKRs || it.TotalOKRs || 0);
+                        if (okrs > maxOKRs) maxOKRs = okrs;
+                        var ms = Number(it.milestones || it.Milestones || 0);
+                        if (ms > maxMilestones) maxMilestones = ms;
+                        var rate = Number(it.peakOKRRate || it.PeakOKRRate || 0);
+                        if (rate > maxOKRRate) maxOKRRate = rate;
+                    }
+
+                    var html = '<h2 style="color:#64b5f6;margin-bottom:20px;">SharePoint Analytics <span class="source-badge source-cloud">CLOUD</span></h2>';
+                    html += '<div class="card-grid">';
+                    html += card(totalSessions, 'Total Sessions');
+                    html += card(formatDuration(totalDuration), 'Total Play Time');
+                    html += card(formatNumber(maxOKRs), 'Highest KRs');
+                    html += card(maxMilestones, 'Best Milestone');
+                    html += card(formatNumber(maxOKRRate) + '/s', 'Peak KR Rate');
+                    html += '</div>';
+
+                    html += '<h3 style="color:#8cf;margin:20px 0 10px;">All Sessions from SharePoint</h3>';
+                    html += '<table><tr><th>Session</th><th>Duration</th><th>Mode</th><th>Milestones</th><th>KRs</th><th>Buildings</th><th>Theme</th><th>End Reason</th><th>Browser</th></tr>';
+                    for (var j = items.length - 1; j >= 0; j--) {
+                        var s = items[j];
+                        html += '<tr>';
+                        html += '<td>' + (s.sessionId || s.SessionId || s.Title || '—') + '</td>';
+                        html += '<td>' + formatDuration(Number(s.duration || s.Duration || 0)) + '</td>';
+                        html += '<td>' + (s.mode || s.Mode || '—') + '</td>';
+                        html += '<td>' + (s.milestones || s.Milestones || 0) + '</td>';
+                        html += '<td>' + formatNumber(Number(s.totalOKRs || s.TotalOKRs || 0)) + '</td>';
+                        html += '<td>' + (s.buildingsPlaced || s.BuildingsPlaced || 0) + '</td>';
+                        html += '<td>' + (s.theme || s.Theme || '—') + '</td>';
+                        html += '<td>' + (s.endReason || s.EndReason || '—') + '</td>';
+                        html += '<td style="font-size:11px;">' + (s.browser || s.Browser || '—') + '</td>';
+                        html += '</tr>';
+                    }
+                    html += '</table>';
+                    panel.innerHTML = html;
+                })
+                .catch(function(err) {
+                    panel.innerHTML = '<div class="empty-state"><h2>Failed to Load</h2><p>' + err.message + '</p><p style="color:#666;margin-top:10px;">Check your GET endpoint in ⚙️ Settings.</p></div>';
+                });
+        }
+
+        function loadConfig() {
+            var saved = localStorage.getItem(GET_ENDPOINT_KEY) || '';
+            document.getElementById('getEndpoint').value = saved;
+        }
+
+        function saveEndpoint() {
+            var url = document.getElementById('getEndpoint').value.trim();
+            var status = document.getElementById('configStatus');
+            if (!url) {
+                localStorage.removeItem(GET_ENDPOINT_KEY);
+                status.className = 'status ok';
+                status.textContent = 'Endpoint cleared.';
+                return;
+            }
+            localStorage.setItem(GET_ENDPOINT_KEY, url);
+            status.className = 'status';
+            status.textContent = 'Testing...';
+            fetch(url)
+                .then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function(data) {
+                    var count = Array.isArray(data) ? data.length : (data.value ? data.value.length : 1);
+                    status.className = 'status ok';
+                    status.textContent = '✅ Connected! Found ' + count + ' record(s).';
+                })
+                .catch(function(err) {
+                    status.className = 'status err';
+                    status.textContent = '❌ ' + err.message + ' — Check the URL and CORS headers.';
+                });
+        }
+
+        // Init
+        renderLocal();
+    </script>
+</body>
+</html>
