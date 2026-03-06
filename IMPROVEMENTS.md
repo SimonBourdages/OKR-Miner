@@ -71,6 +71,11 @@
    - Menu version tag now formats build time from UTC into Pacific time using timezone-aware formatting.
    - Added a fallback formatter that still outputs a PST timestamp if Intl timezone formatting is unavailable.
 
+14. **Story branch and event atlas documentation**
+   - Added a standalone `story-branches-events.html` page that maps objective reviews, unlocks, and branch triggers.
+   - Included the full random event catalog (100 events) with filtering and grouped by negative/positive/neutral pools.
+   - Added a README link so players can quickly open the story/event path guide.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**

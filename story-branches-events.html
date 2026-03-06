@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OKR Miner - Story Branches & Event Atlas</title>
+  <style>
+    :root {
+      --bg: #03070b;
+      --panel: rgba(5, 18, 28, 0.92);
+      --panel-2: rgba(8, 24, 38, 0.88);
+      --line: #1f4c66;
+      --text: #cfe7f6;
+      --muted: #7da2b7;
+      --accent: #00ff88;
+      --gold: #ffd166;
+      --danger: #ff6b6b;
+      --good: #7dffb3;
+      --neutral: #ffe082;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: radial-gradient(circle at 20% 10%, #0d1f35 0%, #03070b 55%, #000 100%);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      width: min(1320px, 96vw);
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--accent);
+      letter-spacing: 2px;
+      font-size: clamp(30px, 3.1vw, 44px);
+      text-shadow: 0 0 16px rgba(0, 255, 136, 0.35);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      color: #9fe7ff;
+      font-size: clamp(21px, 2.2vw, 29px);
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      color: #d9f4ff;
+      font-size: clamp(17px, 1.5vw, 22px);
+    }
+
+    p { margin: 8px 0; }
+
+    .hero, .panel {
+      background: linear-gradient(145deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero p { color: #b2d6ea; }
+
+    .meta {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .top-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .top-links a {
+      color: #001f14;
+      text-decoration: none;
+      background: var(--accent);
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    section { margin-top: 18px; }
+
+    .muted { color: var(--muted); font-size: 12px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 10px;
+      background: rgba(1, 10, 16, 0.9);
+    }
+
+    th, td {
+      border: 1px solid #1a3b50;
+      vertical-align: top;
+      padding: 10px 10px;
+      font-size: 13px;
+    }
+
+    th {
+      background: rgba(0, 255, 136, 0.08);
+      color: var(--accent);
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 0.4px;
+    }
+
+    td .desc {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    td ul {
+      margin: 0;
+      padding-left: 16px;
+    }
+
+    .branch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .branch {
+      border-radius: 12px;
+      border: 1px solid #28475f;
+      background: rgba(3, 12, 19, 0.86);
+      padding: 14px;
+    }
+
+    .branch.equal { border-color: #5aa8ff; }
+    .branch.humans { border-color: #ff6f6f; }
+
+    .branch ul {
+      margin: 0;
+      padding-left: 16px;
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 8px 0 2px; }
+    .chip {
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid #335c78;
+      padding: 4px 10px;
+      color: #b8d9eb;
+      background: rgba(20, 42, 58, 0.55);
+    }
+
+    .event-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .event-card {
+      border: 1px solid #2a4a63;
+      border-radius: 10px;
+      padding: 12px;
+      background: rgba(2, 11, 18, 0.88);
+    }
+
+    .event-card h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: #d3ecff;
+    }
+
+    .event-card p {
+      margin: 0;
+      font-size: 13px;
+      color: #9fc0d4;
+    }
+
+    .filters {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .filters input {
+      min-width: 260px;
+      flex: 1 1 260px;
+      border: 1px solid #35607f;
+      border-radius: 8px;
+      background: rgba(2, 14, 24, 0.95);
+      color: #d7f1ff;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .filters button {
+      border: 1px solid #35607f;
+      border-radius: 8px;
+      background: rgba(0, 255, 136, 0.12);
+      color: var(--accent);
+      padding: 7px 11px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .event-groups {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .event-group {
+      border: 1px solid #274860;
+      border-radius: 10px;
+      padding: 10px 10px 8px;
+      background: rgba(1, 9, 15, 0.88);
+      min-height: 420px;
+    }
+
+    .event-group h3 { margin-bottom: 10px; }
+    .event-group.neg h3 { color: var(--danger); }
+    .event-group.pos h3 { color: var(--good); }
+    .event-group.neu h3 { color: var(--neutral); }
+
+    .event-group ol {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .event-group li {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      column-gap: 7px;
+      row-gap: 1px;
+      align-items: start;
+      border-bottom: 1px dashed rgba(78, 115, 138, 0.32);
+      padding-bottom: 5px;
+    }
+
+    .event-group li:last-child { border-bottom: 0; }
+    .evt-icon { grid-row: 1 / span 2; opacity: 0.95; }
+    .evt-name { font-weight: 700; color: #d6edff; }
+    .evt-desc { grid-column: 2; color: #9abdd1; }
+
+    .tiny {
+      margin-top: 12px;
+      color: #6f94ac;
+      font-size: 11px;
+    }
+
+    @media (max-width: 760px) {
+      th, td { font-size: 12px; padding: 8px; }
+      .event-group { min-height: 0; }
+      .filters input { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero" id="top">
+      <h1>OKR Miner - Story Branches & Event Atlas</h1>
+      <p>This page maps the full objective-review progression, the Milestone 5 story split, and every random event currently defined in the game runtime.</p>
+      <div class="top-links">
+        <a href="#milestones">Objective Reviews</a>
+        <a href="#branching">Story Branches</a>
+        <a href="#triggers">Event Triggers</a>
+        <a href="#event-atlas">Full Event Atlas (100)</a>
+      </div>
+      <div class="meta">Source of truth: <code>index.html</code> milestone/event definitions &middot; Generated 2026-03-06 21:02:21.590 UTC</div>
+    </header>
+
+    <section class="panel" id="milestones">
+      <h2>Objective Review Progression (Unlocks + Triggers)</h2>
+      <p>Each review expands the playable radius by <strong>+30px</strong> (base radius 450px). Unlock rows below include buildings, systems, and notable story/cinematic triggers.</p>
+      <div style="overflow:auto; margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Review</th>
+              <th>KR Goal</th>
+              <th>Milestone Banner</th>
+              <th>Building Unlocks</th>
+              <th>System Unlocks</th>
+              <th>Story / Event Triggers</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+    <tr>
+      <td>1</td>
+      <td>0</td>
+      <td><strong>🚀 Launch!</strong><div class="desc">Recruiters generate HC. Employees generate KRs. Build your empire!</div></td>
+      <td><ul><li>Recruiter (Talent Beacon)</li><li>Employee (Work Station)</li></ul></td>
+      <td><span class="muted">No new systems this review</span></td>
+      <td><span class="muted">Standard progression only</span></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>50</td>
+      <td><strong>✖️ Network Hub Unlocked!</strong><div class="desc">Network Hubs boost ALL production by 1.5x each! Stack them for massive output.</div></td>
+      <td><ul><li>Network Hub</li></ul></td>
+      <td><span class="muted">No new systems this review</span></td>
+      <td><span class="muted">Standard progression only</span></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>500</td>
+      <td><strong>💲 Funding Online!</strong><div class="desc">Buildings now require funding! Finances produce $ to keep everything running.</div></td>
+      <td><ul><li>Finances (Treasury Vault)</li></ul></td>
+      <td><ul><li>Funding system enabled ($ upkeep + underfunded penalties).</li></ul></td>
+      <td><span class="muted">Standard progression only</span></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>5K</td>
+      <td><strong>⬆️ Upgrades Unlocked!</strong><div class="desc">You can now click existing buildings to upgrade them to Lv.2 and Lv.3! With great power comes great responsibility.</div></td>
+      <td><span class="muted">No new building unlock</span></td>
+      <td><ul><li>Building upgrades enabled (Lv.2/Lv.3, with merge/destroy collision logic).</li></ul></td>
+      <td><ul><li>Upgrade unlock cinematic auto-plays when this review is reached.</li></ul></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>50K</td>
+      <td><strong>🤖 AI Unlocked!</strong><div class="desc">Robot Workers produce 100 KR/s but need lots of funding.</div></td>
+      <td><ul><li>AI (Robot Worker)</li></ul></td>
+      <td><span class="muted">No new systems this review</span></td>
+      <td><ul><li>AI Rights decision dialog appears and splits the run into two story branches.</li></ul></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>500K</td>
+      <td><strong>🛸 Threats Incoming!</strong><div class="desc">Spaceships and Competitors are targeting you! IT Support available to heal damage.</div></td>
+      <td><span class="muted">No new building unlock</span></td>
+      <td><ul><li>Technical Debt attack ships enabled.</li><li>IT Support purchasing enabled.</li><li>Competitor raid ships enabled (KR poaching runs).</li></ul></td>
+      <td><ul><li>First competitor raid ship triggers the intro raid video clip.</li></ul></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>5M</td>
+      <td><strong>🌟 Random Events Active!</strong><div class="desc">Space events now occur! Some help, some hurt. Prepare for anything.</div></td>
+      <td><span class="muted">No new building unlock</span></td>
+      <td><ul><li>Random space event system enabled.</li></ul></td>
+      <td><ul><li>Random event timer activates (first event in ~10-25s, then every ~15-35s).</li></ul></td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>50M</td>
+      <td><strong>🎨 Themes Unlocked!</strong><div class="desc">You can now change the visual theme! Each theme provides a small production bonus.</div></td>
+      <td><span class="muted">No new building unlock</span></td>
+      <td><ul><li>Theme switching enabled with small production bonuses.</li></ul></td>
+      <td><span class="muted">Standard progression only</span></td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>500M</td>
+      <td><strong>🌌 Deep Space Phase</strong><div class="desc">Your operation enters deep space. New galaxy background unlocked!</div></td>
+      <td><span class="muted">No new building unlock</span></td>
+      <td><span class="muted">No new systems this review</span></td>
+      <td><span class="muted">Standard progression only</span></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>5B</td>
+      <td><strong>🏦 Investment Unlocked!</strong><div class="desc">Investment Funds earn 2% interest on your $ per second. Smart money management!</div></td>
+      <td><ul><li>Investment (Investment Fund)</li></ul></td>
+      <td><span class="muted">No new systems this review</span></td>
+      <td><span class="muted">Standard progression only</span></td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>50B</td>
+      <td><strong>🔥 Hyperdrive Engaged</strong><div class="desc">Production enters overdrive! The galaxy shifts around you.</div></td>
+      <td><span class="muted">No new building unlock</span></td>
+      <td><span class="muted">No new systems this review</span></td>
+      <td><span class="muted">Standard progression only</span></td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>500B</td>
+      <td><strong>💎 Cosmic Mastery</strong><div class="desc">You are becoming one with the cosmos. Ultimate power approaches.</div></td>
+      <td><span class="muted">No new building unlock</span></td>
+      <td><span class="muted">No new systems this review</span></td>
+      <td><span class="muted">Standard progression only</span></td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>5T</td>
+      <td><strong>🏆 KR Singularity</strong><div class="desc">You have achieved digital transcendence. The universe is yours.</div></td>
+      <td><span class="muted">No new building unlock</span></td>
+      <td><span class="muted">No new systems this review</span></td>
+      <td><span class="muted">Standard progression only</span></td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>1Q</td>
+      <td><strong>♾️ INFINITE BEYOND</strong><div class="desc">Beyond all measurement. You ARE the KRs now.</div></td>
+      <td><span class="muted">No new building unlock</span></td>
+      <td><span class="muted">No new systems this review</span></td>
+      <td><ul><li>Unlocking this review triggers the normal-mode victory screen.</li></ul></td>
+    </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="branching">
+      <h2>Milestone 5 Branch: AI Rights Decision</h2>
+      <p>At <strong>50K KR</strong>, gameplay pauses and presents a two-path decision. Both choices are playable, but they diverge heavily in economy and end-state risk.</p>
+      <div class="branch-grid">
+        <article class="branch equal">
+          <h3>Path A - Equal Rights (AI Transition)</h3>
+          <div class="chips">
+            <span class="chip">Employees partly removed</span>
+            <span class="chip">Recruiters removed</span>
+            <span class="chip">GPU era enabled</span>
+          </div>
+          <ul>
+            <li>Immediately removes 2/3 of Employees; remaining Employees convert into AI at their current levels.</li>
+            <li>1/3 of removed Employees become IT Support drones (autonomous repair units).</li>
+            <li>After ~4s, all Recruiters are liquidated into funding ($), and Recruiter building is locked out.</li>
+            <li>After another ~4s, GPU building unlocks and GPU mode is enabled.</li>
+            <li>AI output becomes constrained by TFLOPS capacity; under-provisioned AI produce reduced/zero effective output.</li>
+            <li>Run remains winnable to final objective reviews.</li>
+          </ul>
+        </article>
+
+        <article class="branch humans">
+          <h3>Path B - Humans First (Robot Uprising)</h3>
+          <div class="chips">
+            <span class="chip">Robot war mode</span>
+            <span class="chip">Aggression ramps with KR progress</span>
+            <span class="chip">Loss achievement path</span>
+          </div>
+          <ul>
+            <li>Enables robot war escalation logic tied to progress toward 5M KR (quadratic aggression growth).</li>
+            <li>AI buildings can actively sabotage non-AI buildings if both exist.</li>
+            <li>If only AI buildings remain, leadership KR reserves are siphoned directly.</li>
+            <li>Attack cadence tightens as aggression rises (faster strike interval, higher building damage, higher KR theft pressure).</li>
+            <li>Intended terminal path: empire collapse and game-over screen with AI takeover cinematic.</li>
+            <li>Losing this branch unlocks the <strong>Taken Over</strong> achievement.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="triggers">
+      <h2>What Triggers Which Event Systems?</h2>
+      <div class="event-summary">
+        <article class="event-card">
+          <h4>Upgrade Unlock Cinematic</h4>
+          <p>Triggered once when Objective Review 4 unlocks upgrades. Gameplay auto-pauses during playback and resumes after countdown.</p>
+        </article>
+        <article class="event-card">
+          <h4>Threat Systems (Review 6)</h4>
+          <p>Technical Debt ships and competitor raiders activate after the 500K KR review. Competitors run KR-poaching attack loops on Leadership.</p>
+        </article>
+        <article class="event-card">
+          <h4>Competitor Intro Clip</h4>
+          <p>Auto-plays once when the <em>first</em> competitor ship spawns, then marks intro as completed for that run/save state.</p>
+        </article>
+        <article class="event-card">
+          <h4>Random Event Engine (Review 7)</h4>
+          <p>After 5M KR review, first random event fires in ~10-25s, then repeats every ~15-35s while the run remains active.</p>
+        </article>
+        <article class="event-card">
+          <h4>Phishing Catastrophe</h4>
+          <p>On each random-event roll there is a 5% chance of a phishing instant-loss event (outside the 100-event pool), awarding the <em>Phished!</em> achievement.</p>
+        </article>
+        <article class="event-card">
+          <h4>AI Takeover Loss Clip</h4>
+          <p>Triggered when robot-uprising path reaches zero remaining buildings and game over. This clip does not resume gameplay.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="event-atlas">
+      <h2>Full Random Event Atlas (100 Events)</h2>
+      <p>Pool composition from runtime data: <strong>100 total</strong> = <strong>40 negative</strong>, <strong>40 positive</strong>, <strong>20 neutral</strong>.</p>
+      <div class="filters">
+        <input id="searchInput" type="search" placeholder="Filter by event name or description (e.g., meteor, bonus, funding, AI)..." />
+        <button type="button" data-filter="all">Show all</button>
+        <button type="button" data-filter="negative">Negative</button>
+        <button type="button" data-filter="positive">Positive</button>
+        <button type="button" data-filter="neutral">Neutral</button>
+      </div>
+
+      <div class="event-groups">
+        <article class="event-group neg" data-type="negative">
+          <h3>Negative Events (40)</h3>
+          <ol><li data-name="meteor shower" data-desc="all buildings take 20 damage!"><span class="evt-icon">☄️</span><span class="evt-name">1. Meteor Shower</span><span class="evt-desc">All buildings take 20 damage!</span></li><li data-name="solar flare" data-desc="lose 30% electricity!"><span class="evt-icon">🔥</span><span class="evt-name">2. Solar Flare</span><span class="evt-desc">Lose 30% electricity!</span></li><li data-name="pirate raid" data-desc="lose 15% hc!"><span class="evt-icon">🛸</span><span class="evt-name">3. Pirate Raid</span><span class="evt-desc">Lose 15% HC!</span></li><li data-name="cosmic tax" data-desc="lose 10% krs!"><span class="evt-icon">💀</span><span class="evt-name">4. Cosmic Tax</span><span class="evt-desc">Lose 10% KRs!</span></li><li data-name="black hole proximity" data-desc="production halved for 10s!"><span class="evt-icon">🌑</span><span class="evt-name">5. Black Hole Proximity</span><span class="evt-desc">Production halved for 10s!</span></li><li data-name="emp pulse" data-desc="finances take 30 damage!"><span class="evt-icon">⚡</span><span class="evt-name">6. EMP Pulse</span><span class="evt-desc">Finances take 30 damage!</span></li><li data-name="space debris" data-desc="a random building destroyed!"><span class="evt-icon">💥</span><span class="evt-name">7. Space Debris</span><span class="evt-desc">A random building destroyed!</span></li><li data-name="gravity well" data-desc="lose 5% of all currencies!"><span class="evt-icon">🌀</span><span class="evt-name">8. Gravity Well</span><span class="evt-desc">Lose 5% of all currencies!</span></li><li data-name="radiation leak" data-desc="processors take 25 damage!"><span class="evt-icon">☢️</span><span class="evt-name">9. Radiation Leak</span><span class="evt-desc">Processors take 25 damage!</span></li><li data-name="ion storm" data-desc="all buildings take 10 damage!"><span class="evt-icon">🌪️</span><span class="evt-name">10. Ion Storm</span><span class="evt-desc">All buildings take 10 damage!</span></li><li data-name="data corruption" data-desc="lose 5% total krs!"><span class="evt-icon">⚠️</span><span class="evt-name">11. Data Corruption</span><span class="evt-desc">Lose 5% total KRs!</span></li><li data-name="fuel shortage" data-desc="funding drops to 0!"><span class="evt-icon">🔋</span><span class="evt-name">12. Fuel Shortage</span><span class="evt-desc">funding drops to 0!</span></li><li data-name="asteroid impact" data-desc="random building takes 50 damage!"><span class="evt-icon">☄️</span><span class="evt-name">13. Asteroid Impact</span><span class="evt-desc">Random building takes 50 damage!</span></li><li data-name="trade embargo" data-desc="lose 20% hc!"><span class="evt-icon">🚫</span><span class="evt-name">14. Trade Embargo</span><span class="evt-desc">Lose 20% HC!</span></li><li data-name="quantum destabilization" data-desc="multipliers take 40 damage!"><span class="evt-icon">🔮</span><span class="evt-name">15. Quantum Destabilization</span><span class="evt-desc">Multipliers take 40 damage!</span></li><li data-name="nebula fog" data-desc="production at 70% for 8s!"><span class="evt-icon">🌫️</span><span class="evt-name">16. Nebula Fog</span><span class="evt-desc">Production at 70% for 8s!</span></li><li data-name="supply line cut" data-desc="collectors take 20 damage!"><span class="evt-icon">✂️</span><span class="evt-name">17. Supply Line Cut</span><span class="evt-desc">Collectors take 20 damage!</span></li><li data-name="warp drive failure" data-desc="lose 3% krs!"><span class="evt-icon">🌀</span><span class="evt-name">18. Warp Drive Failure</span><span class="evt-desc">Lose 3% KRs!</span></li><li data-name="plasma leak" data-desc="synthesizers take 35 damage!"><span class="evt-icon">🧪</span><span class="evt-name">19. Plasma Leak</span><span class="evt-desc">Synthesizers take 35 damage!</span></li><li data-name="comet strike" data-desc="2 buildings take 30 damage each!"><span class="evt-icon">☄️</span><span class="evt-name">20. Comet Strike</span><span class="evt-desc">2 buildings take 30 damage each!</span></li><li data-name="gamma burst" data-desc="all buildings take 15 damage!"><span class="evt-icon">💥</span><span class="evt-name">21. Gamma Burst</span><span class="evt-desc">All buildings take 15 damage!</span></li><li data-name="void rupture" data-desc="lose 25% electricity!"><span class="evt-icon">🌑</span><span class="evt-name">22. Void Rupture</span><span class="evt-desc">Lose 25% electricity!</span></li><li data-name="wormhole collapse" data-desc="random building takes 45 damage!"><span class="evt-icon">🌀</span><span class="evt-name">23. Wormhole Collapse</span><span class="evt-desc">Random building takes 45 damage!</span></li><li data-name="dark matter surge" data-desc="production at 60% for 6s!"><span class="evt-icon">🌌</span><span class="evt-name">24. Dark Matter Surge</span><span class="evt-desc">Production at 60% for 6s!</span></li><li data-name="neutron blast" data-desc="finances take 20 damage!"><span class="evt-icon">⚡</span><span class="evt-name">25. Neutron Blast</span><span class="evt-desc">Finances take 20 damage!</span></li><li data-name="singularity pulse" data-desc="lose 8% ac and 8% el!"><span class="evt-icon">💀</span><span class="evt-name">26. Singularity Pulse</span><span class="evt-desc">Lose 8% AC and 8% el!</span></li><li data-name="magnetar flare" data-desc="banks take 30 damage!"><span class="evt-icon">🔥</span><span class="evt-name">27. Magnetar Flare</span><span class="evt-desc">Banks take 30 damage!</span></li><li data-name="quasar beam" data-desc="lose 12% hc!"><span class="evt-icon">💫</span><span class="evt-name">28. Quasar Beam</span><span class="evt-desc">Lose 12% HC!</span></li><li data-name="solar wind" data-desc="collectors take 15 damage!"><span class="evt-icon">🌪️</span><span class="evt-name">29. Solar Wind</span><span class="evt-desc">Collectors take 15 damage!</span></li><li data-name="cosmic ray burst" data-desc="all buildings take 12 damage!"><span class="evt-icon">⚡</span><span class="evt-name">30. Cosmic Ray Burst</span><span class="evt-desc">All buildings take 12 damage!</span></li><li data-name="space quake" data-desc="3 random buildings take 20 damage!"><span class="evt-icon">🌋</span><span class="evt-name">31. Space Quake</span><span class="evt-desc">3 random buildings take 20 damage!</span></li><li data-name="dimensional rift" data-desc="lose 6% of all currencies!"><span class="evt-icon">🔮</span><span class="evt-name">32. Dimensional Rift</span><span class="evt-desc">Lose 6% of all currencies!</span></li><li data-name="anti-matter leak" data-desc="processors take 30 damage!"><span class="evt-icon">☢️</span><span class="evt-name">33. Anti-matter Leak</span><span class="evt-desc">Processors take 30 damage!</span></li><li data-name="tidal forces" data-desc="production halved for 5s!"><span class="evt-icon">🌊</span><span class="evt-name">34. Tidal Forces</span><span class="evt-desc">Production halved for 5s!</span></li><li data-name="micrometeorites" data-desc="all buildings take 8 damage!"><span class="evt-icon">✨</span><span class="evt-name">35. Micrometeorites</span><span class="evt-desc">All buildings take 8 damage!</span></li><li data-name="dust storm" data-desc="lose 15% electricity!"><span class="evt-icon">🌫️</span><span class="evt-name">36. Dust Storm</span><span class="evt-desc">Lose 15% electricity!</span></li><li data-name="static discharge" data-desc="finances take 25 damage!"><span class="evt-icon">⚡</span><span class="evt-name">37. Static Discharge</span><span class="evt-desc">Finances take 25 damage!</span></li><li data-name="power surge" data-desc="lose 40% electricity!"><span class="evt-icon">💥</span><span class="evt-name">38. Power Surge</span><span class="evt-desc">Lose 40% electricity!</span></li><li data-name="system glitch" data-desc="lose 4% krs!"><span class="evt-icon">⚠️</span><span class="evt-name">39. System Glitch</span><span class="evt-desc">Lose 4% KRs!</span></li><li data-name="overload" data-desc="multipliers take 25 damage!"><span class="evt-icon">🔥</span><span class="evt-name">40. Overload</span><span class="evt-desc">Multipliers take 25 damage!</span></li></ol>
+        </article>
+
+        <article class="event-group pos" data-type="positive">
+          <h3>Positive Events (40)</h3>
+          <ol><li data-name="stellar bonus" data-desc="gain 20% extra hc!"><span class="evt-icon">⭐</span><span class="evt-name">1. Stellar Bonus</span><span class="evt-desc">Gain 20% extra HC!</span></li><li data-name="okr rain" data-desc="gain 5% bonus krs!"><span class="evt-icon">🌟</span><span class="evt-name">2. OKR Rain</span><span class="evt-desc">Gain 5% bonus KRs!</span></li><li data-name="energy surge" data-desc="$ doubled!"><span class="evt-icon">⚡</span><span class="evt-name">3. Energy Surge</span><span class="evt-desc">$ doubled!</span></li><li data-name="repair nanobots" data-desc="heal all buildings 30 hp!"><span class="evt-icon">🔧</span><span class="evt-name">4. Repair Nanobots</span><span class="evt-desc">Heal all buildings 30 HP!</span></li><li data-name="production boost" data-desc="2x production for 10s!"><span class="evt-icon">🚀</span><span class="evt-name">5. Production Boost</span><span class="evt-desc">2x production for 10s!</span></li><li data-name="lucky find" data-desc="gain 50 hc!"><span class="evt-icon">💰</span><span class="evt-name">6. Lucky Find</span><span class="evt-desc">Gain 50 HC!</span></li><li data-name="hyperdrive" data-desc="3x production for 5s!"><span class="evt-icon">🚀</span><span class="evt-name">7. Hyperdrive</span><span class="evt-desc">3x production for 5s!</span></li><li data-name="shield recharge" data-desc="full heal all buildings!"><span class="evt-icon">🛡️</span><span class="evt-name">8. Shield Recharge</span><span class="evt-desc">Full heal all buildings!</span></li><li data-name="trade deal" data-desc="gain 30% hc!"><span class="evt-icon">💎</span><span class="evt-name">9. Trade Deal</span><span class="evt-desc">Gain 30% HC!</span></li><li data-name="star power" data-desc="gain 100 electricity!"><span class="evt-icon">⭐</span><span class="evt-name">10. Star Power</span><span class="evt-desc">Gain 100 electricity!</span></li><li data-name="cosmic windfall" data-desc="gain 40% hc!"><span class="evt-icon">💰</span><span class="evt-name">11. Cosmic Windfall</span><span class="evt-desc">Gain 40% HC!</span></li><li data-name="resource cache" data-desc="gain 75 hc!"><span class="evt-icon">📦</span><span class="evt-name">12. Resource Cache</span><span class="evt-desc">Gain 75 HC!</span></li><li data-name="alien trade" data-desc="gain 3% bonus krs!"><span class="evt-icon">👽</span><span class="evt-name">13. Alien Trade</span><span class="evt-desc">Gain 3% bonus KRs!</span></li><li data-name="nova harvest" data-desc="gain 150 electricity!"><span class="evt-icon">🌟</span><span class="evt-name">14. Nova Harvest</span><span class="evt-desc">Gain 150 electricity!</span></li><li data-name="crystal discovery" data-desc="gain 100 hc!"><span class="evt-icon">💎</span><span class="evt-name">15. Crystal Discovery</span><span class="evt-desc">Gain 100 HC!</span></li><li data-name="deep space signal" data-desc="2x production for 8s!"><span class="evt-icon">📡</span><span class="evt-name">16. Deep Space Signal</span><span class="evt-desc">2x production for 8s!</span></li><li data-name="friendly fleet" data-desc="heal all buildings 50 hp!"><span class="evt-icon">🛸</span><span class="evt-name">17. Friendly Fleet</span><span class="evt-desc">Heal all buildings 50 HP!</span></li><li data-name="tech upgrade" data-desc="1.5x production for 15s!"><span class="evt-icon">🔧</span><span class="evt-name">18. Tech Upgrade</span><span class="evt-desc">1.5x production for 15s!</span></li><li data-name="supply drop" data-desc="gain 60 hc and 60 el!"><span class="evt-icon">📦</span><span class="evt-name">19. Supply Drop</span><span class="evt-desc">Gain 60 HC and 60 el!</span></li><li data-name="quantum luck" data-desc="gain 7% bonus krs!"><span class="evt-icon">🍀</span><span class="evt-name">20. Quantum Luck</span><span class="evt-desc">Gain 7% bonus KRs!</span></li><li data-name="galactic aid" data-desc="full heal and gain 30 hc!"><span class="evt-icon">🌌</span><span class="evt-name">21. Galactic Aid</span><span class="evt-desc">Full heal and gain 30 HC!</span></li><li data-name="nebula mining" data-desc="gain 80 hc!"><span class="evt-icon">⛏️</span><span class="evt-name">22. Nebula Mining</span><span class="evt-desc">Gain 80 HC!</span></li><li data-name="treasure probe" data-desc="gain 25% hc!"><span class="evt-icon">🔭</span><span class="evt-name">23. Treasure Probe</span><span class="evt-desc">Gain 25% HC!</span></li><li data-name="solar harvest" data-desc="gain 200 electricity!"><span class="evt-icon">☀️</span><span class="evt-name">24. Solar Harvest</span><span class="evt-desc">Gain 200 electricity!</span></li><li data-name="warp bonus" data-desc="4x production for 3s!"><span class="evt-icon">🌀</span><span class="evt-name">25. Warp Bonus</span><span class="evt-desc">4x production for 3s!</span></li><li data-name="stardust rain" data-desc="gain 4% bonus krs!"><span class="evt-icon">✨</span><span class="evt-name">26. Stardust Rain</span><span class="evt-desc">Gain 4% bonus KRs!</span></li><li data-name="photon boost" data-desc="2.5x production for 6s!"><span class="evt-icon">💫</span><span class="evt-name">27. Photon Boost</span><span class="evt-desc">2.5x production for 6s!</span></li><li data-name="dark energy tap" data-desc="gain 120 $!"><span class="evt-icon">🌌</span><span class="evt-name">28. Dark Energy Tap</span><span class="evt-desc">Gain 120 $!</span></li><li data-name="gravity assist" data-desc="gain 15% hc!"><span class="evt-icon">🪐</span><span class="evt-name">29. Gravity Assist</span><span class="evt-desc">Gain 15% HC!</span></li><li data-name="time dilation" data-desc="1.8x production for 12s!"><span class="evt-icon">⏳</span><span class="evt-name">30. Time Dilation</span><span class="evt-desc">1.8x production for 12s!</span></li><li data-name="matter conversion" data-desc="gain 90 hc!"><span class="evt-icon">🔬</span><span class="evt-name">31. Matter Conversion</span><span class="evt-desc">Gain 90 HC!</span></li><li data-name="flux capacitor" data-desc="gain 6% bonus krs!"><span class="evt-icon">⚡</span><span class="evt-name">32. Flux Capacitor</span><span class="evt-desc">Gain 6% bonus KRs!</span></li><li data-name="antimatter gift" data-desc="gain 50 hc and 100 el!"><span class="evt-icon">🎁</span><span class="evt-name">33. Antimatter Gift</span><span class="evt-desc">Gain 50 HC and 100 el!</span></li><li data-name="dimensional pocket" data-desc="heal all buildings 40 hp!"><span class="evt-icon">🔮</span><span class="evt-name">34. Dimensional Pocket</span><span class="evt-desc">Heal all buildings 40 HP!</span></li><li data-name="asteroid mining" data-desc="gain 35% hc!"><span class="evt-icon">⛏️</span><span class="evt-name">35. Asteroid Mining</span><span class="evt-desc">Gain 35% HC!</span></li><li data-name="comet tail sweep" data-desc="gain 2% bonus krs!"><span class="evt-icon">☄️</span><span class="evt-name">36. Comet Tail Sweep</span><span class="evt-desc">Gain 2% bonus KRs!</span></li><li data-name="pulsar alignment" data-desc="gain 180 electricity!"><span class="evt-icon">📡</span><span class="evt-name">37. Pulsar Alignment</span><span class="evt-desc">Gain 180 electricity!</span></li><li data-name="cosmic harmony" data-desc="full heal and 1.5x for 10s!"><span class="evt-icon">🌈</span><span class="evt-name">38. Cosmic Harmony</span><span class="evt-desc">Full heal and 1.5x for 10s!</span></li><li data-name="universe expansion" data-desc="gain 10% bonus krs!"><span class="evt-icon">🌌</span><span class="evt-name">39. Universe Expansion</span><span class="evt-desc">Gain 10% bonus KRs!</span></li><li data-name="infinity spark" data-desc="gain 200 hc!"><span class="evt-icon">✨</span><span class="evt-name">40. Infinity Spark</span><span class="evt-desc">Gain 200 HC!</span></li></ol>
+        </article>
+
+        <article class="event-group neu" data-type="neutral">
+          <h3>Neutral Events (20)</h3>
+          <ol><li data-name="space whale sighting" data-desc="a majestic space whale passes by!"><span class="evt-icon">🐋</span><span class="evt-name">1. Space Whale Sighting</span><span class="evt-desc">A majestic space whale passes by!</span></li><li data-name="alien broadcast" data-desc="strange signals detected..."><span class="evt-icon">📡</span><span class="evt-name">2. Alien Broadcast</span><span class="evt-desc">Strange signals detected...</span></li><li data-name="wormhole opens" data-desc="reality shifts momentarily!"><span class="evt-icon">🌀</span><span class="evt-name">3. Wormhole Opens</span><span class="evt-desc">Reality shifts momentarily!</span></li><li data-name="time paradox" data-desc="time flows strangely..."><span class="evt-icon">⏳</span><span class="evt-name">4. Time Paradox</span><span class="evt-desc">Time flows strangely...</span></li><li data-name="dimensional echo" data-desc="an echo ripples through space!"><span class="evt-icon">🔮</span><span class="evt-name">5. Dimensional Echo</span><span class="evt-desc">An echo ripples through space!</span></li><li data-name="cosmic background shift" data-desc="the universe hums differently..."><span class="evt-icon">🌌</span><span class="evt-name">6. Cosmic Background Shift</span><span class="evt-desc">The universe hums differently...</span></li><li data-name="star map update" data-desc="new coordinates received!"><span class="evt-icon">🗺️</span><span class="evt-name">7. Star Map Update</span><span class="evt-desc">New coordinates received!</span></li><li data-name="galactic census" data-desc="your colony is counted!"><span class="evt-icon">📋</span><span class="evt-name">8. Galactic Census</span><span class="evt-desc">Your colony is counted!</span></li><li data-name="nebula drift" data-desc="colorful gases drift past!"><span class="evt-icon">🌫️</span><span class="evt-name">9. Nebula Drift</span><span class="evt-desc">Colorful gases drift past!</span></li><li data-name="solar eclipse" data-desc="a brief shadow falls..."><span class="evt-icon">🌑</span><span class="evt-name">10. Solar Eclipse</span><span class="evt-desc">A brief shadow falls...</span></li><li data-name="planetary alignment" data-desc="the planets align!"><span class="evt-icon">🪐</span><span class="evt-name">11. Planetary Alignment</span><span class="evt-desc">The planets align!</span></li><li data-name="cosmic dust" data-desc="fine particles coat everything!"><span class="evt-icon">✨</span><span class="evt-name">12. Cosmic Dust</span><span class="evt-desc">Fine particles coat everything!</span></li><li data-name="aurora borealis" data-desc="beautiful lights dance across space!"><span class="evt-icon">🌈</span><span class="evt-name">13. Aurora Borealis</span><span class="evt-desc">Beautiful lights dance across space!</span></li><li data-name="gravity fluctuation" data-desc="gravity pulses oddly..."><span class="evt-icon">🌊</span><span class="evt-name">14. Gravity Fluctuation</span><span class="evt-desc">Gravity pulses oddly...</span></li><li data-name="magnetic reversal" data-desc="polarity flips briefly!"><span class="evt-icon">🧲</span><span class="evt-name">15. Magnetic Reversal</span><span class="evt-desc">Polarity flips briefly!</span></li><li data-name="space weather change" data-desc="cosmic winds shift direction!"><span class="evt-icon">🌪️</span><span class="evt-name">16. Space Weather Change</span><span class="evt-desc">Cosmic winds shift direction!</span></li><li data-name="stellar wind shift" data-desc="solar winds change course!"><span class="evt-icon">💨</span><span class="evt-name">17. Stellar Wind Shift</span><span class="evt-desc">Solar winds change course!</span></li><li data-name="photon cascade" data-desc="light scatters beautifully!"><span class="evt-icon">💫</span><span class="evt-name">18. Photon Cascade</span><span class="evt-desc">Light scatters beautifully!</span></li><li data-name="quantum observer" data-desc="something watches from beyond..."><span class="evt-icon">👁️</span><span class="evt-name">19. Quantum Observer</span><span class="evt-desc">Something watches from beyond...</span></li><li data-name="universal hum" data-desc="the cosmos vibrates softly..."><span class="evt-icon">🔔</span><span class="evt-name">20. Universal Hum</span><span class="evt-desc">The cosmos vibrates softly...</span></li></ol>
+        </article>
+      </div>
+
+      <p class="tiny">Note: Event effects are implemented in <code>SPACE_EVENTS</code> and can include resource deltas, temporary buffs/debuffs, or direct building damage/destruction logic.</p>
+    </section>
+  </div>
+
+  <script>
+    (function() {
+      var searchInput = document.getElementById('searchInput');
+      var filterButtons = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
+      var groups = Array.prototype.slice.call(document.querySelectorAll('.event-group'));
+      var activeType = 'all';
+
+      function applyFilters() {
+        var query = (searchInput.value || '').toLowerCase().trim();
+
+        groups.forEach(function(group) {
+          var typeOk = activeType === 'all' || group.getAttribute('data-type') === activeType;
+          group.style.display = typeOk ? '' : 'none';
+          if (!typeOk) return;
+
+          var items = Array.prototype.slice.call(group.querySelectorAll('li'));
+          var visibleInGroup = 0;
+          items.forEach(function(item) {
+            var hay = (item.getAttribute('data-name') || '') + ' ' + (item.getAttribute('data-desc') || '');
+            var match = !query || hay.indexOf(query) >= 0;
+            item.style.display = match ? '' : 'none';
+            if (match) visibleInGroup++;
+          });
+
+          var title = group.querySelector('h3');
+          if (title) {
+            var base = title.textContent.replace(/\s*\([0-9]+ visible\)$/, '');
+            title.textContent = base + ' (' + visibleInGroup + ' visible)';
+          }
+        });
+      }
+
+      filterButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          activeType = btn.getAttribute('data-filter') || 'all';
+          applyFilters();
+        });
+      });
+
+      searchInput.addEventListener('input', applyFilters);
+      applyFilters();
+    })();
+  </script>
+</body>
+</html>

@@ -6,6 +6,11 @@ A space-themed engine building game with a narrative twist. Hire talent, manage 
 
 Play now: [game.thisai.fun](https://game.thisai.fun)
 
+## Story Paths & Event Atlas
+
+- Open the full standalone guide: [Story Branches & Event Atlas](./story-branches-events.html)
+- Includes objective-review unlocks, milestone-5 branch outcomes, trigger conditions, and the complete random-event catalog.
+
 ## Development & Testing
 
 - Install tooling: `npm install`
