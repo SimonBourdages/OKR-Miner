@@ -44,6 +44,7 @@
    - Added a menu debug flow that lets you choose a starting level before launching.
    - Debug starts now generate an optimized pre-placed building layout for the selected level.
    - Debug runs begin with +999,999 HC and +999,999 $ to accelerate scenario testing.
+   - Added an extra +1,000,000 $ on top of debug starting funds and a +1,000,000 debug-only funding cap boost.
 
 8. **Robot uprising AI betrayal behavior**
    - During Humans First robot uprising, existing AI buildings now visibly attack non-AI buildings instead of only abstract random hits.

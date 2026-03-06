@@ -899,7 +899,7 @@
     <div id="debugStartModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:320;overflow-y:auto;padding:20px;">
         <div style="max-width:560px;margin:40px auto;text-align:center;background:rgba(0,20,10,0.95);border:1px solid #00ff88;border-radius:10px;padding:20px;">
             <h2 style="color:#00ff88;font-size:24px;margin-bottom:10px;">🧪 Debug Start</h2>
-            <p style="color:#8cf;font-size:13px;line-height:1.5;margin-bottom:14px;">Choose a level to boot into. Debug starts include optimized pre-placed buildings and +999,999 bonus resources (KR bonus is capped to stay inside the selected level).</p>
+            <p style="color:#8cf;font-size:13px;line-height:1.5;margin-bottom:14px;">Choose a level to boot into. Debug starts include optimized pre-placed buildings, +999,999 HC, +1,999,999 $, and a +1,000,000 $ cap boost (KR bonus is capped to stay inside the selected level).</p>
             <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
                 <label for="debugStartLevelSelect" style="color:#00ff88;font-size:13px;">Start level:</label>
                 <select id="debugStartLevelSelect" onchange="game.updateDebugStartSummary()" style="background:#111;color:#00ff88;border:1px solid #00ff88;border-radius:6px;padding:7px 10px;font-family:inherit;font-size:13px;min-width:300px;"></select>
@@ -1118,6 +1118,7 @@
             { okr: 1e15,    unlock: [], title: '♾️ INFINITE BEYOND', desc: 'Beyond all measurement. You ARE the KRs now.' }
         ];
         var DEBUG_RESOURCE_BONUS = 999999;
+        var DEBUG_FUNDING_BONUS = 1000000;
         var DEBUG_BUILDING_ORDER = ['processor', 'collector', 'multiplier', 'synthesizer', 'generator', 'bank', 'gpu', 'repairbot'];
 
         function getPlayableRadius(state) {
@@ -2133,15 +2134,16 @@
 
             var summary = this.formatDebugPlanSummary(buildingPlan, 5);
             this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2 - 120, 'Debug Level ' + targetLevel + ' Ready', '#0ff', 18);
-            this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2 - 92, '+KR ' + this.formatNumber(this.state.debugOkrBonusApplied || 0) + ' | +HC/$ ' + this.formatNumber(DEBUG_RESOURCE_BONUS), '#ff0', 13);
+            this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2 - 92, '+KR ' + this.formatNumber(this.state.debugOkrBonusApplied || 0) + ' | +HC ' + this.formatNumber(DEBUG_RESOURCE_BONUS) + ' | +$ ' + this.formatNumber(this.state.debugStartingElBonus || DEBUG_RESOURCE_BONUS), '#ff0', 13);
             this.logMessage('🧪', 'Debug mode started (Level ' + targetLevel + ')', summary, 'info');
             this.saveGame(true);
         };
 
         OKRFarmingGame.prototype.buildDebugStateForLevel = function(level) {
             var targetLevel = Math.max(1, Math.min(MILESTONES.length, parseInt(level, 10) || 1));
+            var debugStartingElBonus = DEBUG_RESOURCE_BONUS + DEBUG_FUNDING_BONUS;
             var state = {
-                currencies: { ac: 50 + DEBUG_RESOURCE_BONUS, el: DEBUG_RESOURCE_BONUS },
+                currencies: { ac: 50 + DEBUG_RESOURCE_BONUS, el: debugStartingElBonus },
                 totalOKRs: 0,
                 unlockedMilestones: [0],
                 unlockedBuildings: ['collector', 'processor'],
@@ -2155,7 +2157,10 @@
                 eventsEnabled: false,
                 upgradesEnabled: false,
                 themesEnabled: false,
-                activeTheme: 'emerald'
+                activeTheme: 'emerald',
+                debugMode: true,
+                debugFundingCapBonus: DEBUG_FUNDING_BONUS,
+                debugStartingElBonus: debugStartingElBonus
             };
 
             for (var i = 1; i < targetLevel; i++) {
@@ -2371,7 +2376,7 @@
                 '<div style="color:#8cf;">Projected KR/s: ' + evaluation.okrGain.toFixed(1) +
                 ' · HC/s: ' + evaluation.acGain.toFixed(1) +
                 ' · $/s: ' + evaluation.currentElRate.toFixed(1) + '</div>' +
-                '<div style="color:#aaa;margin-top:6px;">Start bonus: +' + this.formatNumber(debugState.debugOkrBonusApplied || 0) + ' KR, +' + this.formatNumber(DEBUG_RESOURCE_BONUS) + ' HC, +' + this.formatNumber(DEBUG_RESOURCE_BONUS) + ' $.</div>';
+                '<div style="color:#aaa;margin-top:6px;">Start bonus: +' + this.formatNumber(debugState.debugOkrBonusApplied || 0) + ' KR, +' + this.formatNumber(DEBUG_RESOURCE_BONUS) + ' HC, +' + this.formatNumber(debugState.debugStartingElBonus || DEBUG_RESOURCE_BONUS) + ' $. Cap boost: +' + this.formatNumber(debugState.debugFundingCapBonus || 0) + ' $.</div>';
         };
 
         OKRFarmingGame.prototype.newGame = function() {
@@ -3038,14 +3043,18 @@
             this.state.currencies.el += bankInterest;
 
             // Funding ($) balance
+            var effectiveFundingCap = snapshot.fundingCap;
+            if (effectiveFundingCap !== null && this.state.debugMode && this.state.debugFundingCapBonus) {
+                effectiveFundingCap += this.state.debugFundingCapBonus;
+            }
             if (this.state.electricityEnabled) {
                 this.state.currencies.el += (elGain - elDrain) * dt;
                 if (this.state.currencies.el < 0) this.state.currencies.el = 0;
-                if (snapshot.fundingCap !== null && this.state.currencies.el > snapshot.fundingCap) {
-                    this.state.currencies.el = snapshot.fundingCap;
+                if (effectiveFundingCap !== null && this.state.currencies.el > effectiveFundingCap) {
+                    this.state.currencies.el = effectiveFundingCap;
                 }
             }
-            this._fundingCap = snapshot.fundingCap;
+            this._fundingCap = effectiveFundingCap;
 
             // Apply event buffs/debuffs
             if (this._eventBuff) {
