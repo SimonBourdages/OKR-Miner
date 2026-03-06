@@ -131,36 +131,77 @@
         @media (max-width: 768px) {
             #buildings {
                 position: fixed !important;
-                right: 0 !important;
                 left: 0 !important;
-                bottom: 45px !important;
-                top: auto !important;
-                transform: none !important;
-                flex-direction: row !important;
-                overflow-x: auto !important;
-                padding: 6px !important;
-                gap: 6px !important;
+                right: auto !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                flex-direction: column !important;
+                overflow-y: auto !important;
+                max-height: 70vh !important;
+                padding: 4px !important;
+                gap: 4px !important;
                 background: rgba(0, 20, 10, 0.95) !important;
-                border-top: 1px solid #00ff88 !important;
+                border-right: 1px solid #00ff88 !important;
+                border-top: none !important;
+                width: 100px !important;
+                z-index: 15 !important;
             }
 
             #buildings .building-btn {
-                min-width: 120px !important;
-                flex-shrink: 0 !important;
+                min-width: 0 !important;
+                width: 100% !important;
+                font-size: 9px !important;
+                padding: 4px 6px !important;
+            }
+
+            #buildings .building-btn .b-name {
                 font-size: 10px !important;
-                padding: 6px 8px !important;
+            }
+
+            #buildings .building-btn .b-cost {
+                font-size: 9px !important;
+            }
+
+            #buildings .building-btn .b-effect {
+                font-size: 8px !important;
+                display: none !important;
+            }
+
+            #buildings .building-btn .b-preview {
+                display: none !important;
+            }
+
+            #buildings .building-btn .b-metrics {
+                display: none !important;
             }
 
             #ui {
-                font-size: 11px !important;
-                padding: 8px 10px !important;
+                font-size: 10px !important;
+                padding: 6px 8px !important;
                 min-width: auto !important;
+                max-width: 160px !important;
+                left: 105px !important;
+            }
+
+            #controls {
+                font-size: 10px !important;
+                padding: 4px 8px !important;
+            }
+
+            #controls button {
+                font-size: 9px !important;
+                padding: 3px 6px !important;
             }
 
             #repairBotPanel {
-                bottom: auto !important;
-                top: 10px !important;
-                right: 10px !important;
+                bottom: 50px !important;
+                right: 5px !important;
+            }
+
+            #repairBotPanel button {
+                min-width: 90px !important;
+                font-size: 10px !important;
+                padding: 6px !important;
             }
         }
 
@@ -2035,14 +2076,18 @@
             }
 
             // Don't place too close to edges (40px margin, 50px bottom for toolbar)
-            if (x < 40 || x > this.canvas.width - 40 || y < 40 || y > this.canvas.height - 50) {
+            if (x < 20 || x > this.canvas.width - 20 || y < 20 || y > this.canvas.height - 50) {
                 this.addFloatingText(x, y - 20, 'Too close to edge!', '#f84');
                 return;
             }
 
-            // Don't place in the building panel area (right 180px on desktop)
+            // Don't place in the building panel area
             if (window.innerWidth > 768 && x > this.canvas.width - 180) {
                 this.addFloatingText(x, y - 20, 'Building panel area!', '#f84');
+                return;
+            }
+            if (window.innerWidth <= 768 && x < 110) {
+                this.addFloatingText(x, y - 20, 'Building panel!', '#f84');
                 return;
             }
 
@@ -3452,8 +3497,8 @@
 
             var distToFactory = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var tooCloseToFactory = distToFactory < 60;
-            var tooCloseToEdge = mx < 40 || mx > this.canvas.width - 40 || my < 40 || my > this.canvas.height - 40;
-            var inBuildingPanel = window.innerWidth > 768 && mx > this.canvas.width - 180;
+            var tooCloseToEdge = mx < 20 || mx > this.canvas.width - 20 || my < 20 || my > this.canvas.height - 50;
+            var inBuildingPanel = (window.innerWidth > 768 && mx > this.canvas.width - 180) || (window.innerWidth <= 768 && mx < 110);
             var canAfford = this.state.currencies.ac >= b.cost;
 
             var blocked = tooCloseToFactory || tooCloseToEdge || inBuildingPanel;
