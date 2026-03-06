@@ -50,6 +50,14 @@ Generates HeadCount to hire more staff.
 | Lv.3 | +9 HC/s | 4.5 $/s | 300 HC |
 | Lv.4 LEGENDARY | +27 HC/s | 13.5 $/s | Merge only |
 
+**Appearance:**
+| Level | Look |
+|---|---|
+| Lv.1 | 🟢 Small green signal tower with blinking antenna and pulsing signal ring |
+| Lv.2 | 🟢 Taller tower with radar dish, two expanding signal rings |
+| Lv.3 | 🟢 Large broadcast array with golden signal waves, orbiting data dots, glow aura |
+| Lv.4 | 🟢 Legendary version with intense golden broadcast field |
+
 *Liquidated after the AI Rights story event if Equal Rights is chosen.*
 
 ### Employee (Work Station)
@@ -61,6 +69,14 @@ Generates Key Results directly.
 | Lv.2 | +10 KR/s | 6 $/s | 375 HC |
 | Lv.3 | +22.5 KR/s | 13.5 $/s | 900 HC |
 | Lv.4 LEGENDARY | +67.5 KR/s | 40.5 $/s | Merge only |
+
+**Appearance:**
+| Level | Look |
+|---|---|
+| Lv.1 | 🔵 Small desk with a single monitor and blinking cursor |
+| Lv.2 | 🔵 Dual monitors, office chair, and a steaming coffee cup |
+| Lv.3 | 🔵 Triple-monitor command center with holographic floating displays |
+| Lv.4 | 🔵 Legendary workstation with intense holographic aura |
 
 *After milestone 5: 2/3 destroyed, 1/3 converted to IT Support, remaining converted to AI if you choose Equal Rights.*
 
@@ -74,6 +90,14 @@ Multiplies ALL production rates. Stacks multiplicatively.
 | Lv.3 | x5.06 | 22.5 $/s | 3,000 HC |
 | Lv.4 LEGENDARY | x114.3 | 67.5 $/s | Merge only |
 
+**Appearance:**
+| Level | Look |
+|---|---|
+| Lv.1 | 🟣 Central purple circle with 4 radiating connection lines to glowing dots |
+| Lv.2 | 🟣 Larger hub with 6 connections, pulsing data-flow particles along lines |
+| Lv.3 | 🟣 8-connection web with orbiting data packets, golden glow aura |
+| Lv.4 | 🟣 Legendary hub with massive connection web and energy field |
+
 *Two Lv.1 Network Hubs = x2.25 total (1.5 × 1.5).*
 
 ### AI (Robot Worker)
@@ -86,9 +110,17 @@ Massive KR output. Requires GPU capacity after the story branch.
 | Lv.3 | +450 KR/s | 45 $/s | 12,000 HC |
 | Lv.4 LEGENDARY | +1,350 KR/s | 135 $/s | Merge only |
 
+**Appearance:**
+| Level | Look |
+|---|---|
+| Lv.1 | 🔴 Small red robot body with blinking eye and stubby arms |
+| Lv.2 | 🔴 Larger robot with visor, articulated arms, chest display panel |
+| Lv.3 | 🔴 Advanced mech with glowing red eyes, tool arms, pulsing energy core |
+| Lv.4 | 🔴 Legendary mech with orbiting energy motes and intense core glow |
+
 *After choosing Equal Rights: each AI needs GPU capacity to function. Excess AIs without GPU slots produce nothing.*
 
-### Finances (Funding Satellite)
+### Finances (Treasury Vault)
 Generates Funding ($) to keep everything running. Does not consume $ itself.
 
 | Level | Output | Upgrade Cost |
@@ -97,6 +129,14 @@ Generates Funding ($) to keep everything running. Does not consume $ itself.
 | Lv.2 | +10 $/s | 188 HC |
 | Lv.3 | +22.5 $/s | 450 HC |
 | Lv.4 LEGENDARY | +67.5 $/s | Merge only |
+
+**Appearance:**
+| Level | Look |
+|---|---|
+| Lv.1 | 🟤 Small brown vault/safe with silver door, rotating handle, corner rivets |
+| Lv.2 | 🟤 Treasury building with stone pillars, arched door, stacked gold coins on sides |
+| Lv.3 | 🟤 Grand treasury HQ with 4 pillars, triangular pediment, vault door center, orbiting gold coins, floating $$$ |
+| Lv.4 | 🟤 Legendary treasury with golden energy field |
 
 ### Investment (Investment Fund)
 Earns compound interest on your current $ balance every second. Also raises your $ cap.
@@ -108,6 +148,14 @@ Earns compound interest on your current $ balance every second. Also raises your
 | Lv.3 | 9% of $ per second | 1,800 HC |
 | Lv.4 LEGENDARY | 27% of $ per second | Merge only |
 
+**Appearance:**
+| Level | Look |
+|---|---|
+| Lv.1 | 🟡 Dark chart screen with rising green line chart, golden $ at peak, flipping coin below |
+| Lv.2 | 🟡 Larger dashboard with green uptrend + cyan secondary line, grid lines, pulsing $ sign, interest % label |
+| Lv.3 | 🟡 Full financial dashboard: golden frame, bar chart + line chart panels, scrolling ticker, orbiting dividend coins, floating $$$ |
+| Lv.4 | 🟡 Legendary fund with glowing golden dividend field |
+
 ### IT Support (Healing Drone)
 Autonomous drones that heal the most damaged **AI buildings only**. Not placed on the canvas — purchased from the building panel.
 
@@ -116,6 +164,13 @@ Autonomous drones that heal the most damaged **AI buildings only**. Not placed o
 | Heal rate | 15 HP/s per drone |
 | $ Cost/s | 2 $/s per drone |
 | Base cost | 200 HC (increases 1.5× each purchase) |
+
+**Appearance:**
+| Level | Look |
+|---|---|
+| Lv.1 | 🍕 Closed pizza box with pepperoni pizza visible on top, rising steam wisps |
+| Lv.2 | 🍕 Open pizza box with cheese slices, steam clouds, delivery arrow indicator |
+| Lv.3 | 🍕 Full pizza party setup with balloons, confetti particles, multiple open boxes |
 
 *Multiple IT Support drones target different AI buildings. Each heals the lowest-HP AI not already being healed. During the AI takeover transition, 1/3 of destroyed Employees are converted into IT Support drones.*
 
@@ -128,6 +183,14 @@ Required to run AI units. Only unlocked after choosing Equal Rights in the story
 | Lv.2 | Powers 3 AIs | 10 $/s | 1,250 HC |
 | Lv.3 | Powers 5 AIs | 22.5 $/s | 3,000 HC |
 | Lv.4 LEGENDARY | Powers 15 AIs | 67.5 $/s | Merge only |
+
+**Appearance:**
+| Level | Look |
+|---|---|
+| Lv.1 | 💚 Small green circuit board with central processor chip and trace lines |
+| Lv.2 | 💚 Larger PCB with heatsink, spinning cooling fan, memory modules |
+| Lv.3 | 💚 Full GPU card with dual spinning fans, VRAM chips, heat pipes, status LEDs |
+| Lv.4 | 💚 Legendary GPU cluster: triple-stacked cards with pulsing energy field, orbiting data particles, power connectors |
 
 ---
 
