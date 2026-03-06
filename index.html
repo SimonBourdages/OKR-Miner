@@ -3898,6 +3898,14 @@
                     this.trackEvent('milestone', i);
                     this.saveGame(true);
 
+                    // Objective 2: auto-enable detailed view
+                    if (i === 1 && !this.detailedView) {
+                        this.detailedView = true;
+                        var btn = document.getElementById('detailToggleBtn');
+                        if (btn) { btn.textContent = '📊 Details: ON'; btn.style.background = 'rgba(0,255,136,0.3)'; }
+                        this.logMessage('📊', 'Detailed View Enabled', 'Building stats now visible. Toggle off in Menu.', 'info');
+                    }
+
                     // Special: AI choice at milestone 6 (index 5)
                     if (i === 5 && !this.state.aiChoice) {
                         this.running = false;
