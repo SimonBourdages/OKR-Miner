@@ -7883,7 +7883,26 @@
             var PLAYER_KEY = 'okrMinerPlayerId';
             var existing = localStorage.getItem(PLAYER_KEY);
             if (existing) return; // returning player
-            // Generate unique player ID
+
+            // Generate a device fingerprint from stable browser properties
+            var fp = [
+                navigator.userAgent,
+                navigator.language,
+                screen.width + 'x' + screen.height,
+                screen.colorDepth,
+                new Date().getTimezoneOffset(),
+                navigator.hardwareConcurrency || 0,
+                navigator.maxTouchPoints || 0,
+                (navigator.platform || '')
+            ].join('|');
+            // Simple hash
+            var hash = 0;
+            for (var hi = 0; hi < fp.length; hi++) {
+                hash = ((hash << 5) - hash) + fp.charCodeAt(hi);
+                hash = hash & hash; // 32-bit int
+            }
+            var fingerprint = 'fp_' + Math.abs(hash).toString(36);
+
             var playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
             localStorage.setItem(PLAYER_KEY, playerId);
             // Send new player event to analytics
@@ -7902,7 +7921,7 @@
                     eventsTriggered: 0,
                     peakOKRRate: 0,
                     peakACRate: 0,
-                    theme: 'none',
+                    theme: fingerprint,
                     endReason: 'new_player',
                     buildingTypes: '{}',
                     browser: navigator.userAgent.split(' ').slice(-2).join(' '),

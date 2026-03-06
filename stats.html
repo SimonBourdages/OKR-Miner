@@ -155,11 +155,13 @@
     <div class="tabs">
         <div class="tab active" onclick="switchTab('local')">📱 Local Stats</div>
         <div class="tab" onclick="switchTab('cloud')">☁️ SharePoint Data</div>
+        <div class="tab" onclick="switchTab('players')">👥 New Players</div>
         <div class="tab" onclick="switchTab('config')">⚙️ Settings</div>
     </div>
     <div class="content">
         <div id="panel-local" class="active"></div>
         <div id="panel-cloud"></div>
+        <div id="panel-players"></div>
         <div id="panel-config">
             <div class="config-section">
                 <h3>SharePoint GET Endpoint</h3>
@@ -198,10 +200,12 @@
             for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
             document.getElementById('panel-local').classList.remove('active');
             document.getElementById('panel-cloud').classList.remove('active');
+            document.getElementById('panel-players').classList.remove('active');
             document.getElementById('panel-config').classList.remove('active');
             if (name === 'local') { tabs[0].classList.add('active'); document.getElementById('panel-local').classList.add('active'); renderLocal(); }
             if (name === 'cloud') { tabs[1].classList.add('active'); document.getElementById('panel-cloud').classList.add('active'); loadCloud(); }
-            if (name === 'config') { tabs[2].classList.add('active'); document.getElementById('panel-config').classList.add('active'); loadConfig(); }
+            if (name === 'players') { tabs[2].classList.add('active'); document.getElementById('panel-players').classList.add('active'); loadPlayers(); }
+            if (name === 'config') { tabs[3].classList.add('active'); document.getElementById('panel-config').classList.add('active'); loadConfig(); }
         }
 
         function formatNumber(n) {
@@ -290,13 +294,25 @@
                         return;
                     }
 
-                    var totalSessions = items.length;
+                    // Separate new players from game sessions
+                    var newPlayers = [];
+                    var gameSessions = [];
+                    for (var i = 0; i < items.length; i++) {
+                        var mode = items[i].mode || items[i].Mode || '';
+                        var endReason = items[i].endReason || items[i].EndReason || '';
+                        if (mode === 'new_player' || endReason === 'new_player') {
+                            newPlayers.push(items[i]);
+                        } else {
+                            gameSessions.push(items[i]);
+                        }
+                    }
+
                     var totalDuration = 0;
                     var maxOKRs = 0;
                     var maxMilestones = 0;
                     var maxOKRRate = 0;
-                    for (var i = 0; i < items.length; i++) {
-                        var it = items[i];
+                    for (var gi = 0; gi < gameSessions.length; gi++) {
+                        var it = gameSessions[gi];
                         totalDuration += Number(it.duration || it.Duration || 0);
                         var okrs = Number(it.totalOKRs || it.TotalOKRs || 0);
                         if (okrs > maxOKRs) maxOKRs = okrs;
@@ -308,34 +324,144 @@
 
                     var html = '<h2 style="color:#64b5f6;margin-bottom:20px;">SharePoint Analytics <span class="source-badge source-cloud">CLOUD</span></h2>';
                     html += '<div class="card-grid">';
-                    html += card(totalSessions, 'Total Sessions');
+                    html += card(newPlayers.length, 'Unique Players');
+                    html += card(gameSessions.length, 'Game Sessions');
                     html += card(formatDuration(totalDuration), 'Total Play Time');
                     html += card(formatNumber(maxOKRs), 'Highest KRs');
                     html += card(maxMilestones, 'Best Milestone');
                     html += card(formatNumber(maxOKRRate) + '/s', 'Peak KR Rate');
                     html += '</div>';
 
-                    html += '<h3 style="color:#8cf;margin:20px 0 10px;">All Sessions from SharePoint</h3>';
-                    html += '<table><tr><th>Session</th><th>Duration</th><th>Mode</th><th>Milestones</th><th>KRs</th><th>Buildings</th><th>Theme</th><th>End Reason</th><th>Browser</th></tr>';
-                    for (var j = items.length - 1; j >= 0; j--) {
-                        var s = items[j];
-                        html += '<tr>';
-                        html += '<td>' + (s.sessionId || s.SessionId || s.Title || '—') + '</td>';
-                        html += '<td>' + formatDuration(Number(s.duration || s.Duration || 0)) + '</td>';
-                        html += '<td>' + (s.mode || s.Mode || '—') + '</td>';
-                        html += '<td>' + (s.milestones || s.Milestones || 0) + '</td>';
-                        html += '<td>' + formatNumber(Number(s.totalOKRs || s.TotalOKRs || 0)) + '</td>';
-                        html += '<td>' + (s.buildingsPlaced || s.BuildingsPlaced || 0) + '</td>';
-                        html += '<td>' + (s.theme || s.Theme || '—') + '</td>';
-                        html += '<td>' + (s.endReason || s.EndReason || '—') + '</td>';
-                        html += '<td style="font-size:11px;">' + (s.browser || s.Browser || '—') + '</td>';
-                        html += '</tr>';
+                    if (gameSessions.length > 0) {
+                        html += '<h3 style="color:#8cf;margin:20px 0 10px;">Game Sessions</h3>';
+                        html += '<table><tr><th>Session</th><th>Duration</th><th>Mode</th><th>Milestones</th><th>KRs</th><th>Buildings</th><th>Theme</th><th>End Reason</th><th>Browser</th></tr>';
+                        for (var j = gameSessions.length - 1; j >= 0; j--) {
+                            var s = gameSessions[j];
+                            html += '<tr>';
+                            html += '<td>' + (s.sessionId || s.SessionId || s.Title || '—') + '</td>';
+                            html += '<td>' + formatDuration(Number(s.duration || s.Duration || 0)) + '</td>';
+                            html += '<td>' + (s.mode || s.Mode || '—') + '</td>';
+                            html += '<td>' + (s.milestones || s.Milestones || 0) + '</td>';
+                            html += '<td>' + formatNumber(Number(s.totalOKRs || s.TotalOKRs || 0)) + '</td>';
+                            html += '<td>' + (s.buildingsPlaced || s.BuildingsPlaced || 0) + '</td>';
+                            html += '<td>' + (s.theme || s.Theme || '—') + '</td>';
+                            html += '<td>' + (s.endReason || s.EndReason || '—') + '</td>';
+                            html += '<td style="font-size:11px;">' + (s.browser || s.Browser || '—') + '</td>';
+                            html += '</tr>';
+                        }
+                        html += '</table>';
                     }
-                    html += '</table>';
                     panel.innerHTML = html;
                 })
                 .catch(function(err) {
                     panel.innerHTML = '<div class="empty-state"><h2>Failed to Load</h2><p>' + err.message + '</p><p style="color:#666;margin-top:10px;">Check your GET endpoint in ⚙️ Settings.</p></div>';
+                });
+        }
+
+        function loadPlayers() {
+            var panel = document.getElementById('panel-players');
+            var endpoint = localStorage.getItem(GET_ENDPOINT_KEY) || DEFAULT_GET_ENDPOINT;
+            panel.innerHTML = '<div class="empty-state"><h2>Loading...</h2><p>Fetching player data from SharePoint...</p></div>';
+            fetch(endpoint)
+                .then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function(data) {
+                    var items = Array.isArray(data) ? data : (data.value || data.items || [data]);
+
+                    // Extract new players and deduplicate by device fingerprint
+                    var allNewPlayers = [];
+                    for (var i = 0; i < items.length; i++) {
+                        var mode = items[i].mode || items[i].Mode || '';
+                        var endReason = items[i].endReason || items[i].EndReason || '';
+                        if (mode === 'new_player' || endReason === 'new_player') {
+                            allNewPlayers.push(items[i]);
+                        }
+                    }
+
+                    // Deduplicate: fingerprint is stored in theme field (fp_XXXX)
+                    var seenFingerprints = {};
+                    var newPlayers = [];
+                    var duplicateCount = 0;
+                    for (var di = 0; di < allNewPlayers.length; di++) {
+                        var fp = allNewPlayers[di].theme || allNewPlayers[di].Theme || '';
+                        if (fp && fp.indexOf('fp_') === 0) {
+                            if (seenFingerprints[fp]) {
+                                duplicateCount++;
+                                continue; // skip duplicate device
+                            }
+                            seenFingerprints[fp] = true;
+                        }
+                        newPlayers.push(allNewPlayers[di]);
+                    }
+
+                    // Today/this week/this month counts
+                    var now = new Date();
+                    var todayStr = now.toISOString().split('T')[0];
+                    var weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    var monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    var todayCount = 0;
+                    var weekCount = 0;
+                    var monthCount = 0;
+                    for (var ni = 0; ni < newPlayers.length; ni++) {
+                        var ts = newPlayers[ni].sessionId || newPlayers[ni].SessionId || '';
+                        // Extract timestamp from player ID (player_TIMESTAMP_random)
+                        var parts = ts.split('_');
+                        var playerTime = parts.length >= 2 ? new Date(Number(parts[1])) : null;
+                        if (playerTime && !isNaN(playerTime.getTime())) {
+                            if (playerTime.toISOString().split('T')[0] === todayStr) todayCount++;
+                            if (playerTime >= weekAgo) weekCount++;
+                            if (playerTime >= monthAgo) monthCount++;
+                        }
+                    }
+
+                    var html = '<h2 style="color:#69f0ae;margin-bottom:20px;">👥 New Players <span class="source-badge source-cloud">CLOUD</span></h2>';
+                    html += '<div class="card-grid">';
+                    html += card(newPlayers.length, 'Unique Devices');
+                    html += card(allNewPlayers.length, 'Total Signups');
+                    html += card(duplicateCount, 'Duplicates Filtered');
+                    html += card(todayCount, 'Today');
+                    html += card(weekCount, 'This Week');
+                    html += card(monthCount, 'This Month');
+                    html += '</div>';
+
+                    if (newPlayers.length > 0) {
+                        html += '<h3 style="color:#69f0ae;margin:20px 0 10px;">Player List (newest first)</h3>';
+                        html += '<table><tr><th>#</th><th>Player ID</th><th>Device FP</th><th>Joined</th><th>Browser</th><th>Screen</th><th>Version</th></tr>';
+                        for (var j = newPlayers.length - 1; j >= 0; j--) {
+                            var p = newPlayers[j];
+                            var pId = p.sessionId || p.SessionId || p.Title || '—';
+                            var pFp = p.theme || p.Theme || '—';
+                            // Parse join date from player ID
+                            var pParts = pId.split('_');
+                            var joinDate = '—';
+                            if (pParts.length >= 2) {
+                                var d = new Date(Number(pParts[1]));
+                                if (!isNaN(d.getTime())) {
+                                    joinDate = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                                }
+                            }
+                            var rowNum = newPlayers.length - j;
+                            html += '<tr>';
+                            html += '<td style="color:#69f0ae;font-weight:bold;">' + rowNum + '</td>';
+                            html += '<td style="font-family:monospace;font-size:11px;">' + pId + '</td>';
+                            html += '<td style="font-family:monospace;font-size:10px;color:#69f0ae;">' + pFp + '</td>';
+                            html += '<td>' + joinDate + '</td>';
+                            html += '<td style="font-size:11px;">' + (p.browser || p.Browser || '—') + '</td>';
+                            html += '<td>' + (p.screen || p.Screen || '—') + '</td>';
+                            html += '<td>' + (p.version || p.Version || '—') + '</td>';
+                            html += '</tr>';
+                        }
+                        html += '</table>';
+                    } else {
+                        html += '<div class="empty-state"><h2>No Players Yet</h2><p>Share the game link and watch players appear here!</p></div>';
+                    }
+
+                    panel.innerHTML = html;
+                })
+                .catch(function(err) {
+                    panel.innerHTML = '<div class="empty-state"><h2>Failed to Load</h2><p>' + err.message + '</p></div>';
                 });
         }
 
