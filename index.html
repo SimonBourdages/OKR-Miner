@@ -875,6 +875,34 @@
         <div class="trans-reward" id="transReward"></div>
     </div>
 
+    <div id="aiChoiceDialog" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.95);z-index:400;">
+        <div style="max-width:600px;margin:15vh auto;text-align:center;padding:20px;">
+            <h1 style="color:#ffd700;font-size:36px;margin-bottom:20px;">⚖️ The AI Question</h1>
+            <p style="color:#ccc;font-size:16px;margin-bottom:30px;">Your AI workforce is growing. The robots are becoming self-aware.<br>A critical decision must be made.</p>
+            <h2 style="color:#fff;font-size:22px;margin-bottom:40px;">Should AI have the same rights as humans?</h2>
+            <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+                <button onclick="game.chooseAIPath('equal')" style="background:rgba(0,100,255,0.3);border:2px solid #4488ff;border-radius:12px;padding:20px 30px;color:#88ccff;cursor:pointer;font-family:inherit;font-size:16px;min-width:200px;">
+                    <div style="font-size:32px;margin-bottom:8px;">🤖</div>
+                    <div style="font-weight:bold;">Equal Rights</div>
+                    <div style="font-size:12px;color:#888;margin-top:6px;">AI and humans work as one</div>
+                </button>
+                <button onclick="game.chooseAIPath('humans')" style="background:rgba(255,50,50,0.3);border:2px solid #ff4444;border-radius:12px;padding:20px 30px;color:#ff8888;cursor:pointer;font-family:inherit;font-size:16px;min-width:200px;">
+                    <div style="font-size:32px;margin-bottom:8px;">👤</div>
+                    <div style="font-weight:bold;">Humans First</div>
+                    <div style="font-size:12px;color:#888;margin-top:6px;">Humans remain in control</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameOverScreen" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:500;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+            <h1 style="color:#ff0000;font-size:72px;font-weight:bold;text-shadow:0 0 30px #f00,0 0 60px #f00;">GAME OVER</h1>
+            <p style="color:#666;font-size:16px;margin-top:20px;">The machines have won. Perhaps equality was the answer.</p>
+            <button onclick="game.showMenu()" style="margin-top:40px;background:#333;border:1px solid #666;color:#fff;padding:12px 30px;font-family:inherit;font-size:16px;cursor:pointer;border-radius:6px;">Return to Menu</button>
+        </div>
+    </div>
+
     <script>
     (function() {
         'use strict';
@@ -957,6 +985,7 @@
 
         var UPGRADE_COSTS = { 1: 1.0, 2: 2.5, 3: 6.0, 4: 0 }; // Lv.4 is free (merge only)
         var UPGRADE_POWER = { 1: 1.0, 2: 2.0, 3: 4.5, 4: 10.0 }; // Lv.4 = 10x output
+        var GPU_CAPACITY = { 1: 1, 2: 3, 3: 5, 4: 10 };
 
         var BUILDINGS = {
             collector:   { name: 'Recruiter',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 HC/s',          symbol: '', metrics: ['ac'] },
@@ -965,7 +994,8 @@
             synthesizer: { name: 'AI', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 KR/s',        symbol: '', metrics: ['okr'] },
             generator:   { name: 'Finances',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 $/s', symbol: '', metrics: ['el'] },
             bank:        { name: 'Bank',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% $ interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
-            repairbot:   { name: 'Pizza',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Delivers pizza to heal buildings',  symbol: '', metrics: ['hp'], repairRate: 15 }
+            repairbot:   { name: 'Pizza',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Delivers pizza to heal buildings',  symbol: '', metrics: ['hp'], repairRate: 15 },
+            gpu:         { name: 'GPU',         cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#76ff03', desc: 'Powers 1 AI unit',  symbol: '', metrics: ['gpu'], gpuCapacity: 1 }
         };
 
         // Metric icons as small inline SVGs (16x16)
@@ -974,7 +1004,8 @@
             ac: '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#ffd700" stroke="#b8860b" stroke-width="1"/><text x="7" y="11" text-anchor="middle" font-size="9" fill="#8b6914" font-weight="bold">$</text></svg>',
             el: '<svg width="14" height="14" viewBox="0 0 14 14"><polygon points="8,0 4,6 7,6 5,14 11,6 8,6" fill="#ff9800"/></svg>',
             hp: '<svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="5" width="12" height="4" rx="1" fill="#f44336"/><rect x="5" y="1" width="4" height="12" rx="1" fill="#f44336"/></svg>',
-            mult: '<svg width="14" height="14" viewBox="0 0 14 14"><line x1="2" y1="2" x2="12" y2="12" stroke="#ce93d8" stroke-width="2.5"/><line x1="12" y1="2" x2="2" y2="12" stroke="#ce93d8" stroke-width="2.5"/></svg>'
+            mult: '<svg width="14" height="14" viewBox="0 0 14 14"><line x1="2" y1="2" x2="12" y2="12" stroke="#ce93d8" stroke-width="2.5"/><line x1="12" y1="2" x2="2" y2="12" stroke="#ce93d8" stroke-width="2.5"/></svg>',
+            gpu: '<svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="3" width="10" height="8" rx="1" fill="#76ff03"/><rect x="4" y="5" width="6" height="4" fill="#33691e"/></svg>'
         };
 
         var ACHIEVEMENTS = {
@@ -1560,7 +1591,7 @@
             var container = document.getElementById('buildings');
             container.innerHTML = '';
             var self = this;
-            var allTypes = ['collector', 'processor', 'multiplier', 'synthesizer', 'generator', 'bank', 'repairbot'];
+            var allTypes = ['collector', 'processor', 'multiplier', 'synthesizer', 'generator', 'bank', 'repairbot', 'gpu'];
 
             allTypes.forEach(function(type) {
                 if (self.state && self.state.unlockedBuildings && self.state.unlockedBuildings.indexOf(type) === -1) return;
@@ -1725,6 +1756,8 @@
                 shipsEnabled: false,
                 repairBotsEnabled: false,
                 thievesEnabled: false,
+                aiChoice: null,
+                gpuEnabled: false,
                 eventsEnabled: false,
                 upgradesEnabled: false,
                 themesEnabled: false,
@@ -1741,11 +1774,13 @@
                 currencies: { ac: 999999999, el: 500 },
                 totalOKRs: 0,
                 unlockedMilestones: MILESTONES.map(function(m, i) { return i; }),
-                unlockedBuildings: ['collector', 'processor', 'multiplier', 'synthesizer', 'generator', 'bank', 'repairbot'],
+                unlockedBuildings: ['collector', 'processor', 'multiplier', 'synthesizer', 'generator', 'bank', 'repairbot', 'gpu'],
                 electricityEnabled: true,
                 shipsEnabled: true,
                 repairBotsEnabled: true,
                 thievesEnabled: true,
+                aiChoice: 'equal',
+                gpuEnabled: true,
                 eventsEnabled: true,
                 upgradesEnabled: true,
                 themesEnabled: true,
@@ -1778,6 +1813,8 @@
                     if (this.state.shipsEnabled === undefined) this.state.shipsEnabled = false;
                     if (this.state.repairBotsEnabled === undefined) this.state.repairBotsEnabled = false;
                     if (this.state.thievesEnabled === undefined) this.state.thievesEnabled = false;
+                    if (!this.state.aiChoice) this.state.aiChoice = null;
+                    if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
                     if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
                     if (this.state.upgradesEnabled === undefined) this.state.upgradesEnabled = false;
                     if (this.state.themesEnabled === undefined) this.state.themesEnabled = false;
@@ -1891,6 +1928,8 @@
             if (this.state.shipsEnabled === undefined) this.state.shipsEnabled = false;
             if (this.state.repairBotsEnabled === undefined) this.state.repairBotsEnabled = false;
             if (this.state.thievesEnabled === undefined) this.state.thievesEnabled = false;
+            if (!this.state.aiChoice) this.state.aiChoice = null;
+            if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
             if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
             if (this.state.upgradesEnabled === undefined) this.state.upgradesEnabled = false;
             if (this.state.themesEnabled === undefined) this.state.themesEnabled = false;
@@ -2358,6 +2397,31 @@
                 acGain *= this._eventDebuff.mult;
             }
 
+            // GPU capacity check — excess AIs produce nothing
+            if (this.state.gpuEnabled) {
+                var totalGpuCap = 0;
+                var totalAIs = 0;
+                for (var gi = 0; gi < this.nodes.length; gi++) {
+                    if (this.nodes[gi].type === 'gpu') {
+                        totalGpuCap += GPU_CAPACITY[this.nodes[gi].level || 1] || 1;
+                    }
+                    if (this.nodes[gi].type === 'synthesizer') {
+                        totalAIs++;
+                    }
+                }
+                if (totalAIs > totalGpuCap) {
+                    var gpuRatio = totalGpuCap / totalAIs;
+                    var aiOkrReduction = 0;
+                    for (var gi = 0; gi < this.nodes.length; gi++) {
+                        if (this.nodes[gi].type === 'synthesizer') {
+                            var lvlM = UPGRADE_POWER[this.nodes[gi].level || 1];
+                            aiOkrReduction += BUILDINGS.synthesizer.okrPerSec * lvlM * (1 - gpuRatio);
+                        }
+                    }
+                    okrGain -= aiOkrReduction * mult;
+                }
+            }
+
             this.currentOkrRate = okrGain;
             this.currentAcRate = acGain;
             this.currentElRate = elGain - elDrain;
@@ -2631,6 +2695,38 @@
                 if (thief.trail.length > 15) thief.trail.shift();
             }
             } // end thievesEnabled
+
+            // Robot War (PATH B — humans first)
+            if (this.state.robotWar) {
+                this._robotWarTimer = (this._robotWarTimer || 0) + dt;
+                var spawnRate = Math.max(0.3, 2 - this._robotWarTimer * 0.05);
+                if (this._robotWarTimer > spawnRate) {
+                    this._robotWarTimer = 0;
+                    if (this.nodes.length > 0) {
+                        var target = this.nodes[Math.floor(Math.random() * this.nodes.length)];
+                        target.hp = Math.max(0, (target.hp || 100) - 25);
+                        this.spawnParticles(target.x, target.y, '#f44', 8);
+                        this.addFloatingText(target.x, target.y - 20, '-25 HP', '#f44', 12);
+                        this.triggerShake(3);
+                    }
+                    this.state.totalOKRs = Math.max(0, this.state.totalOKRs * 0.95);
+                }
+
+                // Remove dead buildings
+                for (var ri = this.nodes.length - 1; ri >= 0; ri--) {
+                    if (this.nodes[ri].hp <= 0) {
+                        this.spawnParticles(this.nodes[ri].x, this.nodes[ri].y, '#f44', 15);
+                        this.nodes.splice(ri, 1);
+                    }
+                }
+
+                // Check game over: no buildings and no KRs
+                if (this.nodes.length === 0 && this.state.totalOKRs <= 0) {
+                    this.running = false;
+                    document.getElementById('gameOverScreen').style.display = 'flex';
+                    this.stopMusic();
+                }
+            }
 
             // Screen shake decay
             if (this.screenShake.intensity > 0) {
@@ -2908,6 +3004,12 @@
                     this.trackEvent('milestone', i);
                     this.saveGame(true);
 
+                    // Special: AI choice at milestone 5 (index 4)
+                    if (i === 4 && !this.state.aiChoice) {
+                        this.running = false;
+                        document.getElementById('aiChoiceDialog').style.display = 'block';
+                    }
+
                     // Check if ALL milestones unlocked — victory!
                     if (!this.infiniteMode && this.state.unlockedMilestones.length >= MILESTONES.length) {
                         var self = this;
@@ -2917,6 +3019,94 @@
                     break; // one milestone at a time
                 }
             }
+        };
+
+        // =========================================================
+        // AI CHOICE BRANCHING (Milestone 5)
+        // =========================================================
+
+        OKRFarmingGame.prototype.chooseAIPath = function(choice) {
+            document.getElementById('aiChoiceDialog').style.display = 'none';
+            this.state.aiChoice = choice;
+            this.running = true;
+
+            if (choice === 'humans') {
+                this.state.robotWar = true;
+                this.eventBanner = { icon: '', text: '⚠️ ROBOT UPRISING', desc: 'The machines will not forgive this decision...', color: '#f44', type: 'negative', timer: 5 };
+                this.triggerShake(15);
+            } else {
+                this.transformToAIEconomy();
+            }
+            this.saveGame(true);
+        };
+
+        OKRFarmingGame.prototype.transformToAIEconomy = function() {
+            var self = this;
+
+            // Step 1: Remove 2/3 of employees, convert rest to AI
+            var employees = [];
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].type === 'processor') employees.push(i);
+            }
+            // Shuffle
+            for (var i = employees.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var tmp = employees[i]; employees[i] = employees[j]; employees[j] = tmp;
+            }
+            var removeCount = Math.floor(employees.length * 2 / 3);
+
+            // Remove 2/3 (from end to avoid index shifting)
+            var toRemove = employees.slice(0, removeCount).sort(function(a,b) { return b - a; });
+            for (var i = 0; i < toRemove.length; i++) {
+                var n = this.nodes[toRemove[i]];
+                this.spawnParticles(n.x, n.y, '#f44', 10);
+                this.nodes.splice(toRemove[i], 1);
+            }
+
+            // Convert remaining employees to AI
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].type === 'processor') {
+                    this.nodes[i].type = 'synthesizer';
+                    this.spawnParticles(this.nodes[i].x, this.nodes[i].y, '#4488ff', 10);
+                }
+            }
+
+            // Lock employees
+            var empIdx = this.state.unlockedBuildings.indexOf('processor');
+            if (empIdx >= 0) this.state.unlockedBuildings.splice(empIdx, 1);
+
+            this.eventBanner = { icon: '', text: '🤖 Workforce Evolved', desc: '2/3 employees transitioned out. Remaining converted to AI.', color: '#4488ff', type: 'milestone', timer: 5 };
+            this.rebuildBuildingButtons();
+
+            // Step 2: After 4 seconds, remove recruiters
+            setTimeout(function() {
+                var recruiterValue = 0;
+                for (var i = self.nodes.length - 1; i >= 0; i--) {
+                    if (self.nodes[i].type === 'collector') {
+                        var cost = BUILDINGS.collector.cost * (UPGRADE_COSTS[self.nodes[i].level || 1] || 1);
+                        recruiterValue += Math.floor(cost / 3);
+                        self.spawnParticles(self.nodes[i].x, self.nodes[i].y, '#ffd700', 8);
+                        self.nodes.splice(i, 1);
+                    }
+                }
+                self.state.currencies.el += recruiterValue;
+                var recIdx = self.state.unlockedBuildings.indexOf('collector');
+                if (recIdx >= 0) self.state.unlockedBuildings.splice(recIdx, 1);
+
+                self.eventBanner = { icon: '', text: '🤔 Why Recruiters?', desc: 'Recruiters liquidated for ' + self.formatNumber(recruiterValue) + ' $. No longer needed.', color: '#ffd700', type: 'milestone', timer: 5 };
+                self.rebuildBuildingButtons();
+
+                // Step 3: After 4 more seconds, introduce GPU
+                setTimeout(function() {
+                    self.state.gpuEnabled = true;
+                    if (self.state.unlockedBuildings.indexOf('gpu') === -1) {
+                        self.state.unlockedBuildings.push('gpu');
+                    }
+                    self.eventBanner = { icon: '', text: '🖥️ GPU Era Begins!', desc: 'Each AI needs GPU capacity to function. Build GPUs!', color: '#76ff03', type: 'milestone', timer: 6 };
+                    self.rebuildBuildingButtons();
+                    self.saveGame(true);
+                }, 4000);
+            }, 4000);
         };
 
         OKRFarmingGame.prototype.showMilestoneBanner = function(milestone) {
@@ -5002,6 +5192,144 @@
                         ctx.fillText('\u{1F389} PARTY!', x, y - 8 * s);
                     }
                     break;
+
+                case 'gpu':
+                    if (lvl === 1) {
+                        // Lv.1 — Small green circuit board with chip
+                        this._pxRect(ctx, x - 4 * s, y - 3 * s, 8 * s, 6 * s, '#2e7d32');
+                        this._pxRect(ctx, x - 3 * s, y - 2 * s, 6 * s, 4 * s, '#1b5e20');
+                        // Central chip
+                        this._pxRect(ctx, x - 1.5 * s, y - 1.5 * s, 3 * s, 3 * s, '#76ff03');
+                        this._pxRect(ctx, x - s, y - s, 2 * s, 2 * s, '#33691e');
+                        // Pins
+                        for (var pi = -3; pi <= 3; pi++) {
+                            this._pxRect(ctx, x + pi * s, y - 3.5 * s, s * 0.3, s * 0.5, '#aaa');
+                            this._pxRect(ctx, x + pi * s, y + 3 * s, s * 0.3, s * 0.5, '#aaa');
+                        }
+                        // Label
+                        ctx.fillStyle = '#76ff03';
+                        ctx.font = '7px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('GPU', x, y + 5 * s);
+                    } else if (lvl === 2) {
+                        // Lv.2 — Larger board with heatsink and fan
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(118,255,3,0.06)';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        this._pxRect(ctx, x - 5 * s, y - 3.5 * s, 10 * s, 7 * s, '#2e7d32');
+                        this._pxRect(ctx, x - 4 * s, y - 2.5 * s, 8 * s, 5 * s, '#1b5e20');
+                        // Heatsink fins
+                        for (var fi = -3; fi <= 3; fi++) {
+                            this._pxRect(ctx, x + fi * 1.2 * s, y - 2 * s, s * 0.6, 4 * s, '#455a64');
+                        }
+                        // Fan circle
+                        ctx.strokeStyle = '#76ff03';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2 * s, 0, Math.PI * 2);
+                        ctx.stroke();
+                        // Spinning blades
+                        var fanAngle = age * 6;
+                        for (var bi = 0; bi < 4; bi++) {
+                            var bAngle = fanAngle + bi * Math.PI / 2;
+                            ctx.strokeStyle = '#b0bec5';
+                            ctx.lineWidth = s * 0.4;
+                            ctx.beginPath();
+                            ctx.moveTo(x, y);
+                            ctx.lineTo(x + Math.cos(bAngle) * 1.8 * s, y + Math.sin(bAngle) * 1.8 * s);
+                            ctx.stroke();
+                        }
+                        // Pins
+                        for (var pi = -4; pi <= 4; pi++) {
+                            this._pxRect(ctx, x + pi * s, y - 4 * s, s * 0.3, s * 0.5, '#aaa');
+                            this._pxRect(ctx, x + pi * s, y + 3.5 * s, s * 0.3, s * 0.5, '#aaa');
+                        }
+                    } else if (lvl === 3) {
+                        // Lv.3 — Full GPU card with dual fans and VRAM
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(118,255,3,0.08)';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 9 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // PCB
+                        this._pxRect(ctx, x - 7 * s, y - 4 * s, 14 * s, 8 * s, '#1b5e20');
+                        this._pxRect(ctx, x - 6 * s, y - 3 * s, 12 * s, 6 * s, '#2e7d32');
+                        // Dual fans
+                        var fanCenters = [{ fx: x - 2.5 * s, fy: y }, { fx: x + 2.5 * s, fy: y }];
+                        for (var fc = 0; fc < 2; fc++) {
+                            var fcx = fanCenters[fc].fx, fcy = fanCenters[fc].fy;
+                            ctx.strokeStyle = '#76ff03';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.arc(fcx, fcy, 2 * s, 0, Math.PI * 2);
+                            ctx.stroke();
+                            var fanA = age * 8 + fc * Math.PI / 4;
+                            for (var bi = 0; bi < 6; bi++) {
+                                var bA = fanA + bi * Math.PI / 3;
+                                ctx.strokeStyle = '#b0bec5';
+                                ctx.lineWidth = s * 0.3;
+                                ctx.beginPath();
+                                ctx.moveTo(fcx, fcy);
+                                ctx.lineTo(fcx + Math.cos(bA) * 1.7 * s, fcy + Math.sin(bA) * 1.7 * s);
+                                ctx.stroke();
+                            }
+                        }
+                        // VRAM chips
+                        for (var vi = -2; vi <= 2; vi++) {
+                            this._pxRect(ctx, x + vi * 2.5 * s - s * 0.4, y + 2 * s, s * 0.8, s * 0.6, '#76ff03');
+                        }
+                        // Gold connectors at bottom
+                        for (var gi = -5; gi <= 5; gi++) {
+                            this._pxRect(ctx, x + gi * s, y + 4 * s, s * 0.4, s * 0.5, '#ffd700');
+                        }
+                    } else {
+                        // Lv.4 — Legendary GPU cluster with energy field
+                        ctx.save();
+                        var gpuPulse = Math.sin(age * 3) * 0.3 + 0.7;
+                        ctx.fillStyle = 'rgba(118,255,3,' + (gpuPulse * 0.12).toFixed(3) + ')';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 12 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        // Triple GPU stack
+                        for (var gi = -1; gi <= 1; gi++) {
+                            var gy = y + gi * 3 * s;
+                            this._pxRect(ctx, x - 6 * s, gy - 1.2 * s, 12 * s, 2.4 * s, '#1b5e20');
+                            this._pxRect(ctx, x - 5 * s, gy - 0.8 * s, 10 * s, 1.6 * s, '#2e7d32');
+                            // Mini fans
+                            ctx.strokeStyle = '#76ff03';
+                            ctx.lineWidth = 0.8;
+                            ctx.beginPath();
+                            ctx.arc(x - 2 * s, gy, s * 0.8, 0, Math.PI * 2);
+                            ctx.stroke();
+                            ctx.beginPath();
+                            ctx.arc(x + 2 * s, gy, s * 0.8, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                        // Energy arcs between GPUs
+                        ctx.strokeStyle = 'rgba(118,255,3,' + gpuPulse.toFixed(2) + ')';
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([2, 3]);
+                        ctx.beginPath();
+                        ctx.moveTo(x - 4 * s, y - 3 * s);
+                        ctx.lineTo(x + 4 * s, y + 3 * s);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(x + 4 * s, y - 3 * s);
+                        ctx.lineTo(x - 4 * s, y + 3 * s);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                        // Golden stars
+                        ctx.fillStyle = '#ffd700';
+                        ctx.font = 'bold 12px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('⚡ CLUSTER ⚡', x, y - 6 * s);
+                    }
+                    break;
             }
 
             // === Common upgrade indicators (after building switch) ===
@@ -6084,6 +6412,8 @@
             document.getElementById('menuToggleBtn').style.display = 'none';
             document.getElementById('buildings').style.display = 'none';
             document.getElementById('repairBotPanel').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('aiChoiceDialog').style.display = 'none';
             this.stopMusic();
             // Show video as menu background
             var vidIntro = document.getElementById('videoIntro');
