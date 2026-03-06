@@ -90,14 +90,41 @@
             left: 0;
             right: 0;
             z-index: 10;
-            background: rgba(0, 20, 10, 0.92);
+            background: rgba(0, 20, 10, 0.95);
             border-top: 1px solid #00ff88;
             padding: 8px 14px;
             font-size: 12px;
-            display: flex;
+            display: none;
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
+            transition: transform 0.3s ease;
+        }
+
+        #controls.open {
+            display: flex;
+        }
+
+        #menuToggleBtn {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9;
+            background: rgba(0, 20, 10, 0.85);
+            border: 1px solid #00ff88;
+            border-radius: 20px;
+            color: #00ff88;
+            padding: 6px 18px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: bold;
+            display: none;
+        }
+
+        #menuToggleBtn:hover {
+            background: rgba(0, 255, 136, 0.2);
         }
 
         #controls button {
@@ -705,7 +732,9 @@
         </div>
     </div>
 
-    <div id="controls" style="display:none;">
+    <button id="menuToggleBtn" onclick="document.getElementById('controls').classList.toggle('open'); this.style.display='none';">☰ Menu</button>
+    <div id="controls">
+        <button onclick="document.getElementById('controls').classList.remove('open'); document.getElementById('menuToggleBtn').style.display='block';" style="background:rgba(255,60,60,0.2);border-color:#f66;color:#f66;">✕</button>
         <button onclick="game.saveGame()">💾 Save</button>
         <button onclick="game.saveAndQuit()">🚪 Quit</button>
         <button id="soundToggleBtn" onclick="game.cycleSoundMode()">🔊 All Sound</button>
@@ -1922,7 +1951,8 @@
             var vidIntro = document.getElementById('videoIntro');
             if (vidIntro) { vidIntro.style.display = 'none'; vidIntro.style.pointerEvents = 'none'; }
             document.getElementById('ui').style.display = 'block';
-            document.getElementById('controls').style.display = 'flex';
+            document.getElementById('controls').classList.remove('open');
+            document.getElementById('menuToggleBtn').style.display = 'block';
             document.getElementById('buildings').style.display = 'flex';
 
             // Show morale event panel only if unlocked
@@ -5801,7 +5831,8 @@
             }
             document.getElementById('menu').style.display = 'flex';
             document.getElementById('ui').style.display = 'none';
-            document.getElementById('controls').style.display = 'none';
+            document.getElementById('controls').classList.remove('open');
+            document.getElementById('menuToggleBtn').style.display = 'none';
             document.getElementById('buildings').style.display = 'none';
             document.getElementById('repairBotPanel').style.display = 'none';
             this.stopMusic();
