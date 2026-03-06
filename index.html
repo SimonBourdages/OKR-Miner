@@ -739,7 +739,7 @@
         <button onclick="game.saveAndQuit()">🚪 Quit</button>
         <button id="soundToggleBtn" onclick="game.cycleSoundMode()">🔊 All Sound</button>
         <button onclick="game.showAchievements()">🏆</button>
-        <button onclick="game.showEventHistory()">📜</button>
+        <button onclick="game.showLog()">📜 Log</button>
         <button onclick="game.openBugReport()">🐛 Bug</button>
         <button onclick="game.resetCamera()" title="Reset camera zoom and position">🎯 Reset View</button>
         <span style="color:#ff0;font-size:10px;margin-left:auto;">⏱ <span id="eventCountdown">--</span>s</span>
@@ -799,7 +799,7 @@
         <h2 style="color:#ff0;font-size:28px;margin-bottom:20px;text-align:center;">📜 Event History</h2>
         <div id="eventHistoryList" style="max-width:600px;margin:0 auto;"></div>
         <div style="text-align:center;margin-top:20px;">
-            <button onclick="game.hideEventHistory()" style="background:#00ff88;color:#000;border:none;padding:10px 30px;font-family:inherit;font-size:14px;cursor:pointer;border-radius:6px;">Close</button>
+            <button onclick="game.hideLog()" style="background:#00ff88;color:#000;border:none;padding:10px 30px;font-family:inherit;font-size:14px;cursor:pointer;border-radius:6px;">Close</button>
         </div>
     </div>
 
@@ -897,8 +897,8 @@
 
     <div id="gameOverScreen" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:500;">
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
-            <h1 style="color:#ff0000;font-size:72px;font-weight:bold;text-shadow:0 0 30px #f00,0 0 60px #f00;">GAME OVER</h1>
-            <p style="color:#666;font-size:16px;margin-top:20px;">The machines have won. Perhaps equality was the answer.</p>
+            <h1 id="gameOverTitle" style="color:#ff0000;font-size:72px;font-weight:bold;text-shadow:0 0 30px #f00,0 0 60px #f00;">GAME OVER</h1>
+            <p id="gameOverMsg" style="color:#666;font-size:16px;margin-top:20px;max-width:500px;text-align:center;">The machines have won. Perhaps equality was the answer.</p>
             <button onclick="game.showMenu()" style="margin-top:40px;background:#333;border:1px solid #666;color:#fff;padding:12px 30px;font-family:inherit;font-size:16px;cursor:pointer;border-radius:6px;">Return to Menu</button>
         </div>
     </div>
@@ -1022,7 +1022,8 @@
             'nodes-50':     { icon: '🌐', name: 'Megacorp',            desc: 'Place 50 buildings' },
             'upgrade-3':    { icon: '⬆️', name: 'Maxed Out',           desc: 'Upgrade a building to level 3' },
             'collision':    { icon: '💥', name: 'Collateral Damage', desc: 'A building was destroyed during an upgrade collision' },
-            'merge':        { icon: '🔄', name: 'Fusion!', desc: 'Merged two same-type buildings into a Legendary Lv.4' }
+            'merge':        { icon: '🔄', name: 'Fusion!', desc: 'Merged two same-type buildings into a Legendary Lv.4' },
+            'phished':      { icon: '🎣', name: 'Phished!', desc: 'Your Leadership clicked a phishing link. Instant game over.' }
         };
 
         var BG_IMAGES = {
@@ -1139,7 +1140,7 @@
             // === NEGATIVE EVENTS (1-40) ===
             { name: 'Meteor Shower', desc: 'All buildings take 20 damage!', type: 'negative', icon: '☄️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.max(0,g.nodes[i].hp-20); } },
             { name: 'Solar Flare', desc: 'Lose 30% electricity!', type: 'negative', icon: '🔥', effect: function(g) { g.state.currencies.el*=0.7; } },
-            { name: 'Pirate Raid', desc: 'Lose 15% AC!', type: 'negative', icon: '🛸', effect: function(g) { g.state.currencies.ac*=0.85; } },
+            { name: 'Pirate Raid', desc: 'Lose 15% HC!', type: 'negative', icon: '🛸', effect: function(g) { g.state.currencies.ac*=0.85; } },
             { name: 'Cosmic Tax', desc: 'Lose 10% KRs!', type: 'negative', icon: '💀', effect: function(g) { g.state.totalOKRs*=0.9; } },
             { name: 'Black Hole Proximity', desc: 'Production halved for 10s!', type: 'negative', icon: '🌑', effect: function(g) { g._eventDebuff={mult:0.5,timer:10}; } },
             { name: 'EMP Pulse', desc: 'Finances take 30 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-30); } },
@@ -1150,7 +1151,7 @@
             { name: 'Data Corruption', desc: 'Lose 5% total KRs!', type: 'negative', icon: '⚠️', effect: function(g) { g.state.totalOKRs*=0.95; } },
             { name: 'Fuel Shortage', desc: 'funding drops to 0!', type: 'negative', icon: '🔋', effect: function(g) { g.state.currencies.el=0; } },
             { name: 'Asteroid Impact', desc: 'Random building takes 50 damage!', type: 'negative', icon: '☄️', effect: function(g) { if(g.nodes.length>0){var r=Math.floor(Math.random()*g.nodes.length);g.nodes[r].hp=Math.max(0,g.nodes[r].hp-50);} } },
-            { name: 'Trade Embargo', desc: 'Lose 20% AC!', type: 'negative', icon: '🚫', effect: function(g) { g.state.currencies.ac*=0.8; } },
+            { name: 'Trade Embargo', desc: 'Lose 20% HC!', type: 'negative', icon: '🚫', effect: function(g) { g.state.currencies.ac*=0.8; } },
             { name: 'Quantum Destabilization', desc: 'Multipliers take 40 damage!', type: 'negative', icon: '🔮', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='multiplier') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-40); } },
             { name: 'Nebula Fog', desc: 'Production at 70% for 8s!', type: 'negative', icon: '🌫️', effect: function(g) { g._eventDebuff={mult:0.7,timer:8}; } },
             { name: 'Supply Line Cut', desc: 'Collectors take 20 damage!', type: 'negative', icon: '✂️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='collector') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-20); } },
@@ -1164,7 +1165,7 @@
             { name: 'Neutron Blast', desc: 'Finances take 20 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-20); } },
             { name: 'Singularity Pulse', desc: 'Lose 8% AC and 8% el!', type: 'negative', icon: '💀', effect: function(g) { g.state.currencies.ac*=0.92;g.state.currencies.el*=0.92; } },
             { name: 'Magnetar Flare', desc: 'Banks take 30 damage!', type: 'negative', icon: '🔥', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='bank') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-30); } },
-            { name: 'Quasar Beam', desc: 'Lose 12% AC!', type: 'negative', icon: '💫', effect: function(g) { g.state.currencies.ac*=0.88; } },
+            { name: 'Quasar Beam', desc: 'Lose 12% HC!', type: 'negative', icon: '💫', effect: function(g) { g.state.currencies.ac*=0.88; } },
             { name: 'Solar Wind', desc: 'Collectors take 15 damage!', type: 'negative', icon: '🌪️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='collector') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-15); } },
             { name: 'Cosmic Ray Burst', desc: 'All buildings take 12 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.max(0,g.nodes[i].hp-12); } },
             { name: 'Space Quake', desc: '3 random buildings take 20 damage!', type: 'negative', icon: '🌋', effect: function(g) { for(var j=0;j<3;j++){if(g.nodes.length>0){var r=Math.floor(Math.random()*g.nodes.length);g.nodes[r].hp=Math.max(0,g.nodes[r].hp-20);}} } },
@@ -1178,7 +1179,7 @@
             { name: 'System Glitch', desc: 'Lose 4% KRs!', type: 'negative', icon: '⚠️', effect: function(g) { g.state.totalOKRs*=0.96; } },
             { name: 'Overload', desc: 'Multipliers take 25 damage!', type: 'negative', icon: '🔥', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='multiplier') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-25); } },
             // === POSITIVE EVENTS (41-80) ===
-            { name: 'Stellar Bonus', desc: 'Gain 20% extra AC!', type: 'positive', icon: '⭐', effect: function(g) { g.state.currencies.ac*=1.2; } },
+            { name: 'Stellar Bonus', desc: 'Gain 20% extra HC!', type: 'positive', icon: '⭐', effect: function(g) { g.state.currencies.ac*=1.2; } },
             { name: 'OKR Rain', desc: 'Gain 5% bonus KRs!', type: 'positive', icon: '🌟', effect: function(g) { var bonus=g.state.totalOKRs*0.05;g.state.totalOKRs+=bonus; } },
             { name: 'Energy Surge', desc: '$ doubled!', type: 'positive', icon: '⚡', effect: function(g) { g.state.currencies.el*=2; } },
             { name: 'Repair Nanobots', desc: 'Heal all buildings 30 HP!', type: 'positive', icon: '🔧', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+30); } },
@@ -1186,9 +1187,9 @@
             { name: 'Lucky Find', desc: 'Gain 50 HC!', type: 'positive', icon: '💰', effect: function(g) { g.state.currencies.ac+=50; } },
             { name: 'Hyperdrive', desc: '3x production for 5s!', type: 'positive', icon: '🚀', effect: function(g) { g._eventBuff={mult:3,timer:5}; } },
             { name: 'Shield Recharge', desc: 'Full heal all buildings!', type: 'positive', icon: '🛡️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100; } },
-            { name: 'Trade Deal', desc: 'Gain 30% AC!', type: 'positive', icon: '💎', effect: function(g) { g.state.currencies.ac*=1.3; } },
+            { name: 'Trade Deal', desc: 'Gain 30% HC!', type: 'positive', icon: '💎', effect: function(g) { g.state.currencies.ac*=1.3; } },
             { name: 'Star Power', desc: 'Gain 100 electricity!', type: 'positive', icon: '⭐', effect: function(g) { g.state.currencies.el+=100; } },
-            { name: 'Cosmic Windfall', desc: 'Gain 40% AC!', type: 'positive', icon: '💰', effect: function(g) { g.state.currencies.ac*=1.4; } },
+            { name: 'Cosmic Windfall', desc: 'Gain 40% HC!', type: 'positive', icon: '💰', effect: function(g) { g.state.currencies.ac*=1.4; } },
             { name: 'Resource Cache', desc: 'Gain 75 HC!', type: 'positive', icon: '📦', effect: function(g) { g.state.currencies.ac+=75; } },
             { name: 'Alien Trade', desc: 'Gain 3% bonus KRs!', type: 'positive', icon: '👽', effect: function(g) { var bonus=g.state.totalOKRs*0.03;g.state.totalOKRs+=bonus; } },
             { name: 'Nova Harvest', desc: 'Gain 150 electricity!', type: 'positive', icon: '🌟', effect: function(g) { g.state.currencies.el+=150; } },
@@ -1200,19 +1201,19 @@
             { name: 'Quantum Luck', desc: 'Gain 7% bonus KRs!', type: 'positive', icon: '🍀', effect: function(g) { var bonus=g.state.totalOKRs*0.07;g.state.totalOKRs+=bonus; } },
             { name: 'Galactic Aid', desc: 'Full heal and gain 30 HC!', type: 'positive', icon: '🌌', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100;g.state.currencies.ac+=30; } },
             { name: 'Nebula Mining', desc: 'Gain 80 HC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac+=80; } },
-            { name: 'Treasure Probe', desc: 'Gain 25% AC!', type: 'positive', icon: '🔭', effect: function(g) { g.state.currencies.ac*=1.25; } },
+            { name: 'Treasure Probe', desc: 'Gain 25% HC!', type: 'positive', icon: '🔭', effect: function(g) { g.state.currencies.ac*=1.25; } },
             { name: 'Solar Harvest', desc: 'Gain 200 electricity!', type: 'positive', icon: '☀️', effect: function(g) { g.state.currencies.el+=200; } },
             { name: 'Warp Bonus', desc: '4x production for 3s!', type: 'positive', icon: '🌀', effect: function(g) { g._eventBuff={mult:4,timer:3}; } },
             { name: 'Stardust Rain', desc: 'Gain 4% bonus KRs!', type: 'positive', icon: '✨', effect: function(g) { var bonus=g.state.totalOKRs*0.04;g.state.totalOKRs+=bonus; } },
             { name: 'Photon Boost', desc: '2.5x production for 6s!', type: 'positive', icon: '💫', effect: function(g) { g._eventBuff={mult:2.5,timer:6}; } },
             { name: 'Dark Energy Tap', desc: 'Gain 120 $!', type: 'positive', icon: '🌌', effect: function(g) { g.state.currencies.el+=120; } },
-            { name: 'Gravity Assist', desc: 'Gain 15% AC!', type: 'positive', icon: '🪐', effect: function(g) { g.state.currencies.ac*=1.15; } },
+            { name: 'Gravity Assist', desc: 'Gain 15% HC!', type: 'positive', icon: '🪐', effect: function(g) { g.state.currencies.ac*=1.15; } },
             { name: 'Time Dilation', desc: '1.8x production for 12s!', type: 'positive', icon: '⏳', effect: function(g) { g._eventBuff={mult:1.8,timer:12}; } },
             { name: 'Matter Conversion', desc: 'Gain 90 HC!', type: 'positive', icon: '🔬', effect: function(g) { g.state.currencies.ac+=90; } },
             { name: 'Flux Capacitor', desc: 'Gain 6% bonus KRs!', type: 'positive', icon: '⚡', effect: function(g) { var bonus=g.state.totalOKRs*0.06;g.state.totalOKRs+=bonus; } },
             { name: 'Antimatter Gift', desc: 'Gain 50 HC and 100 el!', type: 'positive', icon: '🎁', effect: function(g) { g.state.currencies.ac+=50;g.state.currencies.el+=100; } },
             { name: 'Dimensional Pocket', desc: 'Heal all buildings 40 HP!', type: 'positive', icon: '🔮', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+40); } },
-            { name: 'Asteroid Mining', desc: 'Gain 35% AC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac*=1.35; } },
+            { name: 'Asteroid Mining', desc: 'Gain 35% HC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac*=1.35; } },
             { name: 'Comet Tail Sweep', desc: 'Gain 2% bonus KRs!', type: 'positive', icon: '☄️', effect: function(g) { var bonus=g.state.totalOKRs*0.02;g.state.totalOKRs+=bonus; } },
             { name: 'Pulsar Alignment', desc: 'Gain 180 electricity!', type: 'positive', icon: '📡', effect: function(g) { g.state.currencies.el+=180; } },
             { name: 'Cosmic Harmony', desc: 'Full heal and 1.5x for 10s!', type: 'positive', icon: '🌈', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100;g._eventBuff={mult:1.5,timer:10}; } },
@@ -1269,7 +1270,7 @@
             this.eventBanner = null;
             this._eventBuff = null;
             this._eventDebuff = null;
-            this.eventHistory = [];
+            this.gameLog = [];
             this.floatingTexts = [];
             this.combo = 0;
             this.comboTimer = 0;
@@ -1859,6 +1860,7 @@
                     document.getElementById('saveCodeText').value = code;
                     document.getElementById('saveCodeModal').style.display = 'block';
                     this.playSound('click');
+                    this.logMessage('💾', 'Game saved', '', 'info');
                 }
             } catch (e) {
                 if (!silent) this.addFloatingText(this.canvas.width / 2, 60, 'Save failed!', '#f44');
@@ -1965,7 +1967,7 @@
             this.eventBanner = null;
             this._eventBuff = null;
             this._eventDebuff = null;
-            this.eventHistory = [];
+            this.gameLog = [];
             this.floatingTexts = [];
             this.combo = 0;
             this.comboTimer = 0;
@@ -2096,6 +2098,7 @@
                     this.triggerShake(4);
                     this.playSound('complete');
                     this.trackEvent('thief_destroyed');
+                    this.logMessage('☠️', 'Competitor defeated!', '', 'positive');
                     return;
                 }
             }
@@ -2152,7 +2155,7 @@
             var b = BUILDINGS[type];
 
             if (this.state.currencies.ac < b.cost) {
-                this.addFloatingText(x, y, 'Not enough AC!', '#f44');
+                this.addFloatingText(x, y, 'Not enough HC!', '#f44');
                 this.playSound('click');
                 return;
             }
@@ -2183,6 +2186,7 @@
             this.spawnParticles(x, y, b.color, 10);
             this.triggerShake(4);
             this.playSound('place');
+            this.logMessage('🏗️', b.name + ' placed', '-' + b.cost + ' HC', 'info');
 
             // Combo system
             this.combo++;
@@ -2229,7 +2233,7 @@
             var upgradeCost = Math.floor(baseCost * UPGRADE_COSTS[nextLevel]);
 
             if (this.state.currencies.ac < upgradeCost) {
-                this.addFloatingText(node.x, node.y - 20, 'Need ' + upgradeCost + ' AC!', '#f44');
+                this.addFloatingText(node.x, node.y - 20, 'Need ' + upgradeCost + ' HC!', '#f44');
                 this.playSound('click');
                 return;
             }
@@ -2244,6 +2248,7 @@
             this.spawnParticles(node.x, node.y, '#ffd700', 15);
             this.triggerShake(6);
             this.playSound('complete');
+            this.logMessage('⬆️', BUILDINGS[node.type].name + ' → Lv.' + nextLevel, '-' + upgradeCost + ' HC', 'info');
 
             // Check for collisions with nearby buildings after upgrade
             var hitRadius = 15 + node.level * 8; // hitbox grows with level
@@ -2276,6 +2281,7 @@
                     this.triggerShake(12);
                     this.playSound('complete');
                     this.unlock('merge');
+                    this.logMessage('🔄', 'MERGE! ' + BUILDINGS[node.type].name + ' → Lv.4 Legendary', '', 'milestone');
                 } else {
                     // DIFFERENT TYPE — Destroy the other building, refund 50%
                     var refund = Math.floor(BUILDINGS[colNode.type].cost * (UPGRADE_COSTS[colNode.level || 1] || 1) * 0.5);
@@ -2288,6 +2294,7 @@
                     // Remove the destroyed building
                     this.nodes.splice(colIdx, 1);
                     this.unlock('collision');
+                    this.logMessage('💥', BUILDINGS[colNode.type].name + ' destroyed', '+' + refund + ' HC refund', 'warning');
                 }
             }
 
@@ -2300,7 +2307,7 @@
             if (!this.running || !this.state) return;
             var cost = this.repairBotCost;
             if (this.state.currencies.ac < cost) {
-                this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2, 'Need ' + cost + ' AC!', '#f44', 14);
+                this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2, 'Need ' + cost + ' HC!', '#f44', 14);
                 this.playSound('click');
                 return;
             }
@@ -2316,6 +2323,7 @@
             this.spawnParticles(fX, fY - 60, '#0ff', 10);
             this.playSound('complete');
             this.trackEvent('repairbot');
+            this.logMessage('🔧', 'IT Support deployed', 'Total: ' + this.repairBots.length, 'info');
             this.rebuildBuildingButtons();
             this.updateUI();
         };
@@ -2682,7 +2690,7 @@
                     thief.stealing = true;
                     thief.stealTimer -= dt;
                     if (Math.random() < dt * 2) {
-                        this.addFloatingText(fX + (Math.random() - 0.5) * 50, fY - 50, '-' + Math.floor(stealAmt) + ' OKR!', '#f0f', 12);
+                        this.addFloatingText(fX + (Math.random() - 0.5) * 50, fY - 50, '-' + Math.floor(stealAmt) + ' KR!', '#f0f', 12);
                     }
                     if (thief.stealTimer <= 0) {
                         thief.phase = 'fleeing';
@@ -2744,14 +2752,17 @@
                     if (progress > 0.3 && !this._warWarn1) {
                         this._warWarn1 = true;
                         this.eventBanner = { icon: '', text: '⚠️ MACHINES ESCALATING', desc: 'The robots are getting stronger...', color: '#f44', type: 'negative', timer: 4 };
+                        this.logMessage('⚠️', 'MACHINES ESCALATING', 'The robots are getting stronger...', 'negative');
                     }
                     if (progress > 0.6 && !this._warWarn2) {
                         this._warWarn2 = true;
                         this.eventBanner = { icon: '', text: '🔥 CRITICAL THREAT', desc: 'Your empire is crumbling under the assault!', color: '#f44', type: 'negative', timer: 4 };
+                        this.logMessage('🔥', 'CRITICAL THREAT', 'Your empire is crumbling under the assault!', 'negative');
                     }
                     if (progress > 0.85 && !this._warWarn3) {
                         this._warWarn3 = true;
                         this.eventBanner = { icon: '', text: '💀 TOTAL WAR', desc: 'There is no stopping them now...', color: '#f00', type: 'negative', timer: 5 };
+                        this.logMessage('💀', 'TOTAL WAR', 'There is no stopping them now...', 'negative');
                     }
                 }
 
@@ -2892,6 +2903,25 @@
 
         OKRFarmingGame.prototype.triggerRandomEvent = function() {
             if (!this.running || !this.state || this.nodes.length === 0) return;
+
+            // 5% chance of phishing attack — instant game over
+            if (Math.random() < 0.05) {
+                this.unlock('phished');
+                this.logMessage('🎣', 'PHISHING ATTACK', 'Your Leadership clicked a suspicious link...', 'negative');
+                this.running = false;
+                this.stopMusic();
+                var self = this;
+                this.eventBanner = { icon: '🎣', text: 'SECURITY BREACH', desc: 'Leadership clicked a phishing link!', color: '#f00', type: 'negative', timer: 10 };
+                this.triggerShake(20);
+                this.spawnParticles(this.canvas.width / 2, this.canvas.height / 2, '#f00', 40);
+                setTimeout(function() {
+                    document.getElementById('gameOverTitle').textContent = 'HACKED';
+                    document.getElementById('gameOverMsg').textContent = 'Your Leadership clicked a phishing link. All systems compromised. Everything is gone.';
+                    document.getElementById('gameOverScreen').style.display = 'flex';
+                }, 2000);
+                return;
+            }
+
             var evt = SPACE_EVENTS[Math.floor(Math.random() * SPACE_EVENTS.length)];
 
             // Execute effect
@@ -2905,14 +2935,7 @@
             }
 
             // Record in history
-            this.eventHistory.push({
-                icon: evt.icon,
-                name: evt.name,
-                desc: evt.desc,
-                type: evt.type,
-                time: Math.floor((Date.now() - this.levelStartTime) / 1000)
-            });
-            if (this.eventHistory.length > 50) this.eventHistory.shift();
+            this.logMessage(evt.icon, evt.name, evt.desc, evt.type);
 
             // Show banner
             var bannerColor = evt.type === 'positive' ? '#0f0' : evt.type === 'negative' ? '#f44' : '#ff0';
@@ -3080,6 +3103,7 @@
             } else {
                 this.transformToAIEconomy();
             }
+            this.logMessage('⚖️', choice === 'equal' ? 'Equal Rights chosen' : 'Humans First chosen', '', 'milestone');
             this.saveGame(true);
         };
 
@@ -3173,6 +3197,7 @@
                 type: 'milestone',
                 timer: 6
             };
+            this.logMessage('⭐', milestone.title, milestone.desc, 'milestone');
         };
 
         // Legacy stubs for backward compatibility
@@ -3437,7 +3462,7 @@
                 var nextElCost = (bt.elCost || 0) * nextPower;
                 var nextInterest = bt.interestRate ? bt.interestRate * nextPower : 0;
 
-                lines.push({ text: '⬆ UPGRADE to Lv.' + nextLvl + '  (' + cost + ' AC)', color: canAfford ? '#0f0' : '#f44', bold: true });
+                lines.push({ text: '⬆ UPGRADE to Lv.' + nextLvl + '  (' + cost + ' HC)', color: canAfford ? '#0f0' : '#f44', bold: true });
 
                 if (bt.okrPerSec > 0) {
                     lines.push({ text: 'KR/s: ' + nodeOkr.toFixed(1) + ' → ' + nextOkr.toFixed(1), color: '#8f8' });
@@ -3459,7 +3484,7 @@
                 }
 
                 if (!canAfford) {
-                    lines.push({ text: '(need ' + (cost - Math.floor(this.state.currencies.ac)) + ' more AC)', color: '#f66' });
+                    lines.push({ text: '(need ' + (cost - Math.floor(this.state.currencies.ac)) + ' more HC)', color: '#f66' });
                 }
             }
 
@@ -6062,7 +6087,18 @@
             });
         };
 
-        OKRFarmingGame.prototype.spawnParticles = function(x, y, color, count) {
+        OKRFarmingGame.prototype.logMessage = function(icon, title, desc, type) {
+            this.gameLog.push({
+                icon: icon || '',
+                text: title,
+                desc: desc || '',
+                type: type || 'info',
+                time: Math.floor((Date.now() - this.levelStartTime) / 1000)
+            });
+            if (this.gameLog.length > 200) this.gameLog.shift();
+        };
+
+        OKRFarmingGame.prototype.spawnParticles= function(x, y, color, count) {
             for (var i = 0; i < count; i++) {
                 var angle = Math.random() * Math.PI * 2;
                 var speed = 30 + Math.random() * 100;
@@ -6116,6 +6152,7 @@
             popup.innerHTML = ach.icon + ' <strong>' + ach.name + '</strong><br><small>' + ach.desc + '</small>';
             popup.style.display = 'block';
             this.playSound('complete');
+            this.logMessage(ach.icon, 'Achievement: ' + ach.name, ach.desc, 'achievement');
 
             setTimeout(function() {
                 popup.style.display = 'none';
@@ -6147,34 +6184,35 @@
             document.getElementById('achievementsList').style.display = 'none';
         };
 
-        OKRFarmingGame.prototype.showEventHistory = function() {
+        OKRFarmingGame.prototype.showLog = function() {
             var panel = document.getElementById('eventHistoryPanel');
             var list = document.getElementById('eventHistoryList');
+            var titleEl = panel.querySelector('h2');
+            if (titleEl) titleEl.textContent = '📜 Game Log';
             list.innerHTML = '';
 
-            if (this.eventHistory.length === 0) {
-                list.innerHTML = '<div style="color:#888;text-align:center;padding:20px;">No events yet. Keep playing!</div>';
+            if (this.gameLog.length === 0) {
+                list.innerHTML = '<div style="color:#888;text-align:center;padding:20px;">No messages yet. Keep playing!</div>';
             } else {
-                for (var i = this.eventHistory.length - 1; i >= 0; i--) {
-                    var ev = this.eventHistory[i];
-                    var color = ev.type === 'positive' ? '#0f0' : ev.type === 'negative' ? '#f44' : '#ff0';
-                    var typeLabel = ev.type === 'positive' ? '▲ BOOST' : ev.type === 'negative' ? '▼ HAZARD' : '◆ EVENT';
+                for (var i = this.gameLog.length - 1; i >= 0; i--) {
+                    var ev = this.gameLog[i];
+                    var color = ev.type === 'positive' || ev.type === 'achievement' ? '#0f0' : ev.type === 'negative' || ev.type === 'warning' ? '#f44' : ev.type === 'milestone' ? '#ffd700' : '#0ff';
+                    var typeLabel = ev.type === 'positive' ? '▲ BOOST' : ev.type === 'negative' ? '▼ HAZARD' : ev.type === 'milestone' ? '★ MILESTONE' : ev.type === 'achievement' ? '🏆 ACHIEVEMENT' : ev.type === 'warning' ? '⚠ WARNING' : ev.type === 'neutral' ? '◆ EVENT' : 'ℹ INFO';
                     var div = document.createElement('div');
-                    div.style.cssText = 'background:rgba(0,20,40,0.8);border:1px solid ' + color + ';border-radius:6px;padding:10px 14px;margin-bottom:8px;';
+                    div.style.cssText = 'background:rgba(0,20,40,0.8);border:1px solid ' + color + ';border-radius:6px;padding:8px 12px;margin-bottom:6px;';
                     div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-                        '<span style="color:' + color + ';font-size:11px;font-weight:bold;">' + typeLabel + '</span>' +
-                        '<span style="color:#888;font-size:10px;">' + ev.time + 's</span>' +
+                        '<span style="color:' + color + ';font-size:10px;font-weight:bold;">' + typeLabel + '</span>' +
+                        '<span style="color:#888;font-size:9px;">' + ev.time + 's</span>' +
                         '</div>' +
-                        '<div style="font-size:15px;margin-top:4px;color:#fff;">' + ev.icon + ' ' + ev.name + '</div>' +
-                        '<div style="font-size:11px;color:' + color + ';margin-top:2px;">' + ev.desc + '</div>';
+                        '<div style="font-size:13px;margin-top:3px;color:#fff;">' + ev.icon + ' ' + ev.text + '</div>' +
+                        (ev.desc ? '<div style="font-size:10px;color:' + color + ';margin-top:2px;">' + ev.desc + '</div>' : '');
                     list.appendChild(div);
                 }
             }
-
             panel.style.display = 'block';
         };
 
-        OKRFarmingGame.prototype.hideEventHistory = function() {
+        OKRFarmingGame.prototype.hideLog = function() {
             document.getElementById('eventHistoryPanel').style.display = 'none';
         };
 
