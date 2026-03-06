@@ -80,6 +80,13 @@
    - Raised the default new-game starting HC from `50` to `101`.
    - Aligned the HUD default value and debug-state base HC seed with the same starting baseline.
 
+16. **VPN achievement wording update**
+   - Updated the VPN Enabled achievement description to report reduced packet loss instead of particle flow wording.
+
+17. **Network Hub branch amplification**
+   - Connection-edge generation now adds one extra direct Leadership branch per Network Hub.
+   - Extra branches target the next closest buildings first to increase visible network branching.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**

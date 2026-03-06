@@ -1273,7 +1273,7 @@
             'merge':        { icon: '🔄', name: 'Fusion!', desc: 'Merged two same-type buildings into a Legendary Lv.4' },
             'phished':      { icon: '🎣', name: 'Phished!', desc: 'Your Leadership clicked a phishing link. Instant game over.' },
             'ai-takeover-loss': { icon: '🤖', name: 'Taken Over', desc: 'Lose the robot war after choosing Humans First' },
-            'vpn':              { icon: '🔒', name: 'VPN Enabled', desc: 'Network Hub secured your connections. Particle flows disabled.' }
+            'vpn':              { icon: '🔒', name: 'VPN Enabled', desc: 'Network Hub secured your connections. Packet loss reduced.' }
         };
 
         var BG_IMAGES = {
@@ -4106,7 +4106,7 @@
             this.drawPixelGrid(ctx, w, h);
             this.drawAsteroidBelt(ctx, w, h);
 
-            // Connections: MST chain linking all nodes to factory
+            // Connections: MST network plus hub-driven extra leadership branches
             var fX = w / 2;
             var fY = h / 2;
             var edges = this._lastComputedEdges || this.computeConnectionEdges();
@@ -4753,7 +4753,7 @@
         };
 
         // =========================================================
-        // MST CONNECTION EDGES
+        // CONNECTION EDGES (MST + leadership branch boosts)
         // =========================================================
 
         OKRFarmingGame.prototype.computeConnectionEdges = function(extraNode) {
@@ -4822,6 +4822,45 @@
                             minEdge[j] = best;
                         }
                     }
+                }
+            }
+
+            // Each Network Hub adds one extra direct leadership branch to the next closest building.
+            var hubCount = 0;
+            for (var hi = 0; hi < this.nodes.length; hi++) {
+                if (this.nodes[hi].type === 'multiplier') hubCount++;
+            }
+            if (hubCount > 0) {
+                var directFactoryNodeIdx = {};
+                for (var ei = 0; ei < edges.length; ei++) {
+                    var fromIdx = edges[ei].from.idx;
+                    var toIdx = edges[ei].to.idx;
+                    if (fromIdx >= 0 && toIdx === -1) directFactoryNodeIdx[fromIdx] = true;
+                    else if (toIdx >= 0 && fromIdx === -1) directFactoryNodeIdx[toIdx] = true;
+                }
+
+                var preferredCandidates = [];
+                var fallbackCandidates = [];
+                for (var pi = 1; pi < points.length; pi++) {
+                    var point = points[pi];
+                    if (point.idx < 0) continue; // Skip factory/ghost nodes for branch boosts
+                    var pdx = point.x - fX;
+                    var pdy = point.y - fY;
+                    var dist = Math.sqrt(pdx * pdx + pdy * pdy);
+                    var candidate = { point: point, dist: dist };
+                    if (directFactoryNodeIdx[point.idx]) fallbackCandidates.push(candidate);
+                    else preferredCandidates.push(candidate);
+                }
+
+                preferredCandidates.sort(function(a, b) { return a.dist - b.dist; });
+                fallbackCandidates.sort(function(a, b) { return a.dist - b.dist; });
+                var branchCandidates = preferredCandidates.concat(fallbackCandidates);
+                var extraBranchCount = Math.min(hubCount, branchCandidates.length);
+                for (var bi = 0; bi < extraBranchCount; bi++) {
+                    edges.push({
+                        from: branchCandidates[bi].point,
+                        to: points[0]
+                    });
                 }
             }
 
@@ -6435,7 +6474,7 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
             ctx.fillRect(mmX, mmY, mmW, mmH);
 
-            // MST connection lines (colour-coded by building type)
+            // Connection lines (MST + optional leadership branch boosts)
             var edges = this.computeConnectionEdges();
             ctx.lineWidth = 1;
             for (var i = 0; i < edges.length; i++) {
