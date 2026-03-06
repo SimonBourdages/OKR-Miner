@@ -7461,44 +7461,19 @@
             var w = this.canvas.width;
             var h = this.canvas.height;
 
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, w, h);
+            // Clear canvas to transparent so the video behind shows through
+            ctx.clearRect(0, 0, w, h);
 
-            if (this.galaxyLoaded[0] || this.galaxyLoaded[1]) {
-                var menuImg = this.galaxyLoaded[1] ? this.galaxyImages[1] : this.galaxyImg;
-                ctx.save();
-                ctx.filter = 'brightness(0.15) saturate(0.8)';
-                var imgW = menuImg.width;
-                var imgH = menuImg.height;
-                var scale = Math.max(w / imgW, h / imgH);
-                ctx.drawImage(menuImg, (w - imgW * scale) / 2, (h - imgH * scale) / 2, imgW * scale, imgH * scale);
-                ctx.filter = 'none';
-                ctx.restore();
-            }
-
+            // Light scanlines overlay only
             this.drawScanlines(ctx, w, h);
 
-            // Animated stars for menu
+            // Animated scanline loop for menu
             var self = this;
             if (!this.running && !this._menuAnim) {
                 this._menuAnim = true;
                 (function menuLoop() {
                     if (self.running) { self._menuAnim = false; return; }
-                    ctx.fillStyle = '#000';
-                    ctx.fillRect(0, 0, w, h);
-                    if (self.galaxyLoaded[0] || self.galaxyLoaded[1]) {
-                        var menuImg2 = self.galaxyLoaded[1] ? self.galaxyImages[1] : self.galaxyImg;
-                        ctx.save();
-                        ctx.filter = 'brightness(0.15) saturate(0.8) hue-rotate(' + ((Date.now() * 0.01) % 360) + 'deg)';
-                        var sc = Math.max(w / menuImg2.width, h / menuImg2.height);
-                        ctx.drawImage(menuImg2,
-                            (w - menuImg2.width * sc) / 2,
-                            (h - menuImg2.height * sc) / 2,
-                            menuImg2.width * sc,
-                            menuImg2.height * sc);
-                        ctx.filter = 'none';
-                        ctx.restore();
-                    }
+                    ctx.clearRect(0, 0, w, h);
                     self.drawScanlines(ctx, w, h);
                     requestAnimationFrame(menuLoop);
                 })();
