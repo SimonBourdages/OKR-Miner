@@ -1184,10 +1184,7 @@
             { okr: 50e6,    unlock: [], title: '🎨 Themes Unlocked!', desc: 'You can now change the visual theme! Each theme provides a small production bonus.', enableThemes: true },
             { okr: 500e6,   unlock: [], title: '🌟 Random Events Active!', desc: 'Space events now occur! Some help, some hurt. Prepare for anything.', enableEvents: true },
             { okr: 5e9,     unlock: [], title: '🌌 Deep Space Phase', desc: 'Your operation enters deep space. New galaxy background unlocked!' },
-            { okr: 50e9,    unlock: [], title: '🔥 Hyperdrive Engaged', desc: 'Production enters overdrive! The galaxy shifts around you.' },
-            { okr: 500e9,   unlock: [], title: '💎 Cosmic Mastery', desc: 'You are becoming one with the cosmos. Ultimate power approaches.' },
-            { okr: 5e12,    unlock: [], title: '🏆 KR Singularity', desc: 'You have achieved digital transcendence. The universe is yours.' },
-            { okr: 1e15,    unlock: [], title: '♾️ INFINITE BEYOND', desc: 'Beyond all measurement. You ARE the KRs now.' }
+            { okr: 50e9,    unlock: [], title: '🔥 VICTORY — Hyperdrive Engaged!', desc: 'You have mastered the galaxy. Congratulations!' }
         ];
         var STARTING_HC = 101;
         var DEBUG_RESOURCE_BONUS = 999999;
@@ -1273,7 +1270,7 @@
             'level-1':      { icon: '🎓', name: 'Graduate',            desc: 'Complete Level 1' },
             'level-5':      { icon: '📋', name: 'Pipeline Pro',        desc: 'Complete Level 5' },
             'level-10':     { icon: '🌌', name: 'Galaxy Brain',        desc: 'Complete Level 10' },
-            'level-15':     { icon: '👑', name: 'Digital Transcender', desc: 'Complete the final level' },
+            'level-11':     { icon: '👑', name: 'Digital Transcender', desc: 'Complete Level 11 — Victory!' },
             'build-first':  { icon: '🏗️', name: 'Architect',           desc: 'Place your first automation building' },
             'multiplier':   { icon: '✖️', name: 'Force Multiplier',    desc: 'Place a Network Hub' },
             'collector-50': { icon: '🏦', name: 'KR Mogul',           desc: 'Collect 50 total KRs' },
@@ -3899,6 +3896,13 @@
 
                     this.trackEvent('milestone', i);
                     this.saveGame(true);
+
+                    // Level achievements
+                    var levelNum = this.state.unlockedMilestones.length;
+                    if (levelNum >= 1) this.unlock('level-1');
+                    if (levelNum >= 5) this.unlock('level-5');
+                    if (levelNum >= 10) this.unlock('level-10');
+                    if (levelNum >= 11) this.unlock('level-11');
 
                     // Objective 2: auto-enable detailed view
                     if (i === 1 && !this.detailedView) {
