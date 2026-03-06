@@ -191,6 +191,7 @@
     <script>
         var ANALYTICS_KEY = 'okrMinerAnalytics';
         var GET_ENDPOINT_KEY = 'okrMinerGetEndpoint';
+        var DEFAULT_GET_ENDPOINT = 'https://default09a5a6493ff94704bf43d028ceb5f5.a3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/81bf35a421774897a3804b40fb5ade6c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=aR3M7ZNXwIFvDsuNAK7iVf6FuKDVxOjs9Dk2HnJrSi8';
 
         function switchTab(name) {
             var tabs = document.querySelectorAll('.tab');
@@ -275,11 +276,7 @@
 
         function loadCloud() {
             var panel = document.getElementById('panel-cloud');
-            var endpoint = localStorage.getItem(GET_ENDPOINT_KEY);
-            if (!endpoint) {
-                panel.innerHTML = '<div class="empty-state"><h2>SharePoint Not Configured</h2><p>Go to ⚙️ Settings and paste your Power Automate GET flow URL.</p></div>';
-                return;
-            }
+            var endpoint = localStorage.getItem(GET_ENDPOINT_KEY) || DEFAULT_GET_ENDPOINT;
             panel.innerHTML = '<div class="empty-state"><h2>Loading...</h2><p>Fetching data from SharePoint...</p></div>';
             fetch(endpoint)
                 .then(function(r) {
