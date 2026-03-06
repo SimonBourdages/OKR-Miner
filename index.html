@@ -972,8 +972,8 @@
             }
         };
 
-        var UPGRADE_COSTS = { 1: 1.0, 2: 2.5, 3: 6.0 }; // multiplier on base cost
-        var UPGRADE_POWER = { 1: 1.0, 2: 2.0, 3: 4.5 }; // multiplier on output
+        var UPGRADE_COSTS = { 1: 1.0, 2: 2.5, 3: 6.0, 4: 0 }; // Lv.4 is free (merge only)
+        var UPGRADE_POWER = { 1: 1.0, 2: 2.0, 3: 4.5, 4: 10.0 }; // Lv.4 = 10x output
 
         var BUILDINGS = {
             collector:   { name: 'Recruiter',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 HC/s',          symbol: '', metrics: ['ac'] },
@@ -1006,7 +1006,9 @@
             'speed-demon':  { icon: '⚡', name: 'Speed Demon',          desc: 'Complete any level in under 15 seconds' },
             'nodes-10':     { icon: '🏭', name: 'Industrialist',       desc: 'Place 10 buildings' },
             'nodes-50':     { icon: '🌐', name: 'Megacorp',            desc: 'Place 50 buildings' },
-            'upgrade-3':    { icon: '⬆️', name: 'Maxed Out',           desc: 'Upgrade a building to level 3' }
+            'upgrade-3':    { icon: '⬆️', name: 'Maxed Out',           desc: 'Upgrade a building to level 3' },
+            'collision':    { icon: '💥', name: 'Collateral Damage', desc: 'A building was destroyed during an upgrade collision' },
+            'merge':        { icon: '🔄', name: 'Fusion!', desc: 'Merged two same-type buildings into a Legendary Lv.4' }
         };
 
         var BG_IMAGES = {
@@ -2178,8 +2180,13 @@
                 return;
             }
             var currentLevel = node.level || 1;
+            if (currentLevel >= 4) {
+                this.addFloatingText(node.x, node.y - 20, '★ LEGENDARY MAX!', '#ffd700', 14);
+                this.playSound('click');
+                return;
+            }
             if (currentLevel >= 3) {
-                this.addFloatingText(node.x, node.y - 20, 'MAX LEVEL!', '#ffd700', 14);
+                this.addFloatingText(node.x, node.y - 20, 'MAX LEVEL! Merge with same type for Lv.4', '#ffd700', 12);
                 this.playSound('click');
                 return;
             }
@@ -2203,6 +2210,52 @@
             this.spawnParticles(node.x, node.y, '#ffd700', 15);
             this.triggerShake(6);
             this.playSound('complete');
+
+            // Check for collisions with nearby buildings after upgrade
+            var hitRadius = 15 + node.level * 8; // hitbox grows with level
+            var collisions = [];
+            for (var ci = 0; ci < this.nodes.length; ci++) {
+                if (ci === idx) continue;
+                var other = this.nodes[ci];
+                var cdx = node.x - other.x;
+                var cdy = node.y - other.y;
+                var cdist = Math.sqrt(cdx * cdx + cdy * cdy);
+                if (cdist < hitRadius) {
+                    collisions.push(ci);
+                }
+            }
+
+            // Process collisions (handle one at a time, highest priority first)
+            if (collisions.length > 0) {
+                var colIdx = collisions[0];
+                var colNode = this.nodes[colIdx];
+
+                if (colNode.type === node.type && node.level < 4) {
+                    // SAME TYPE — MERGE into Lv.4 Legendary!
+                    node.level = 4;
+                    // Remove the other building
+                    this.nodes.splice(colIdx, 1);
+                    // Big celebration
+                    this.addFloatingText(node.x, node.y - 70, '🔄 MERGE! Legendary Lv.4!', '#ffd700', 20);
+                    this.spawnParticles(node.x, node.y, '#ffd700', 30);
+                    this.spawnParticles(node.x, node.y, '#fff', 15);
+                    this.triggerShake(12);
+                    this.playSound('complete');
+                    this.unlock('merge');
+                } else {
+                    // DIFFERENT TYPE — Destroy the other building, refund 50%
+                    var refund = Math.floor(BUILDINGS[colNode.type].cost * (UPGRADE_COSTS[colNode.level || 1] || 1) * 0.5);
+                    this.state.currencies.ac += refund;
+                    this.addFloatingText(colNode.x, colNode.y - 30, '💥 DESTROYED!', '#f44', 16);
+                    this.addFloatingText(colNode.x, colNode.y - 50, '+' + refund + ' HC refund', '#ff0', 12);
+                    this.spawnParticles(colNode.x, colNode.y, '#f44', 20);
+                    this.spawnParticles(colNode.x, colNode.y, '#ff0', 10);
+                    this.triggerShake(8);
+                    // Remove the destroyed building
+                    this.nodes.splice(colIdx, 1);
+                    this.unlock('collision');
+                }
+            }
 
             this.trackEvent('upgrade', node.type + '_to_' + nextLevel);
             this.updateBuildingButtons();
@@ -3132,8 +3185,10 @@
 
             lines.push({ text: '', color: '' }); // spacer
 
-            if (lvl >= 3) {
-                lines.push({ text: '★★★ MAX LEVEL', color: '#ffd700', bold: true });
+            if (lvl >= 4) {
+                lines.push({ text: '★★★★ LEGENDARY', color: '#ffd700', bold: true });
+            } else if (lvl >= 3) {
+                lines.push({ text: '★★★ MAX — Merge with same type for Lv.4', color: '#ffd700', bold: true });
             } else {
                 var nextLvl = lvl + 1;
                 var cost = Math.floor(bt.cost * UPGRADE_COSTS[nextLvl]);
@@ -4950,20 +5005,39 @@
             // Upgrade glow ring
             if (lvl >= 2) {
                 ctx.save();
-                if (lvl === 3) {
+                if (lvl === 4) {
+                    // Legendary golden pulsing double ring
+                    var legendPulse = Math.sin(age * 4) * 0.3 + 0.7;
+                    ctx.strokeStyle = 'rgba(255,215,0,' + legendPulse.toFixed(2) + ')';
+                    ctx.lineWidth = 4;
+                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowBlur = 24;
+                    ctx.beginPath();
+                    ctx.arc(x, y, (7 + lvl) * s, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Second outer ring
+                    ctx.strokeStyle = 'rgba(255,180,0,' + (legendPulse * 0.5).toFixed(2) + ')';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(x, y, (9 + lvl) * s, 0, Math.PI * 2);
+                    ctx.stroke();
+                } else if (lvl === 3) {
                     ctx.strokeStyle = 'rgba(255,215,0,0.5)';
                     ctx.lineWidth = 3;
                     ctx.shadowColor = '#ffd700';
                     ctx.shadowBlur = 14;
+                    ctx.beginPath();
+                    ctx.arc(x, y, (7 + lvl) * s, 0, Math.PI * 2);
+                    ctx.stroke();
                 } else {
                     ctx.strokeStyle = 'rgba(0,255,255,0.3)';
                     ctx.lineWidth = 2;
                     ctx.shadowColor = '#0ff';
                     ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    ctx.arc(x, y, (7 + lvl) * s, 0, Math.PI * 2);
+                    ctx.stroke();
                 }
-                ctx.beginPath();
-                ctx.arc(x, y, (7 + lvl) * s, 0, Math.PI * 2);
-                ctx.stroke();
                 ctx.restore();
             }
 
@@ -4978,32 +5052,38 @@
                 ctx.font = 'bold 11px Segoe UI';
                 ctx.textAlign = 'center';
                 ctx.fillText('\u2605\u2605\u2605', x, y + (9 + lvl) * s);
+            } else if (lvl === 4) {
+                ctx.fillStyle = '#ffd700';
+                ctx.font = 'bold 13px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText('\u2605\u2605\u2605\u2605', x, y + (9 + lvl) * s);
             }
 
-            // Lv.3 orbiting energy motes
-            if (lvl === 3) {
+            // Lv.3+ orbiting energy motes
+            if (lvl >= 3) {
                 var moteR = (7 + lvl) * s;
-                for (var em = 0; em < 4; em++) {
-                    var emA = age * 2 + em * (Math.PI / 2);
+                var moteCount = lvl === 4 ? 8 : 4;
+                for (var em = 0; em < moteCount; em++) {
+                    var emA = age * 2 + em * (Math.PI * 2 / moteCount);
                     var emx = x + Math.cos(emA) * moteR;
                     var emy = y + Math.sin(emA) * moteR;
                     ctx.save();
-                    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                    ctx.fillStyle = lvl === 4 ? 'rgba(255,215,0,0.9)' : 'rgba(255,255,255,0.8)';
                     ctx.shadowColor = '#ffd700';
-                    ctx.shadowBlur = 6;
+                    ctx.shadowBlur = lvl === 4 ? 10 : 6;
                     ctx.beginPath();
-                    ctx.arc(emx, emy, s * 0.4, 0, Math.PI * 2);
+                    ctx.arc(emx, emy, s * (lvl === 4 ? 0.6 : 0.4), 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 }
             }
 
             // Building name label
-            var labelColor = lvl === 3 ? '#ffd700' : BUILDINGS[node.type].color;
+            var labelColor = lvl >= 3 ? '#ffd700' : BUILDINGS[node.type].color;
             ctx.fillStyle = labelColor;
-            ctx.font = lvl === 3 ? 'bold 10px Segoe UI' : '9px Segoe UI';
+            ctx.font = lvl >= 3 ? 'bold 10px Segoe UI' : '9px Segoe UI';
             ctx.textAlign = 'center';
-            var label = BUILDINGS[node.type].name + (lvl > 1 ? ' Lv.' + lvl : '');
+            var label = BUILDINGS[node.type].name + (lvl === 4 ? ' LEGENDARY' : (lvl > 1 ? ' Lv.' + lvl : ''));
             ctx.fillText(label, x, y + 7 * s);
 
             // HP bar (show when damaged OR when damage flash is active)
