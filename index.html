@@ -7578,6 +7578,36 @@
                 } catch(e) {}
             }
 
+            // Send bug report to SharePoint telemetry (reuse existing columns)
+            try {
+                var bugPayload = {
+                    sessionId: 'bug_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                    duration: 0,
+                    mode: 'bug_report',
+                    milestones: this.state ? this.state.unlockedMilestones.length : 0,
+                    totalOKRs: this.state ? Math.floor(this.state.totalOKRs) : 0,
+                    buildingsPlaced: this.nodes ? this.nodes.length : 0,
+                    upgradesDone: 0,
+                    repairBotsBought: 0,
+                    shipsDestroyed: 0,
+                    thievesDestroyed: 0,
+                    eventsTriggered: 0,
+                    peakOKRRate: 0,
+                    peakACRate: 0,
+                    theme: type || 'bug',
+                    endReason: 'bug_report',
+                    buildingTypes: JSON.stringify({ title: title, description: desc, contact: contact || '', type: type }),
+                    browser: navigator.userAgent.split(' ').slice(-2).join(' '),
+                    screen: window.innerWidth + 'x' + window.innerHeight,
+                    version: GAME_VERSION
+                };
+                fetch(ANALYTICS_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bugPayload)
+                });
+            } catch(e) {}
+
             // Open GitHub issue in new tab
             window.open(issueUrl, '_blank');
             this.closeBugReport();
