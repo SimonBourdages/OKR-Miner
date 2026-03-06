@@ -1,0 +1,27 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'fun.thisai.okrminer'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "fun.thisai.okrminer"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.webkit:webkit:1.8.0'
+}
