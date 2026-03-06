@@ -891,6 +891,7 @@
         <button onclick="game.startInfiniteMode()">♾️ INFINITE MODE</button>
         <button onclick="game.showDebugStartDialog()">🧪 DEBUG MODE</button>
         <button onclick="game.continueGame()">CONTINUE</button>
+        <button onclick="game.showAchievements()">🏆 ACHIEVEMENTS</button>
         <button onclick="game.showLoadCode()">📋 LOAD CODE</button>
         <button onclick="game.clearSave()">CLEAR SAVE</button>
         <div id="versionTag" style="margin-top:16px;color:#666;font-size:10px;letter-spacing:1px;"></div>
@@ -1176,7 +1177,7 @@
             processor:   { name: 'Employee',   cost: 150,  acPerSec: 0,   okrPerSec: 5,   elCost: 3,  color: '#2196f3', desc: '+5 KR/s',         symbol: '', metrics: ['okr'] },
             multiplier:  { name: 'Network Hub',  cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#9c27b0', desc: 'x1.5 all rates',   symbol: '', metrics: ['okr', 'ac', 'el', 'mult'], multiplier: 1.5 },
             synthesizer: { name: 'AI', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 KR/s',        symbol: '', metrics: ['okr'] },
-            generator:   { name: 'Finances',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 $/s', symbol: '', metrics: ['el'] },
+            generator:   { name: 'Finances',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 15, elCost: 0, color: '#ff9800', desc: '+15 $/s', symbol: '', metrics: ['el'] },
             bank:        { name: 'Investment',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% $ interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
             repairbot:   { name: 'IT Support',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Heals AI buildings',  symbol: '', metrics: ['hp'], repairRate: 15 },
             gpu:         { name: 'GPU',         cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#76ff03', desc: 'Powers 1 AI unit',  symbol: '', metrics: ['gpu'], gpuCapacity: 1 }
@@ -1314,6 +1315,7 @@
         ];
 
         var SAVE_KEY = 'okrFarmingGame';
+        var ACHIEVEMENTS_KEY = 'okrMinerAchievements';
         var ANALYTICS_KEY = 'okrMinerAnalytics';
         // Google Sheets analytics endpoint — replace with your Apps Script web app URL
         var ANALYTICS_ENDPOINT = 'https://script.google.com/macros/s/PASTE_YOUR_SCRIPT_ID_HERE/exec';
@@ -1464,7 +1466,7 @@
             this.selectedBuilding = 'collector';
             this.detailedView = false;
             this.levelStartTime = 0;
-            this.unlockedAchievements = {};
+            this.unlockedAchievements = this.loadPersistentAchievements();
             this.tutorialShown = {};
             this.connectionAnim = 0;
             this._looping = false;
@@ -2399,7 +2401,7 @@
                 activeTheme: 'emerald'
             };
             this.nodes = [];
-            this.unlockedAchievements = {};
+            this.unlockedAchievements = this.loadPersistentAchievements();
             this.startGame();
         };
 
@@ -2423,7 +2425,7 @@
                 activeTheme: 'emerald'
             };
             this.nodes = [];
-            this.unlockedAchievements = {};
+            this.unlockedAchievements = this.loadPersistentAchievements();
             this.startGame();
         };
 
@@ -2434,7 +2436,8 @@
                     var data = JSON.parse(saved);
                     this.state = data.state;
                     this.nodes = data.nodes || [];
-                    this.unlockedAchievements = data.achievements || {};
+                    this.unlockedAchievements = this.mergeAchievementSets(this.loadPersistentAchievements(), data.achievements || {});
+                    this.savePersistentAchievements();
                     // Normalize nodes for backward compatibility
                     for (var i = 0; i < this.nodes.length; i++) {
                         if (!this.nodes[i].level) this.nodes[i].level = 1;
@@ -2481,6 +2484,7 @@
                 achievements: this.unlockedAchievements
             };
             try {
+                this.savePersistentAchievements();
                 localStorage.setItem(SAVE_KEY, JSON.stringify(data));
                 if (!silent) {
                     // Show save code modal only on manual save
@@ -2554,7 +2558,8 @@
             // Load the save data
             this.state = data.state;
             this.nodes = data.nodes || [];
-            this.unlockedAchievements = data.achievements || {};
+            this.unlockedAchievements = this.mergeAchievementSets(this.loadPersistentAchievements(), data.achievements || {});
+            this.savePersistentAchievements();
             // Normalize
             for (var i = 0; i < this.nodes.length; i++) {
                 if (!this.nodes[i].level) this.nodes[i].level = 1;
@@ -6812,12 +6817,45 @@
         // ACHIEVEMENTS
         // =========================================================
 
+        OKRFarmingGame.prototype.mergeAchievementSets = function(primary, secondary) {
+            var merged = {};
+            var key;
+            var sources = [primary || {}, secondary || {}];
+            for (var si = 0; si < sources.length; si++) {
+                var src = sources[si];
+                for (key in src) {
+                    if (!Object.prototype.hasOwnProperty.call(src, key)) continue;
+                    if (!src[key]) continue;
+                    merged[key] = true;
+                }
+            }
+            return merged;
+        };
+
+        OKRFarmingGame.prototype.loadPersistentAchievements = function() {
+            try {
+                var raw = localStorage.getItem(ACHIEVEMENTS_KEY);
+                if (!raw) return {};
+                var parsed = JSON.parse(raw);
+                return this.mergeAchievementSets(parsed, {});
+            } catch (e) {
+                return {};
+            }
+        };
+
+        OKRFarmingGame.prototype.savePersistentAchievements = function() {
+            try {
+                localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(this.unlockedAchievements || {}));
+            } catch (e) {}
+        };
+
         OKRFarmingGame.prototype.unlock = function(id) {
             if (this.unlockedAchievements[id]) return;
             var ach = ACHIEVEMENTS[id];
             if (!ach) return;
 
             this.unlockedAchievements[id] = true;
+            this.savePersistentAchievements();
 
             var popup = document.getElementById('achievementPopup');
             popup.innerHTML = ach.icon + ' <strong>' + ach.name + '</strong><br><small>' + ach.desc + '</small>';
@@ -7153,6 +7191,7 @@
                     achievements: this.unlockedAchievements
                 };
                 try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(e) {}
+                this.savePersistentAchievements();
             }
             document.getElementById('victoryScreen').style.display = 'none';
             this.showMenu();

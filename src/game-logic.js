@@ -61,7 +61,7 @@
     }
 
     function calculateFundingCap(nodes) {
-        var fundingCap = 500;
+        var fundingCap = 1000000;
         var list = nodes || [];
         for (var i = 0; i < list.length; i++) {
             if (list[i].type !== 'bank') continue;

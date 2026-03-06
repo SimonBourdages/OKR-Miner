@@ -6,7 +6,7 @@ const BUILDINGS = {
     processor: { cost: 150, acPerSec: 0, okrPerSec: 5, elCost: 3 },
     multiplier: { cost: 500, acPerSec: 0, okrPerSec: 0, elCost: 5, multiplier: 1.5 },
     synthesizer: { cost: 2000, acPerSec: 0, okrPerSec: 100, elCost: 10 },
-    generator: { cost: 75, acPerSec: 0, okrPerSec: 0, elPerSec: 5, elCost: 0 },
+    generator: { cost: 75, acPerSec: 0, okrPerSec: 0, elPerSec: 15, elCost: 0 },
     bank: { cost: 300, acPerSec: 0, okrPerSec: 0, elCost: 0, interestRate: 0.02 },
     gpu: { cost: 500, acPerSec: 0, okrPerSec: 0, elCost: 5 }
 };
@@ -184,7 +184,7 @@ describe('production snapshot calculations', () => {
             baseElGain: 10
         });
 
-        expect(snapshot.fundingCap).toBe(5000);
+        expect(snapshot.fundingCap).toBe(1004500);
     });
 });
 

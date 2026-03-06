@@ -50,6 +50,14 @@
    - During Humans First robot uprising, existing AI buildings now visibly attack non-AI buildings instead of only abstract random hits.
    - When only AI buildings remain, leadership KR reserves are explicitly siphoned with dedicated warning feedback.
 
+9. **Menu-visible persistent achievements**
+   - Added Achievements access directly from the main menu.
+   - Achievement unlocks now persist in dedicated browser localStorage and are merged with save/load data so progress survives sessions.
+
+10. **Finances economy and base funding cap rebalance**
+   - Increased Finances building funding output from `+5 $/s` to `+15 $/s` (3x), scaling all upgrade levels accordingly.
+   - Raised the default starting funding cap to `1,000,000 $` in shared funding-cap logic.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**
