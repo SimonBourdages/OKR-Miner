@@ -907,15 +907,16 @@
         <h1>OKR FARMING</h1>
         <div class="subtitle">Engine Building Game</div>
         <button onclick="game.newGame()">NEW GAME</button>
-        <button onclick="game.startInfiniteMode()">♾️ INFINITE MODE</button>
         <button onclick="game.continueGame()">CONTINUE</button>
         <button onclick="game.showAchievements()">🏆 ACHIEVEMENTS</button>
+        <button id="infiniteModeBtn" onclick="game.startInfiniteMode()" style="display:none;">♾️ INFINITE MODE</button>
         <button onclick="game.showLoadCode()">📋 LOAD CODE</button>
         <button onclick="game.clearSave()">CLEAR SAVE</button>
         <div id="versionTag" style="margin-top:16px;color:#666;font-size:10px;letter-spacing:1px;cursor:pointer;" onclick="game._versionTaps=(game._versionTaps||0)+1;if(game._versionTaps>=2){game._versionTaps=0;document.getElementById('debugMenu').style.display=document.getElementById('debugMenu').style.display==='none'?'block':'none';}clearTimeout(game._versionTapTimer);game._versionTapTimer=setTimeout(function(){game._versionTaps=0;},800);"></div>
         <div id="debugMenu" style="display:none;margin-top:10px;">
             <button onclick="game.showDebugStartDialog()" style="background:rgba(255,255,0,0.1);color:#ff0;border-color:#ff0;font-size:14px;padding:8px 20px;">🧪 DEBUG MODE</button>
             <button onclick="window.location.href='./stats.html'" style="background:rgba(100,181,246,0.1);color:#64b5f6;border-color:#64b5f6;font-size:14px;padding:8px 20px;">📊 ANALYTICS</button>
+            <button onclick="game.startInfiniteMode()" style="background:rgba(255,255,0,0.1);color:#ff0;border-color:#ff0;font-size:14px;padding:8px 20px;">♾️ INFINITE (BYPASS)</button>
         </div>
     </div>
 
@@ -1782,6 +1783,7 @@
             this.setupAiTakeoverVideo();
             this.setupCompetitorIntroVideo();
             this.rebuildBuildingButtons();
+            this.updateInfiniteModeVisibility();
             this.renderMenuBackground();
         }
 
@@ -7132,6 +7134,15 @@
             }
         };
 
+        OKRFarmingGame.prototype.updateInfiniteModeVisibility = function() {
+            var count = 0;
+            for (var k in this.unlockedAchievements) {
+                if (this.unlockedAchievements[k]) count++;
+            }
+            var btn = document.getElementById('infiniteModeBtn');
+            if (btn) btn.style.display = count >= 5 ? 'block' : 'none';
+        };
+
         OKRFarmingGame.prototype.showLog = function() {
             var panel = document.getElementById('eventHistoryPanel');
             var list = document.getElementById('eventHistoryList');
@@ -7444,6 +7455,7 @@
                 this.autosaveInterval = null;
             }
             document.getElementById('menu').style.display = 'flex';
+            this.updateInfiniteModeVisibility();
             document.getElementById('ui').style.display = 'none';
             document.getElementById('controls').classList.remove('open');
             document.getElementById('menuToggleBtn').style.display = 'none';
