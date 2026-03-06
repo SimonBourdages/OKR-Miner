@@ -863,7 +863,7 @@
         </div>
         <div class="stat-row">
             <span class="stat-label">HC</span>
-            <span class="stat-value" id="currencyDisplay">50</span>
+            <span class="stat-value" id="currencyDisplay">101</span>
         </div>
         <div id="elRow" class="stat-row" style="display:none;">
             <span class="stat-label">$</span>
@@ -1176,6 +1176,7 @@
             { okr: 5e12,    unlock: [], title: '🏆 KR Singularity', desc: 'You have achieved digital transcendence. The universe is yours.' },
             { okr: 1e15,    unlock: [], title: '♾️ INFINITE BEYOND', desc: 'Beyond all measurement. You ARE the KRs now.' }
         ];
+        var STARTING_HC = 101;
         var DEBUG_RESOURCE_BONUS = 999999;
         var DEBUG_FUNDING_BONUS = 1000000;
         var DEBUG_BUILDING_ORDER = ['processor', 'collector', 'multiplier', 'synthesizer', 'generator', 'bank', 'gpu', 'repairbot'];
@@ -2216,7 +2217,7 @@
             var targetLevel = Math.max(1, Math.min(MILESTONES.length, parseInt(level, 10) || 1));
             var debugStartingElBonus = DEBUG_RESOURCE_BONUS + DEBUG_FUNDING_BONUS;
             var state = {
-                currencies: { ac: 50 + DEBUG_RESOURCE_BONUS, el: debugStartingElBonus },
+                currencies: { ac: STARTING_HC + DEBUG_RESOURCE_BONUS, el: debugStartingElBonus },
                 totalOKRs: 0,
                 unlockedMilestones: [0],
                 unlockedBuildings: ['collector', 'processor'],
@@ -2456,7 +2457,7 @@
         OKRFarmingGame.prototype.newGame = function() {
             this.infiniteMode = false;
             this.state = {
-                currencies: { ac: 50, el: 0 },
+                currencies: { ac: STARTING_HC, el: 0 },
                 totalOKRs: 0,
                 unlockedMilestones: [0],
                 unlockedBuildings: ['collector', 'processor'],

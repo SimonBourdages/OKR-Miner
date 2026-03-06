@@ -76,6 +76,10 @@
    - Included the full random event catalog (100 events) with filtering and grouped by negative/positive/neutral pools.
    - Added a README link so players can quickly open the story/event path guide.
 
+15. **Starting HC baseline adjustment**
+   - Raised the default new-game starting HC from `50` to `101`.
+   - Aligned the HUD default value and debug-state base HC seed with the same starting baseline.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**
