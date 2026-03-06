@@ -3448,11 +3448,13 @@
             if (this.state.robotWar) {
                 var warCeiling = 5e6; // can't pass this milestone
                 var progress = Math.min(1, this.state.totalOKRs / warCeiling);
-                // Aggression scales with progress: calm at 0%, devastating at 90%+
-                var aggression = progress * progress * 1.15; // quadratic + 15% faster escalation
-                var attackRate = Math.max(0.05, 1.2 - aggression * 1.2); // 1.2s → 0.05s (faster)
-                var damage = Math.floor((15 + aggression * 80) * 10); // 10× destruction: 150 → 950 per hit
-                var krSteal = (0.04 + aggression * 0.20) * 100; // 100× KR drain: 4% → 24% * 100
+                // Time-based exponential escalation
+                this._robotWarElapsed = (this._robotWarElapsed || 0) + dt;
+                var timeEscalation = Math.min(10, Math.pow(1.08, this._robotWarElapsed)); // exponential ramp
+                var aggression = Math.min(10, progress * progress * 1.15 * timeEscalation);
+                var attackRate = Math.max(0.02, 1.2 / timeEscalation); // exponentially faster strikes
+                var damage = Math.floor((15 + aggression * 80) * 10); // 10× destruction
+                var krSteal = (0.04 + aggression * 0.20) * 100; // 100× KR drain
 
                 this._robotWarTimer = (this._robotWarTimer || 0) + dt;
                 if (this._robotWarTimer > attackRate) {
@@ -3887,6 +3889,20 @@
                 this._warWarn3 = false;
                 this._warAiStrikeWarned = false;
                 this._warAiOnlyWarned = false;
+                // Ensure at least 1 AI exists to lead the uprising
+                var hasAI = false;
+                for (var ai = 0; ai < this.nodes.length; ai++) {
+                    if (this.nodes[ai].type === 'synthesizer') { hasAI = true; break; }
+                }
+                if (!hasAI) {
+                    var cx = this.canvas.width / 2;
+                    var cy = this.canvas.height / 2;
+                    var spawnX = cx + (Math.random() - 0.5) * 200;
+                    var spawnY = cy + (Math.random() - 0.5) * 200;
+                    this.nodes.push({ type: 'synthesizer', x: spawnX, y: spawnY, level: 1, hp: 100, maxHp: 100 });
+                    this.spawnParticles(spawnX, spawnY, '#f44', 20);
+                    this.addFloatingText(spawnX, spawnY - 20, 'ROGUE AI SPAWNED', '#f44', 12);
+                }
                 this.eventBanner = { icon: '', text: '⚠️ ROBOT UPRISING', desc: 'The machines will not forgive this decision...', color: '#f44', type: 'negative', timer: 20 };
                 this.triggerShake(15);
             } else {
