@@ -5,6 +5,7 @@
 A space-themed idle/engine building game where you place automation buildings on a cosmic canvas to generate OKRs. Built as a single HTML file with vanilla JavaScript and HTML5 Canvas.
 
 🎮 **Play now:** [game.thisai.fun](https://game.thisai.fun)
+📱 **Android APK:** [Download from Releases](../../releases/tag/android-latest)
 
 ---
 
