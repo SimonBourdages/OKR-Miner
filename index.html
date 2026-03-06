@@ -845,8 +845,8 @@
             <span class="stat-value" id="currencyDisplay">50</span>
         </div>
         <div id="elRow" class="stat-row" style="display:none;">
-            <span class="stat-label">💲</span>
-            <span class="stat-value" id="elDisplay" style="color:#ffd700;">0</span><span id="elCapDisplay" style="color:#888;font-size:9px;"></span><span style="color:#ffd700;"> $</span>
+            <span class="stat-label">$</span>
+            <span class="stat-value" style="color:#ffd700;"><span id="elDisplay">0</span><span id="elCapDisplay" style="color:#999;"></span></span>
         </div>
         <div style="margin-top:6px;border-top:1px solid #234;padding-top:4px;cursor:pointer;color:#888;font-size:10px;text-align:center;" onclick="var r=document.getElementById('ratesSection');r.style.display=r.style.display==='none'?'block':'none';">▼ Rates</div>
         <div id="ratesSection" style="display:none;">
@@ -1094,7 +1094,7 @@
             { okr: 5e6,     unlock: [], title: '🌟 Random Events Active!', desc: 'Space events now occur! Some help, some hurt. Prepare for anything.', enableEvents: true },
             { okr: 50e6,    unlock: [], title: '🎨 Themes Unlocked!', desc: 'You can now change the visual theme! Each theme provides a small production bonus.', enableThemes: true },
             { okr: 500e6,   unlock: [], title: '🌌 Deep Space Phase', desc: 'Your operation enters deep space. New galaxy background unlocked!' },
-            { okr: 5e9,     unlock: ['bank'], title: '🏦 Bank Unlocked!', desc: 'Investment Funds earn 2% interest on your $ per second. Smart money management!' },
+            { okr: 5e9,     unlock: ['bank'], title: '🏦 Investment Unlocked!', desc: 'Investment Funds earn 2% interest on your $ per second. Smart money management!' },
             { okr: 50e9,    unlock: [], title: '🔥 Hyperdrive Engaged', desc: 'Production enters overdrive! The galaxy shifts around you.' },
             { okr: 500e9,   unlock: [], title: '💎 Cosmic Mastery', desc: 'You are becoming one with the cosmos. Ultimate power approaches.' },
             { okr: 5e12,    unlock: [], title: '🏆 KR Singularity', desc: 'You have achieved digital transcendence. The universe is yours.' },
@@ -1129,7 +1129,7 @@
                 primary: '#ff9900', accent: '#ffcc00', danger: '#ff3333',
                 panelBg: 'rgba(25, 12, 0, 0.92)', panelBorder: '#ff9900',
                 gridColor: 'rgba(255, 153, 0, 0.04)',
-                bonus: 'el', bonusDesc: '+1% el/s', bonusMult: 1.01
+                bonus: 'el', bonusDesc: '+1% $/s', bonusMult: 1.01
             },
             arctic: {
                 name: 'Arctic Command',
@@ -1179,8 +1179,8 @@
             'level-10':     { icon: '🌌', name: 'Galaxy Brain',        desc: 'Complete Level 10' },
             'level-15':     { icon: '👑', name: 'Digital Transcender', desc: 'Complete the final level' },
             'build-first':  { icon: '🏗️', name: 'Architect',           desc: 'Place your first automation building' },
-            'multiplier':   { icon: '✖️', name: 'Force Multiplier',    desc: 'Place a Multiplier building' },
-            'collector-50': { icon: '🏦', name: 'OKR Mogul',           desc: 'Collect 50 total OKRs' },
+            'multiplier':   { icon: '✖️', name: 'Force Multiplier',    desc: 'Place a Network Hub' },
+            'collector-50': { icon: '🏦', name: 'KR Mogul',           desc: 'Collect 50 total KRs' },
             'speed-demon':  { icon: '⚡', name: 'Speed Demon',          desc: 'Complete any level in under 15 seconds' },
             'nodes-10':     { icon: '🏭', name: 'Industrialist',       desc: 'Place 10 buildings' },
             'nodes-50':     { icon: '🌐', name: 'Megacorp',            desc: 'Place 50 buildings' },
@@ -3581,7 +3581,7 @@
                 elRateEl.textContent = (this.currentElRate >= 0 ? '+' : '') + this.currentElRate.toFixed(1);
                 elRateEl.style.color = this.currentElRate >= 0 ? '#ffd700' : '#f44';
                 if (this.UNDERFUNDED) {
-                    elRateEl.textContent += ' ⚠ UNDERFUNDED';
+                    elRateEl.textContent += ' ⚠';
                 }
             }
 
