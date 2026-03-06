@@ -739,9 +739,10 @@
         <button onclick="game.saveAndQuit()">🚪 Quit</button>
         <button id="soundToggleBtn" onclick="game.cycleSoundMode()">🔊 All Sound</button>
         <button onclick="game.showAchievements()">🏆</button>
-        <button onclick="game.showLog()">📜 Log</button>
-        <button onclick="game.openBugReport()">🐛 Bug</button>
-        <button onclick="game.resetCamera()" title="Reset camera zoom and position">🎯 Reset View</button>
+        <button onclick="game.showLog()">📜</button>
+        <button onclick="game.openBugReport()">🐛</button>
+        <button id="detailToggleBtn" onclick="game.toggleDetailedView()">📊 Details: OFF</button>
+        <button onclick="game.resetCamera()">🎯</button>
         <span style="color:#ff0;font-size:10px;margin-left:auto;">⏱ <span id="eventCountdown">--</span>s</span>
     </div>
 
@@ -1277,6 +1278,7 @@
             this.lastTick = 0;
             this.running = false;
             this.selectedBuilding = 'collector';
+            this.detailedView = false;
             this.levelStartTime = 0;
             this.unlockedAchievements = {};
             this.tutorialShown = {};
@@ -1671,6 +1673,7 @@
         OKRFarmingGame.prototype.updateBuildingPreview = function(type) {
             var el = document.getElementById('preview-' + type);
             if (!el || !this.state) return;
+            if (!this.detailedView) { el.innerHTML = ''; return; }
 
             var b = BUILDINGS[type];
 
@@ -3364,13 +3367,15 @@
                 try { this.drawPixelNode(ctx, this.nodes[i]); } catch(e) { console.error('drawPixelNode error:', e); }
             }
 
-            // Draw info tooltip for hovered node
-            for (var i = 0; i < this.nodes.length; i++) {
-                var n = this.nodes[i];
-                var dx = this.mouseX - n.x, dy = this.mouseY - n.y;
-                if (Math.sqrt(dx*dx + dy*dy) < 25) {
-                    try { this.drawNodeTooltip(ctx, n); } catch(e) { console.error('tooltip error:', e); }
-                    break;
+            // Draw info tooltip for hovered node (only in detailed view)
+            if (this.detailedView) {
+                for (var i = 0; i < this.nodes.length; i++) {
+                    var n = this.nodes[i];
+                    var dx = this.mouseX - n.x, dy = this.mouseY - n.y;
+                    if (Math.sqrt(dx*dx + dy*dy) < 25) {
+                        try { this.drawNodeTooltip(ctx, n); } catch(e) { console.error('tooltip error:', e); }
+                        break;
+                    }
                 }
             }
 
@@ -6123,6 +6128,13 @@
             this.camera.targetZoom = 1;
             this.camera.targetOffsetX = 0;
             this.camera.targetOffsetY = 0;
+        };
+
+        OKRFarmingGame.prototype.toggleDetailedView = function() {
+            this.detailedView = !this.detailedView;
+            var btn = document.getElementById('detailToggleBtn');
+            if (btn) btn.textContent = this.detailedView ? '📊 Details: ON' : '📊 Details: OFF';
+            if (btn) btn.style.background = this.detailedView ? 'rgba(0,255,136,0.3)' : '';
         };
 
         // =========================================================
