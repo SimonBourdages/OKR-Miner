@@ -610,6 +610,45 @@
             background: rgba(255, 68, 68, 0.35);
         }
 
+        #competitorIntroVideoModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 360;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            padding: 16px;
+        }
+
+        #competitorIntroVideoModal video {
+            width: min(92vw, 960px);
+            max-height: 75vh;
+            border: 2px solid #ff66ff;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        #skipCompetitorIntroVideoBtn {
+            background: rgba(255, 102, 255, 0.15);
+            color: #ff99ff;
+            border: 1px solid #ff66ff;
+            border-radius: 6px;
+            padding: 8px 20px;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        #skipCompetitorIntroVideoBtn:hover {
+            background: rgba(255, 102, 255, 0.35);
+        }
+
         .hint-text {
             position: fixed;
             bottom: 60px;
@@ -922,6 +961,14 @@
         </video>
         <button id="skipAiTakeoverVideoBtn">SKIP CLIP</button>
         <div id="aiTakeoverVideoResumeCountdown" class="video-resume-countdown"></div>
+    </div>
+
+    <div id="competitorIntroVideoModal">
+        <video id="competitorIntroVideo" muted playsinline preload="metadata">
+            <source src="./spaceship-resource-raid-video.mp4" type="video/mp4">
+        </video>
+        <button id="skipCompetitorIntroVideoBtn">SKIP CLIP</button>
+        <div id="competitorIntroVideoResumeCountdown" class="video-resume-countdown"></div>
     </div>
 
     <div class="hint-text" id="hintText"></div>
@@ -1651,6 +1698,7 @@
             this.setupVideoIntro();
             this.setupUpgradeUnlockVideo();
             this.setupAiTakeoverVideo();
+            this.setupCompetitorIntroVideo();
             this.rebuildBuildingButtons();
             this.renderMenuBackground();
         }
@@ -1815,6 +1863,14 @@
             }
         };
 
+        OKRFarmingGame.prototype.setupCompetitorIntroVideo = function() {
+            var self = this;
+            var skipBtn = document.getElementById('skipCompetitorIntroVideoBtn');
+            if (skipBtn) {
+                skipBtn.addEventListener('click', function() { self.stopManagedVideoPlayback(true); });
+            }
+        };
+
         OKRFarmingGame.prototype.hideAiTakeoverVideo = function() {
             this.stopManagedVideoPlayback(false);
         };
@@ -1825,6 +1881,19 @@
                 videoId: 'aiTakeoverVideo',
                 countdownId: 'aiTakeoverVideoResumeCountdown',
                 resumeOnEnd: false
+            });
+        };
+
+        OKRFarmingGame.prototype.hideCompetitorIntroVideo = function() {
+            this.stopManagedVideoPlayback(false);
+        };
+
+        OKRFarmingGame.prototype.playCompetitorIntroVideo = function() {
+            this.startManagedVideoPlayback({
+                modalId: 'competitorIntroVideoModal',
+                videoId: 'competitorIntroVideo',
+                countdownId: 'competitorIntroVideoResumeCountdown',
+                resumeOnEnd: true
             });
         };
 
@@ -2005,6 +2074,7 @@
                 shipsEnabled: false,
                 repairBotsEnabled: false,
                 thievesEnabled: false,
+                competitorIntroPlayed: false,
                 aiChoice: null,
                 gpuEnabled: false,
                 eventsEnabled: false,
@@ -2028,6 +2098,7 @@
                 shipsEnabled: true,
                 repairBotsEnabled: true,
                 thievesEnabled: true,
+                competitorIntroPlayed: false,
                 aiChoice: 'equal',
                 gpuEnabled: true,
                 eventsEnabled: true,
@@ -2062,6 +2133,7 @@
                     if (this.state.shipsEnabled === undefined) this.state.shipsEnabled = false;
                     if (this.state.repairBotsEnabled === undefined) this.state.repairBotsEnabled = false;
                     if (this.state.thievesEnabled === undefined) this.state.thievesEnabled = false;
+                    if (this.state.competitorIntroPlayed === undefined) this.state.competitorIntroPlayed = this.state.unlockedMilestones.indexOf(5) >= 0;
                     if (!this.state.aiChoice) this.state.aiChoice = null;
                     if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
                     if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
@@ -2178,6 +2250,7 @@
             if (this.state.shipsEnabled === undefined) this.state.shipsEnabled = false;
             if (this.state.repairBotsEnabled === undefined) this.state.repairBotsEnabled = false;
             if (this.state.thievesEnabled === undefined) this.state.thievesEnabled = false;
+            if (this.state.competitorIntroPlayed === undefined) this.state.competitorIntroPlayed = this.state.unlockedMilestones.indexOf(5) >= 0;
             if (!this.state.aiChoice) this.state.aiChoice = null;
             if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
             if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
@@ -2225,6 +2298,7 @@
             this._lastComputedEdges = null;
             this.hideUpgradeUnlockVideo();
             this.hideAiTakeoverVideo();
+            this.hideCompetitorIntroVideo();
 
             // Show game UI, hide menus
             document.getElementById('menu').style.display = 'none';
@@ -3124,6 +3198,8 @@
             else if (side === 1) { x = w + 30; y = Math.random() * h; }
             else if (side === 2) { x = Math.random() * w; y = -30; }
             else { x = Math.random() * w; y = h + 30; }
+            var shouldPlayIntro = !!this.state && !this.state.competitorIntroPlayed;
+            if (shouldPlayIntro) this.state.competitorIntroPlayed = true;
             this.thiefShips.push({
                 x: x, y: y,
                 spawnX: x, spawnY: y,
@@ -3134,6 +3210,10 @@
                 phase: 'approaching',
                 stealTimer: 0, stolen: 0, returnTimer: 0
             });
+            if (shouldPlayIntro) {
+                this.playCompetitorIntroVideo();
+                this.saveGame(true);
+            }
         };
 
         // =========================================================
@@ -6724,6 +6804,7 @@
             document.getElementById('aiChoiceDialog').style.display = 'none';
             this.hideUpgradeUnlockVideo();
             this.hideAiTakeoverVideo();
+            this.hideCompetitorIntroVideo();
             this.stopMusic();
             // Show video as menu background
             var vidIntro = document.getElementById('videoIntro');

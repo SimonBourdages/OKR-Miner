@@ -36,6 +36,10 @@
 5. **Offline cache alignment**
    - Updated service worker cache list/version to include the new `src/game-logic.js` asset.
 
+6. **Competitor raid cinematic introduction**
+   - Added a new autoplay cinematic (`spaceship-resource-raid-video.mp4`) that triggers once when the first competitor ship appears.
+   - Wired it into the shared managed-video flow so gameplay auto-pauses during playback and resumes with the same countdown UX used by upgrade cinematics.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**
