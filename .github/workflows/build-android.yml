@@ -1,0 +1,59 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'index.html'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: okr-miner-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 90
+
+      - name: Create or update GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: Android APK (latest)
+          body: |
+            ## OKR Miner — Android APK
+
+            Install this APK on your Android phone (Android 7.0+ required).
+
+            ### How to install
+            1. Download `app-debug.apk` below
+            2. On your phone, enable **Settings > Security > Install unknown apps** (or similar)
+            3. Open the downloaded APK and tap **Install**
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          make_latest: true
+          prerelease: false

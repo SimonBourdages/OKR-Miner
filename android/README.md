@@ -2,6 +2,16 @@
 
 A WebView wrapper that turns the [OKR Miner](https://game.thisai.fun) web game into an installable Android app.
 
+## Download APK
+
+The latest APK is automatically built by CI and published as a GitHub Release:
+
+👉 **[Download latest APK from Releases](../../releases/tag/android-latest)**
+
+1. Download `app-debug.apk` from the release page
+2. On your Android phone, go to **Settings > Security** and enable **Install unknown apps**
+3. Open the downloaded APK and tap **Install**
+
 ## Build Instructions
 
 ### Option 1: Android Studio
