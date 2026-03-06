@@ -29,18 +29,6 @@ jobs:
             "
           fi
 
-      - name: Approve PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.pulls.createReview({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-              event: 'APPROVE',
-              body: ' Auto-approved. JS validated.'
-            });
-
       - name: Merge PR
         uses: actions/github-script@v7
         with:
