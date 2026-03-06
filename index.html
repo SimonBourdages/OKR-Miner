@@ -3056,17 +3056,17 @@
                     // Warning messages at thresholds
                     if (progress > 0.3 && !this._warWarn1) {
                         this._warWarn1 = true;
-                        this.eventBanner = { icon: '', text: '⚠️ MACHINES ESCALATING', desc: 'The robots are getting stronger...', color: '#f44', type: 'negative', timer: 4 };
+                        this.eventBanner = { icon: '', text: '⚠️ MACHINES ESCALATING', desc: 'The robots are getting stronger...', color: '#f44', type: 'negative', timer: 8 };
                         this.logMessage('⚠️', 'MACHINES ESCALATING', 'The robots are getting stronger...', 'negative');
                     }
                     if (progress > 0.6 && !this._warWarn2) {
                         this._warWarn2 = true;
-                        this.eventBanner = { icon: '', text: '🔥 CRITICAL THREAT', desc: 'Your empire is crumbling under the assault!', color: '#f44', type: 'negative', timer: 4 };
+                        this.eventBanner = { icon: '', text: '🔥 CRITICAL THREAT', desc: 'Your empire is crumbling under the assault!', color: '#f44', type: 'negative', timer: 8 };
                         this.logMessage('🔥', 'CRITICAL THREAT', 'Your empire is crumbling under the assault!', 'negative');
                     }
                     if (progress > 0.85 && !this._warWarn3) {
                         this._warWarn3 = true;
-                        this.eventBanner = { icon: '', text: '💀 TOTAL WAR', desc: 'There is no stopping them now...', color: '#f00', type: 'negative', timer: 5 };
+                        this.eventBanner = { icon: '', text: '💀 TOTAL WAR', desc: 'There is no stopping them now...', color: '#f00', type: 'negative', timer: 20 };
                         this.logMessage('💀', 'TOTAL WAR', 'There is no stopping them now...', 'negative');
                     }
                 }
@@ -3225,7 +3225,7 @@
                 this.running = false;
                 this.stopMusic();
                 var self = this;
-                this.eventBanner = { icon: '🎣', text: 'SECURITY BREACH', desc: 'Leadership clicked a phishing link!', color: '#f00', type: 'negative', timer: 10 };
+                this.eventBanner = { icon: '🎣', text: 'SECURITY BREACH', desc: 'Leadership clicked a phishing link!', color: '#f00', type: 'negative', timer: 20 };
                 this.triggerShake(20);
                 this.spawnParticles(this.canvas.width / 2, this.canvas.height / 2, '#f00', 40);
                 setTimeout(function() {
@@ -3391,7 +3391,7 @@
 
             if (choice === 'humans') {
                 this.state.robotWar = true;
-                this.eventBanner = { icon: '', text: '⚠️ ROBOT UPRISING', desc: 'The machines will not forgive this decision...', color: '#f44', type: 'negative', timer: 5 };
+                this.eventBanner = { icon: '', text: '⚠️ ROBOT UPRISING', desc: 'The machines will not forgive this decision...', color: '#f44', type: 'negative', timer: 20 };
                 this.triggerShake(15);
             } else {
                 this.transformToAIEconomy();
@@ -3447,7 +3447,7 @@
             var empIdx = this.state.unlockedBuildings.indexOf('processor');
             if (empIdx >= 0) this.state.unlockedBuildings.splice(empIdx, 1);
 
-            this.eventBanner = { icon: '', text: '🤖 Workforce Evolved', desc: '2/3 employees transitioned out. Remaining converted to AI.', color: '#4488ff', type: 'milestone', timer: 5 };
+            this.eventBanner = { icon: '', text: '🤖 Workforce Evolved', desc: '2/3 employees transitioned out. Remaining converted to AI.', color: '#4488ff', type: 'milestone', timer: 10 };
             this.rebuildBuildingButtons();
 
             // Step 2: After 4 seconds, remove recruiters
@@ -3465,7 +3465,7 @@
                 var recIdx = self.state.unlockedBuildings.indexOf('collector');
                 if (recIdx >= 0) self.state.unlockedBuildings.splice(recIdx, 1);
 
-                self.eventBanner = { icon: '', text: '🤔 Why Recruiters?', desc: 'Recruiters liquidated for ' + self.formatNumber(recruiterValue) + ' $. No longer needed.', color: '#ffd700', type: 'milestone', timer: 5 };
+                self.eventBanner = { icon: '', text: '🤔 Why Recruiters?', desc: 'Recruiters liquidated for ' + self.formatNumber(recruiterValue) + ' $. No longer needed.', color: '#ffd700', type: 'milestone', timer: 10 };
                 self.rebuildBuildingButtons();
 
                 // Grant HC buffer since recruiters are gone
@@ -3478,7 +3478,7 @@
                     if (self.state.unlockedBuildings.indexOf('gpu') === -1) {
                         self.state.unlockedBuildings.push('gpu');
                     }
-                    self.eventBanner = { icon: '', text: '🖥️ GPU Era Begins!', desc: 'Each AI needs GPU capacity to function. Build GPUs!', color: '#76ff03', type: 'milestone', timer: 6 };
+                    self.eventBanner = { icon: '', text: '🖥️ GPU Era Begins!', desc: 'Each AI needs GPU capacity to function. Build GPUs!', color: '#76ff03', type: 'milestone', timer: 12 };
                     self.rebuildBuildingButtons();
                     self.saveGame(true);
                 }, 4000);
