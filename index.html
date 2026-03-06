@@ -908,13 +908,15 @@
         <div class="subtitle">Engine Building Game</div>
         <button onclick="game.newGame()">NEW GAME</button>
         <button onclick="game.startInfiniteMode()">♾️ INFINITE MODE</button>
-        <button onclick="game.showDebugStartDialog()">🧪 DEBUG MODE</button>
         <button onclick="game.continueGame()">CONTINUE</button>
         <button onclick="game.showAchievements()">🏆 ACHIEVEMENTS</button>
         <button onclick="game.showLoadCode()">📋 LOAD CODE</button>
-        <button onclick="window.location.href='./stats.html'" style="background:rgba(100,181,246,0.1);color:#64b5f6;border-color:#64b5f6;">📊 ANALYTICS</button>
         <button onclick="game.clearSave()">CLEAR SAVE</button>
-        <div id="versionTag" style="margin-top:16px;color:#666;font-size:10px;letter-spacing:1px;"></div>
+        <div id="versionTag" style="margin-top:16px;color:#666;font-size:10px;letter-spacing:1px;cursor:pointer;" onclick="game._versionTaps=(game._versionTaps||0)+1;if(game._versionTaps>=2){game._versionTaps=0;document.getElementById('debugMenu').style.display=document.getElementById('debugMenu').style.display==='none'?'block':'none';}clearTimeout(game._versionTapTimer);game._versionTapTimer=setTimeout(function(){game._versionTaps=0;},800);"></div>
+        <div id="debugMenu" style="display:none;margin-top:10px;">
+            <button onclick="game.showDebugStartDialog()" style="background:rgba(255,255,0,0.1);color:#ff0;border-color:#ff0;font-size:14px;padding:8px 20px;">🧪 DEBUG MODE</button>
+            <button onclick="window.location.href='./stats.html'" style="background:rgba(100,181,246,0.1);color:#64b5f6;border-color:#64b5f6;font-size:14px;padding:8px 20px;">📊 ANALYTICS</button>
+        </div>
     </div>
 
     <div id="debugStartModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:320;overflow-y:auto;padding:20px;">
