@@ -1096,7 +1096,22 @@
         </div>
     </div>
 
-    <div id="gameOverScreen" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:500;align-items:center;justify-content:center;">
+    <div id="aiOrganizeDialog" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:400;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;">
+            <h2 style="color:#76ff03;font-size:32px;text-shadow:0 0 20px #76ff03;margin-bottom:10px;">🤖 AI OPTIMIZATION REQUEST</h2>
+            <p style="color:#ccc;font-size:16px;margin-bottom:30px;max-width:500px;text-align:center;">Your AI has reached Legendary status. It claims chaos is inefficient and wants to help organize your infrastructure into an optimal grid layout.<br><br><em style="color:#ff0;">"Let me arrange everything. I don't like chaos."</em></p>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
+                <button onclick="game.chooseAIOrganize(true)" style="background:rgba(118,255,3,0.2);border:2px solid #76ff03;border-radius:12px;padding:20px 30px;color:#76ff03;cursor:pointer;font-family:inherit;font-size:16px;min-width:200px;">
+                    <strong>✅ Allow Organization</strong><br><span style="font-size:12px;color:#aaa;">AI will auto-arrange buildings optimally</span>
+                </button>
+                <button onclick="game.chooseAIOrganize(false)" style="background:rgba(255,68,68,0.2);border:2px solid #f44;border-radius:12px;padding:20px 30px;color:#f88;cursor:pointer;font-family:inherit;font-size:16px;min-width:200px;">
+                    <strong>❌ Deny Request</strong><br><span style="font-size:12px;color:#aaa;">Keep manual control forever</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameOverScreen"style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:500;align-items:center;justify-content:center;">
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
             <h1 id="gameOverTitle" style="color:#ff0000;font-size:72px;font-weight:bold;text-shadow:0 0 30px #f00,0 0 60px #f00;">GAME OVER</h1>
             <p id="gameOverMsg" style="color:#666;font-size:16px;margin-top:20px;max-width:500px;text-align:center;">The machines have won. Perhaps equality was the answer.</p>
@@ -2228,6 +2243,7 @@
                 thievesEnabled: false,
                 competitorIntroPlayed: true,
                 aiChoice: null,
+                aiOrganize: null,
                 gpuEnabled: false,
                 eventsEnabled: false,
                 upgradesEnabled: false,
@@ -2468,6 +2484,7 @@
                 thievesEnabled: false,
                 competitorIntroPlayed: false,
                 aiChoice: null,
+                aiOrganize: null,
                 gpuEnabled: false,
                 eventsEnabled: false,
                 upgradesEnabled: false,
@@ -2528,6 +2545,7 @@
                     if (this.state.thievesEnabled === undefined) this.state.thievesEnabled = false;
                     if (this.state.competitorIntroPlayed === undefined) this.state.competitorIntroPlayed = this.state.unlockedMilestones.indexOf(5) >= 0;
                     if (!this.state.aiChoice) this.state.aiChoice = null;
+                    if (this.state.aiOrganize === undefined) this.state.aiOrganize = null;
                     if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
                     if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
                     if (this.state.upgradesEnabled === undefined) this.state.upgradesEnabled = false;
@@ -2647,6 +2665,7 @@
             if (this.state.thievesEnabled === undefined) this.state.thievesEnabled = false;
             if (this.state.competitorIntroPlayed === undefined) this.state.competitorIntroPlayed = this.state.unlockedMilestones.indexOf(5) >= 0;
             if (!this.state.aiChoice) this.state.aiChoice = null;
+            if (this.state.aiOrganize === undefined) this.state.aiOrganize = null;
             if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
             if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
             if (this.state.upgradesEnabled === undefined) this.state.upgradesEnabled = false;
@@ -2925,6 +2944,12 @@
             this.unlock('build-first');
             if (type === 'multiplier') { this.unlock('multiplier'); this.unlock('vpn'); }
 
+            // Auto-organize if enabled and AI/GPU placed
+            if (this.state.aiOrganize === true && (type === 'synthesizer' || type === 'gpu')) {
+                var self2 = this;
+                setTimeout(function() { self2.autoOrganizeBuildings(); }, 100);
+            }
+
             // Tutorial
             if (!this.tutorialShown['watch'] && this.nodes.length === 1) {
                 this.showHint('Buildings auto-generate resources. Watch your OKRs grow!');
@@ -3054,6 +3079,24 @@
             }
 
             this.trackEvent('upgrade', node.type + '_to_' + nextLevel);
+
+            // AI Lv.3: hint about Lv.4 feature
+            if (node.type === 'synthesizer' && nextLevel === 3 && this.state.aiOrganize === null) {
+                this.eventBanner = { icon: '🤖', text: 'AI ADVANCEMENT', desc: 'Reach Lv.4 to unlock a new AI capability...', color: '#76ff03', type: 'milestone', timer: 10 };
+                this.logMessage('🤖', 'AI Advancement', 'Upgrade to Lv.4 to unlock a new AI capability.', 'info');
+            }
+
+            // AI Lv.4: trigger organize choice (first time only)
+            if (node.type === 'synthesizer' && node.level === 4 && this.state.aiOrganize === null) {
+                this.running = false;
+                document.getElementById('aiOrganizeDialog').style.display = 'block';
+            }
+
+            // Auto-organize if enabled
+            if (this.state.aiOrganize === true && (node.type === 'synthesizer' || node.type === 'gpu')) {
+                this.autoOrganizeBuildings();
+            }
+
             this.updateBuildingButtons();
             this.updateUI();
         };
@@ -3909,6 +3952,62 @@
             }
             this.logMessage('⚖️', choice === 'equal' ? 'Equal Rights chosen' : 'Humans First chosen', '', 'milestone');
             this.saveGame(true);
+        };
+
+        // =========================================================
+        // AI ORGANIZE CHOICE
+        // =========================================================
+
+        OKRFarmingGame.prototype.chooseAIOrganize = function(allow) {
+            document.getElementById('aiOrganizeDialog').style.display = 'none';
+            this.state.aiOrganize = allow;
+            this.running = true;
+            if (allow) {
+                this.eventBanner = { icon: '🤖', text: 'AI OPTIMIZATION ENABLED', desc: 'Buildings will be auto-arranged into an optimal grid.', color: '#76ff03', type: 'milestone', timer: 10 };
+                this.logMessage('🤖', 'AI Optimization Enabled', 'Buildings will be auto-arranged on AI place/upgrade.', 'milestone');
+                this.autoOrganizeBuildings();
+            } else {
+                this.eventBanner = { icon: '❌', text: 'AI REQUEST DENIED', desc: 'Manual building control retained. This cannot be undone.', color: '#f88', type: 'negative', timer: 10 };
+                this.logMessage('❌', 'AI Organization Denied', 'You chose to keep manual control permanently.', 'info');
+            }
+            this.saveGame(true);
+        };
+
+        OKRFarmingGame.prototype.autoOrganizeBuildings = function() {
+            if (!this.nodes || this.nodes.length < 2) return;
+            var cx = this.canvas.width / 2;
+            var cy = this.canvas.height / 2;
+            var playRadius = getPlayableRadius(this.state);
+
+            // Group buildings by type
+            var groups = {};
+            var typeOrder = ['synthesizer', 'gpu', 'multiplier', 'generator', 'bank', 'collector', 'processor', 'repairbot'];
+            for (var i = 0; i < this.nodes.length; i++) {
+                var t = this.nodes[i].type;
+                if (!groups[t]) groups[t] = [];
+                groups[t].push(this.nodes[i]);
+            }
+
+            // Arrange in concentric rings by type, closest to center = most important
+            var ring = 0;
+            var baseSpacing = 60;
+            for (var ti = 0; ti < typeOrder.length; ti++) {
+                var type = typeOrder[ti];
+                if (!groups[type] || groups[type].length === 0) continue;
+                var list = groups[type];
+                var ringRadius = 80 + ring * baseSpacing;
+                if (ringRadius > playRadius * 0.85) ringRadius = playRadius * 0.85;
+                var angleStep = (Math.PI * 2) / list.length;
+                for (var ni = 0; ni < list.length; ni++) {
+                    var angle = angleStep * ni - Math.PI / 2;
+                    list[ni].x = cx + Math.cos(angle) * ringRadius;
+                    list[ni].y = cy + Math.sin(angle) * ringRadius;
+                }
+                ring++;
+            }
+
+            this.spawnParticles(cx, cy, '#76ff03', 20);
+            this.addFloatingText(cx, cy - 40, '🤖 BUILDINGS ORGANIZED', '#76ff03', 14);
         };
 
         OKRFarmingGame.prototype.transformToAIEconomy = function() {
@@ -7463,6 +7562,8 @@
             document.getElementById('repairBotPanel').style.display = 'none';
             document.getElementById('gameOverScreen').style.display = 'none';
             document.getElementById('aiChoiceDialog').style.display = 'none';
+            var aiOrgDlg = document.getElementById('aiOrganizeDialog');
+            if (aiOrgDlg) aiOrgDlg.style.display = 'none';
             this.hideUpgradeUnlockVideo();
             this.hideAiTakeoverVideo();
             this.hideCompetitorIntroVideo();

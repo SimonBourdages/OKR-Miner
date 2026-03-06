@@ -278,19 +278,22 @@
   <div class="wrap">
     <header class="hero" id="top">
       <h1>OKR Miner - Story Branches & Event Atlas</h1>
-      <p>This page maps the full objective-review progression, the Milestone 5 story split, and every random event currently defined in the game runtime.</p>
+      <p>This page maps the full objective-review progression, the Milestone 6 story split, and every random event currently defined in the game runtime.</p>
       <div class="top-links">
         <a href="#milestones">Objective Reviews</a>
+        <a href="#buildings">Buildings & TFLOPS</a>
         <a href="#branching">Story Branches</a>
         <a href="#triggers">Event Triggers</a>
+        <a href="#achievements">Achievements</a>
+        <a href="#themes">Themes</a>
         <a href="#event-atlas">Full Event Atlas (100)</a>
       </div>
-      <div class="meta">Source of truth: <code>index.html</code> milestone/event definitions &middot; Generated 2026-03-06 21:02:21.590 UTC</div>
+      <div class="meta">Source of truth: <code>index.html</code> milestone/event definitions &middot; Analytics via Power Automate SharePoint endpoint</div>
     </header>
 
     <section class="panel" id="milestones">
       <h2>Objective Review Progression (Unlocks + Triggers)</h2>
-      <p>Each review expands the playable radius by <strong>+30px</strong> (base radius 450px). Unlock rows below include buildings, systems, and notable story/cinematic triggers.</p>
+      <p>Each review expands the playable radius by <strong>50%</strong> (base radius 900px). Unlock rows below include buildings, systems, and notable story/cinematic triggers.</p>
       <div style="overflow:auto; margin-top:10px;">
         <table>
           <thead>
@@ -326,32 +329,32 @@
       <td>500</td>
       <td><strong>💲 Funding Online!</strong><div class="desc">Buildings now require funding! Finances produce $ to keep everything running.</div></td>
       <td><ul><li>Finances (Treasury Vault)</li></ul></td>
-      <td><ul><li>Funding system enabled ($ upkeep + underfunded penalties).</li></ul></td>
+      <td><ul><li>Funding system enabled ($ upkeep). Investment buildings raise the $ cap. ⚠ icon shown when underfunded.</li></ul></td>
       <td><span class="muted">Standard progression only</span></td>
     </tr>
     <tr>
       <td>4</td>
       <td>5K</td>
-      <td><strong>⬆️ Upgrades Unlocked!</strong><div class="desc">You can now click existing buildings to upgrade them to Lv.2 and Lv.3! With great power comes great responsibility.</div></td>
+      <td><strong>⬆️ Upgrades Unlocked!</strong><div class="desc">You can now click existing buildings to upgrade them to Lv.2, Lv.3, and Lv.4 Legendary (13.5×)! With great power comes great responsibility.</div></td>
       <td><span class="muted">No new building unlock</span></td>
-      <td><ul><li>Building upgrades enabled (Lv.2/Lv.3, with merge/destroy collision logic).</li></ul></td>
+      <td><ul><li>Building upgrades enabled (Lv.2/Lv.3/Lv.4 Legendary at 13.5×, with merge/destroy collision logic).</li></ul></td>
       <td><ul><li>Upgrade unlock cinematic auto-plays when this review is reached.</li></ul></td>
     </tr>
     <tr>
       <td>5</td>
       <td>50K</td>
-      <td><strong>🤖 AI Unlocked!</strong><div class="desc">Robot Workers produce 100 KR/s but need lots of funding.</div></td>
+      <td><strong>🤖 AI Unlocked!</strong><div class="desc">Robot Workers produce 100 KR/s but need TFLOPS from GPUs.</div></td>
       <td><ul><li>AI (Robot Worker)</li></ul></td>
       <td><span class="muted">No new systems this review</span></td>
-      <td><ul><li>AI Rights decision dialog appears and splits the run into two story branches.</li></ul></td>
+      <td><span class="muted">Standard progression only</span></td>
     </tr>
     <tr>
       <td>6</td>
       <td>500K</td>
-      <td><strong>🛸 Threats Incoming!</strong><div class="desc">Spaceships and Competitors are targeting you! IT Support available to heal damage.</div></td>
-      <td><span class="muted">No new building unlock</span></td>
+      <td><strong>🛸 Threats + AI Rights!</strong><div class="desc">Threats incoming! IT Support available. Plus the pivotal AI Rights choice that splits the run.</div></td>
+      <td><ul><li>IT Support (heals AI buildings only)</li></ul></td>
       <td><ul><li>Technical Debt attack ships enabled.</li><li>IT Support purchasing enabled.</li><li>Competitor raid ships enabled (KR poaching runs).</li></ul></td>
-      <td><ul><li>First competitor raid ship triggers the intro raid video clip.</li></ul></td>
+      <td><ul><li>AI Rights decision dialog appears and splits the run into two story branches.</li><li>First competitor raid ship triggers the intro raid video clip.</li></ul></td>
     </tr>
     <tr>
       <td>7</td>
@@ -423,22 +426,25 @@
     </section>
 
     <section class="panel" id="branching">
-      <h2>Milestone 5 Branch: AI Rights Decision</h2>
-      <p>At <strong>50K KR</strong>, gameplay pauses and presents a two-path decision. Both choices are playable, but they diverge heavily in economy and end-state risk.</p>
+      <h2>Milestone 6 Branch: AI Rights Decision</h2>
+      <p>At <strong>500K KR</strong> (Milestone 6, index 5), gameplay pauses and presents a two-path decision. Both choices are playable, but they diverge heavily in economy and end-state risk.</p>
       <div class="branch-grid">
         <article class="branch equal">
           <h3>Path A - Equal Rights (AI Transition)</h3>
           <div class="chips">
-            <span class="chip">Employees partly removed</span>
-            <span class="chip">Recruiters removed</span>
+            <span class="chip">2/3 Employees destroyed</span>
+            <span class="chip">Recruiters liquidated</span>
             <span class="chip">GPU era enabled</span>
+            <span class="chip">AI Auto-Organize at Lv.4</span>
           </div>
           <ul>
-            <li>Immediately removes 2/3 of Employees; remaining Employees convert into AI at their current levels.</li>
-            <li>1/3 of removed Employees become IT Support drones (autonomous repair units).</li>
-            <li>After ~4s, all Recruiters are liquidated into funding ($), and Recruiter building is locked out.</li>
-            <li>After another ~4s, GPU building unlocks and GPU mode is enabled.</li>
-            <li>AI output becomes constrained by TFLOPS capacity; under-provisioned AI produce reduced/zero effective output.</li>
+            <li>Immediately destroys 2/3 of Employees.</li>
+            <li>1/3 of destroyed Employees are converted to IT Support drones (autonomous repair units for AI buildings).</li>
+            <li>Remaining Employees convert into AI at their current levels. Employee building type is locked.</li>
+            <li>After ~4s, all Recruiters are liquidated at 1/3 value → $. Recruiter building type is locked.</li>
+            <li>After another ~4s, GPU Era begins — GPU building unlocks.</li>
+            <li>Each AI now requires TFLOPS to operate (Lv.1=4, Lv.2=8, Lv.3=18, Lv.4=54). Under-provisioned AI produce reduced/zero output.</li>
+            <li>AI Auto-Organize is offered when any AI building reaches Lv.4.</li>
             <li>Run remains winnable to final objective reviews.</li>
           </ul>
         </article>
@@ -447,15 +453,21 @@
           <h3>Path B - Humans First (Robot Uprising)</h3>
           <div class="chips">
             <span class="chip">Robot war mode</span>
-            <span class="chip">Aggression ramps with KR progress</span>
+            <span class="chip">Can't pass milestone 7</span>
+            <span class="chip">No IT Support</span>
+            <span class="chip">10× building damage</span>
             <span class="chip">Loss achievement path</span>
           </div>
           <ul>
-            <li>Enables robot war escalation logic tied to progress toward 5M KR (quadratic aggression growth).</li>
-            <li>AI buildings can actively sabotage non-AI buildings if both exist.</li>
-            <li>If only AI buildings remain, leadership KR reserves are siphoned directly.</li>
-            <li>Attack cadence tightens as aggression rises (faster strike interval, higher building damage, higher KR theft pressure).</li>
-            <li>Intended terminal path: empire collapse and game-over screen with AI takeover cinematic.</li>
+            <li>Robot uprising begins — cannot progress past milestone 7.</li>
+            <li><strong>IT Support disabled</strong> — healing is completely removed.</li>
+            <li><strong>10× building damage</strong> (150-950 per hit).</li>
+            <li><strong>100× KR drain</strong> — KRs are siphoned at 100× normal rate.</li>
+            <li><strong>Zero KR production</strong> during the robot war.</li>
+            <li><strong>Exponential strike escalation</strong> — attack frequency scales at 1.08^(elapsed seconds).</li>
+            <li>When KRs reach 0, all AI buildings self-destruct.</li>
+            <li>If no AI exists, a rogue AI spawns to lead the uprising.</li>
+            <li>Game over when all buildings are destroyed — AI takeover cinematic plays.</li>
             <li>Losing this branch unlocks the <strong>Taken Over</strong> achievement.</li>
           </ul>
         </article>
@@ -483,12 +495,107 @@
         </article>
         <article class="event-card">
           <h4>Phishing Catastrophe</h4>
-          <p>On each random-event roll there is a 5% chance of a phishing instant-loss event (outside the 100-event pool), awarding the <em>Phished!</em> achievement.</p>
+          <p>On each random-event roll there is a 5% chance of a phishing instant game-over event (outside the 100-event pool), awarding the <em>Phished!</em> achievement.</p>
+        </article>
+        <article class="event-card">
+          <h4>VPN Enabled</h4>
+          <p>When the first Network Hub is placed, particle flows between buildings stop. Unlocks the <em>🔒 VPN Enabled</em> achievement.</p>
         </article>
         <article class="event-card">
           <h4>AI Takeover Loss Clip</h4>
           <p>Triggered when robot-uprising path reaches zero remaining buildings and game over. This clip does not resume gameplay.</p>
         </article>
+      </div>
+    </section>
+
+    <section class="panel" id="buildings">
+      <h2>Building Types & TFLOPS System</h2>
+      <p>All building types use the current naming convention. Lv.4 Legendary provides <strong>13.5×</strong> base output.</p>
+      <div style="overflow:auto; margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Building</th>
+              <th>Role</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Recruiter</td><td>Generates HC (Human Capital)</td><td>Talent Beacon icon</td></tr>
+            <tr><td>Employee</td><td>Generates KRs</td><td>Work Station icon</td></tr>
+            <tr><td>Network Hub</td><td>Boosts ALL production by 1.5× each</td><td>Stackable multiplier</td></tr>
+            <tr><td>Finances</td><td>Produces $ (funding)</td><td>Treasury Vault themed icon</td></tr>
+            <tr><td>AI</td><td>Produces 100 KR/s — requires TFLOPS</td><td>Robot Worker icon</td></tr>
+            <tr><td>GPU</td><td>Generates TFLOPS (no ongoing $ drain)</td><td>One-time HC purchase. Lv.1=5, Lv.2=15, Lv.3=35, Lv.4=100 TFLOPS</td></tr>
+            <tr><td>Investment</td><td>Earns 2% interest on $ per second</td><td>Raises the $ funding cap</td></tr>
+            <tr><td>IT Support</td><td>Heals AI buildings ONLY</td><td>Autonomous repair drones</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 style="margin-top:14px;">TFLOPS Consumption per AI Level</h3>
+      <div style="overflow:auto; margin-top:6px;">
+        <table>
+          <thead>
+            <tr><th>AI Level</th><th>TFLOPS Required</th><th>GPU Level</th><th>TFLOPS Produced</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Lv.1</td><td>4</td><td>Lv.1</td><td>5</td></tr>
+            <tr><td>Lv.2</td><td>8</td><td>Lv.2</td><td>15</td></tr>
+            <tr><td>Lv.3</td><td>18</td><td>Lv.3</td><td>35</td></tr>
+            <tr><td>Lv.4 (Legendary)</td><td>54</td><td>Lv.4 (Legendary)</td><td>100</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">GPU has no ongoing $ drain — one-time HC purchase only. Under-provisioned AI produce reduced or zero output.</p>
+    </section>
+
+    <section class="panel" id="achievements">
+      <h2>Achievements (17 Total)</h2>
+      <p>Infinite Mode unlocks after earning <strong>5 achievements</strong>.</p>
+      <div style="overflow:auto; margin-top:10px;">
+        <table>
+          <thead>
+            <tr><th>Icon</th><th>Name</th><th>Unlock Condition</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>🪙</td><td>First KR Complete</td><td>Complete your first KR</td></tr>
+            <tr><td>🎓</td><td>Graduate</td><td>Reach Level 1</td></tr>
+            <tr><td>📋</td><td>Pipeline Pro</td><td>Reach Level 5</td></tr>
+            <tr><td>🌌</td><td>Galaxy Brain</td><td>Reach Level 10</td></tr>
+            <tr><td>👑</td><td>Digital Transcender</td><td>Reach the final level</td></tr>
+            <tr><td>🏗️</td><td>Architect</td><td>Place your first building</td></tr>
+            <tr><td>✖️</td><td>Force Multiplier</td><td>Place a Network Hub</td></tr>
+            <tr><td>🏦</td><td>KR Mogul</td><td>Earn 50 total KRs</td></tr>
+            <tr><td>⚡</td><td>Speed Demon</td><td>Complete a level in under 15s</td></tr>
+            <tr><td>🏭</td><td>Industrialist</td><td>Own 10 buildings</td></tr>
+            <tr><td>🌐</td><td>Megacorp</td><td>Own 50 buildings</td></tr>
+            <tr><td>⬆️</td><td>Maxed Out</td><td>Upgrade a building to Lv.3</td></tr>
+            <tr><td>💥</td><td>Collateral Damage</td><td>Trigger an upgrade collision</td></tr>
+            <tr><td>🔄</td><td>Fusion!</td><td>Merge a building to Lv.4</td></tr>
+            <tr><td>🎣</td><td>Phished!</td><td>Lose to a phishing attack</td></tr>
+            <tr><td>🤖</td><td>Taken Over</td><td>Lose the robot war (Path B)</td></tr>
+            <tr><td>🔒</td><td>VPN Enabled</td><td>Place your first Network Hub</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="themes">
+      <h2>Themes (Unlocked at Milestone 8 — 50M KR)</h2>
+      <p>Five visual themes, each with a small production bonus:</p>
+      <div style="overflow:auto; margin-top:10px;">
+        <table>
+          <thead>
+            <tr><th>Theme</th><th>Bonus</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Emerald Matrix</td><td>+1% KR/s</td></tr>
+            <tr><td>Neon Synthwave</td><td>+1% HC/s</td></tr>
+            <tr><td>Solar Forge</td><td>+1% $/s</td></tr>
+            <tr><td>Arctic Command</td><td>+1% repair speed</td></tr>
+            <tr><td>Deep Space</td><td>No bonus (visual only)</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
@@ -506,7 +613,7 @@
       <div class="event-groups">
         <article class="event-group neg" data-type="negative">
           <h3>Negative Events (40)</h3>
-          <ol><li data-name="meteor shower" data-desc="all buildings take 20 damage!"><span class="evt-icon">☄️</span><span class="evt-name">1. Meteor Shower</span><span class="evt-desc">All buildings take 20 damage!</span></li><li data-name="solar flare" data-desc="lose 30% electricity!"><span class="evt-icon">🔥</span><span class="evt-name">2. Solar Flare</span><span class="evt-desc">Lose 30% electricity!</span></li><li data-name="pirate raid" data-desc="lose 15% hc!"><span class="evt-icon">🛸</span><span class="evt-name">3. Pirate Raid</span><span class="evt-desc">Lose 15% HC!</span></li><li data-name="cosmic tax" data-desc="lose 10% krs!"><span class="evt-icon">💀</span><span class="evt-name">4. Cosmic Tax</span><span class="evt-desc">Lose 10% KRs!</span></li><li data-name="black hole proximity" data-desc="production halved for 10s!"><span class="evt-icon">🌑</span><span class="evt-name">5. Black Hole Proximity</span><span class="evt-desc">Production halved for 10s!</span></li><li data-name="emp pulse" data-desc="finances take 30 damage!"><span class="evt-icon">⚡</span><span class="evt-name">6. EMP Pulse</span><span class="evt-desc">Finances take 30 damage!</span></li><li data-name="space debris" data-desc="a random building destroyed!"><span class="evt-icon">💥</span><span class="evt-name">7. Space Debris</span><span class="evt-desc">A random building destroyed!</span></li><li data-name="gravity well" data-desc="lose 5% of all currencies!"><span class="evt-icon">🌀</span><span class="evt-name">8. Gravity Well</span><span class="evt-desc">Lose 5% of all currencies!</span></li><li data-name="radiation leak" data-desc="processors take 25 damage!"><span class="evt-icon">☢️</span><span class="evt-name">9. Radiation Leak</span><span class="evt-desc">Processors take 25 damage!</span></li><li data-name="ion storm" data-desc="all buildings take 10 damage!"><span class="evt-icon">🌪️</span><span class="evt-name">10. Ion Storm</span><span class="evt-desc">All buildings take 10 damage!</span></li><li data-name="data corruption" data-desc="lose 5% total krs!"><span class="evt-icon">⚠️</span><span class="evt-name">11. Data Corruption</span><span class="evt-desc">Lose 5% total KRs!</span></li><li data-name="fuel shortage" data-desc="funding drops to 0!"><span class="evt-icon">🔋</span><span class="evt-name">12. Fuel Shortage</span><span class="evt-desc">funding drops to 0!</span></li><li data-name="asteroid impact" data-desc="random building takes 50 damage!"><span class="evt-icon">☄️</span><span class="evt-name">13. Asteroid Impact</span><span class="evt-desc">Random building takes 50 damage!</span></li><li data-name="trade embargo" data-desc="lose 20% hc!"><span class="evt-icon">🚫</span><span class="evt-name">14. Trade Embargo</span><span class="evt-desc">Lose 20% HC!</span></li><li data-name="quantum destabilization" data-desc="multipliers take 40 damage!"><span class="evt-icon">🔮</span><span class="evt-name">15. Quantum Destabilization</span><span class="evt-desc">Multipliers take 40 damage!</span></li><li data-name="nebula fog" data-desc="production at 70% for 8s!"><span class="evt-icon">🌫️</span><span class="evt-name">16. Nebula Fog</span><span class="evt-desc">Production at 70% for 8s!</span></li><li data-name="supply line cut" data-desc="collectors take 20 damage!"><span class="evt-icon">✂️</span><span class="evt-name">17. Supply Line Cut</span><span class="evt-desc">Collectors take 20 damage!</span></li><li data-name="warp drive failure" data-desc="lose 3% krs!"><span class="evt-icon">🌀</span><span class="evt-name">18. Warp Drive Failure</span><span class="evt-desc">Lose 3% KRs!</span></li><li data-name="plasma leak" data-desc="synthesizers take 35 damage!"><span class="evt-icon">🧪</span><span class="evt-name">19. Plasma Leak</span><span class="evt-desc">Synthesizers take 35 damage!</span></li><li data-name="comet strike" data-desc="2 buildings take 30 damage each!"><span class="evt-icon">☄️</span><span class="evt-name">20. Comet Strike</span><span class="evt-desc">2 buildings take 30 damage each!</span></li><li data-name="gamma burst" data-desc="all buildings take 15 damage!"><span class="evt-icon">💥</span><span class="evt-name">21. Gamma Burst</span><span class="evt-desc">All buildings take 15 damage!</span></li><li data-name="void rupture" data-desc="lose 25% electricity!"><span class="evt-icon">🌑</span><span class="evt-name">22. Void Rupture</span><span class="evt-desc">Lose 25% electricity!</span></li><li data-name="wormhole collapse" data-desc="random building takes 45 damage!"><span class="evt-icon">🌀</span><span class="evt-name">23. Wormhole Collapse</span><span class="evt-desc">Random building takes 45 damage!</span></li><li data-name="dark matter surge" data-desc="production at 60% for 6s!"><span class="evt-icon">🌌</span><span class="evt-name">24. Dark Matter Surge</span><span class="evt-desc">Production at 60% for 6s!</span></li><li data-name="neutron blast" data-desc="finances take 20 damage!"><span class="evt-icon">⚡</span><span class="evt-name">25. Neutron Blast</span><span class="evt-desc">Finances take 20 damage!</span></li><li data-name="singularity pulse" data-desc="lose 8% ac and 8% el!"><span class="evt-icon">💀</span><span class="evt-name">26. Singularity Pulse</span><span class="evt-desc">Lose 8% AC and 8% el!</span></li><li data-name="magnetar flare" data-desc="banks take 30 damage!"><span class="evt-icon">🔥</span><span class="evt-name">27. Magnetar Flare</span><span class="evt-desc">Banks take 30 damage!</span></li><li data-name="quasar beam" data-desc="lose 12% hc!"><span class="evt-icon">💫</span><span class="evt-name">28. Quasar Beam</span><span class="evt-desc">Lose 12% HC!</span></li><li data-name="solar wind" data-desc="collectors take 15 damage!"><span class="evt-icon">🌪️</span><span class="evt-name">29. Solar Wind</span><span class="evt-desc">Collectors take 15 damage!</span></li><li data-name="cosmic ray burst" data-desc="all buildings take 12 damage!"><span class="evt-icon">⚡</span><span class="evt-name">30. Cosmic Ray Burst</span><span class="evt-desc">All buildings take 12 damage!</span></li><li data-name="space quake" data-desc="3 random buildings take 20 damage!"><span class="evt-icon">🌋</span><span class="evt-name">31. Space Quake</span><span class="evt-desc">3 random buildings take 20 damage!</span></li><li data-name="dimensional rift" data-desc="lose 6% of all currencies!"><span class="evt-icon">🔮</span><span class="evt-name">32. Dimensional Rift</span><span class="evt-desc">Lose 6% of all currencies!</span></li><li data-name="anti-matter leak" data-desc="processors take 30 damage!"><span class="evt-icon">☢️</span><span class="evt-name">33. Anti-matter Leak</span><span class="evt-desc">Processors take 30 damage!</span></li><li data-name="tidal forces" data-desc="production halved for 5s!"><span class="evt-icon">🌊</span><span class="evt-name">34. Tidal Forces</span><span class="evt-desc">Production halved for 5s!</span></li><li data-name="micrometeorites" data-desc="all buildings take 8 damage!"><span class="evt-icon">✨</span><span class="evt-name">35. Micrometeorites</span><span class="evt-desc">All buildings take 8 damage!</span></li><li data-name="dust storm" data-desc="lose 15% electricity!"><span class="evt-icon">🌫️</span><span class="evt-name">36. Dust Storm</span><span class="evt-desc">Lose 15% electricity!</span></li><li data-name="static discharge" data-desc="finances take 25 damage!"><span class="evt-icon">⚡</span><span class="evt-name">37. Static Discharge</span><span class="evt-desc">Finances take 25 damage!</span></li><li data-name="power surge" data-desc="lose 40% electricity!"><span class="evt-icon">💥</span><span class="evt-name">38. Power Surge</span><span class="evt-desc">Lose 40% electricity!</span></li><li data-name="system glitch" data-desc="lose 4% krs!"><span class="evt-icon">⚠️</span><span class="evt-name">39. System Glitch</span><span class="evt-desc">Lose 4% KRs!</span></li><li data-name="overload" data-desc="multipliers take 25 damage!"><span class="evt-icon">🔥</span><span class="evt-name">40. Overload</span><span class="evt-desc">Multipliers take 25 damage!</span></li></ol>
+          <ol><li data-name="meteor shower" data-desc="all buildings take 20 damage!"><span class="evt-icon">☄️</span><span class="evt-name">1. Meteor Shower</span><span class="evt-desc">All buildings take 20 damage!</span></li><li data-name="solar flare" data-desc="lose 30% electricity!"><span class="evt-icon">🔥</span><span class="evt-name">2. Solar Flare</span><span class="evt-desc">Lose 30% electricity!</span></li><li data-name="pirate raid" data-desc="lose 15% hc!"><span class="evt-icon">🛸</span><span class="evt-name">3. Pirate Raid</span><span class="evt-desc">Lose 15% HC!</span></li><li data-name="cosmic tax" data-desc="lose 10% krs!"><span class="evt-icon">💀</span><span class="evt-name">4. Cosmic Tax</span><span class="evt-desc">Lose 10% KRs!</span></li><li data-name="black hole proximity" data-desc="production halved for 10s!"><span class="evt-icon">🌑</span><span class="evt-name">5. Black Hole Proximity</span><span class="evt-desc">Production halved for 10s!</span></li><li data-name="emp pulse" data-desc="finances take 30 damage!"><span class="evt-icon">⚡</span><span class="evt-name">6. EMP Pulse</span><span class="evt-desc">Finances take 30 damage!</span></li><li data-name="space debris" data-desc="a random building destroyed!"><span class="evt-icon">💥</span><span class="evt-name">7. Space Debris</span><span class="evt-desc">A random building destroyed!</span></li><li data-name="gravity well" data-desc="lose 5% of all currencies!"><span class="evt-icon">🌀</span><span class="evt-name">8. Gravity Well</span><span class="evt-desc">Lose 5% of all currencies!</span></li><li data-name="radiation leak" data-desc="employees take 25 damage!"><span class="evt-icon">☢️</span><span class="evt-name">9. Radiation Leak</span><span class="evt-desc">Employees take 25 damage!</span></li><li data-name="ion storm" data-desc="all buildings take 10 damage!"><span class="evt-icon">🌪️</span><span class="evt-name">10. Ion Storm</span><span class="evt-desc">All buildings take 10 damage!</span></li><li data-name="data corruption" data-desc="lose 5% total krs!"><span class="evt-icon">⚠️</span><span class="evt-name">11. Data Corruption</span><span class="evt-desc">Lose 5% total KRs!</span></li><li data-name="fuel shortage" data-desc="funding drops to 0!"><span class="evt-icon">🔋</span><span class="evt-name">12. Fuel Shortage</span><span class="evt-desc">funding drops to 0!</span></li><li data-name="asteroid impact" data-desc="random building takes 50 damage!"><span class="evt-icon">☄️</span><span class="evt-name">13. Asteroid Impact</span><span class="evt-desc">Random building takes 50 damage!</span></li><li data-name="trade embargo" data-desc="lose 20% hc!"><span class="evt-icon">🚫</span><span class="evt-name">14. Trade Embargo</span><span class="evt-desc">Lose 20% HC!</span></li><li data-name="quantum destabilization" data-desc="network hubs take 40 damage!"><span class="evt-icon">🔮</span><span class="evt-name">15. Quantum Destabilization</span><span class="evt-desc">Network Hubs take 40 damage!</span></li><li data-name="nebula fog" data-desc="production at 70% for 8s!"><span class="evt-icon">🌫️</span><span class="evt-name">16. Nebula Fog</span><span class="evt-desc">Production at 70% for 8s!</span></li><li data-name="supply line cut" data-desc="recruiters take 20 damage!"><span class="evt-icon">✂️</span><span class="evt-name">17. Supply Line Cut</span><span class="evt-desc">Recruiters take 20 damage!</span></li><li data-name="warp drive failure" data-desc="lose 3% krs!"><span class="evt-icon">🌀</span><span class="evt-name">18. Warp Drive Failure</span><span class="evt-desc">Lose 3% KRs!</span></li><li data-name="plasma leak" data-desc="ai buildings take 35 damage!"><span class="evt-icon">🧪</span><span class="evt-name">19. Plasma Leak</span><span class="evt-desc">AI buildings take 35 damage!</span></li><li data-name="comet strike" data-desc="2 buildings take 30 damage each!"><span class="evt-icon">☄️</span><span class="evt-name">20. Comet Strike</span><span class="evt-desc">2 buildings take 30 damage each!</span></li><li data-name="gamma burst" data-desc="all buildings take 15 damage!"><span class="evt-icon">💥</span><span class="evt-name">21. Gamma Burst</span><span class="evt-desc">All buildings take 15 damage!</span></li><li data-name="void rupture" data-desc="lose 25% electricity!"><span class="evt-icon">🌑</span><span class="evt-name">22. Void Rupture</span><span class="evt-desc">Lose 25% electricity!</span></li><li data-name="wormhole collapse" data-desc="random building takes 45 damage!"><span class="evt-icon">🌀</span><span class="evt-name">23. Wormhole Collapse</span><span class="evt-desc">Random building takes 45 damage!</span></li><li data-name="dark matter surge" data-desc="production at 60% for 6s!"><span class="evt-icon">🌌</span><span class="evt-name">24. Dark Matter Surge</span><span class="evt-desc">Production at 60% for 6s!</span></li><li data-name="neutron blast" data-desc="finances take 20 damage!"><span class="evt-icon">⚡</span><span class="evt-name">25. Neutron Blast</span><span class="evt-desc">Finances take 20 damage!</span></li><li data-name="singularity pulse" data-desc="lose 8% ac and 8% el!"><span class="evt-icon">💀</span><span class="evt-name">26. Singularity Pulse</span><span class="evt-desc">Lose 8% AC and 8% el!</span></li><li data-name="magnetar flare" data-desc="investments take 30 damage!"><span class="evt-icon">🔥</span><span class="evt-name">27. Magnetar Flare</span><span class="evt-desc">Investments take 30 damage!</span></li><li data-name="quasar beam" data-desc="lose 12% hc!"><span class="evt-icon">💫</span><span class="evt-name">28. Quasar Beam</span><span class="evt-desc">Lose 12% HC!</span></li><li data-name="solar wind" data-desc="recruiters take 15 damage!"><span class="evt-icon">🌪️</span><span class="evt-name">29. Solar Wind</span><span class="evt-desc">Recruiters take 15 damage!</span></li><li data-name="cosmic ray burst" data-desc="all buildings take 12 damage!"><span class="evt-icon">⚡</span><span class="evt-name">30. Cosmic Ray Burst</span><span class="evt-desc">All buildings take 12 damage!</span></li><li data-name="space quake" data-desc="3 random buildings take 20 damage!"><span class="evt-icon">🌋</span><span class="evt-name">31. Space Quake</span><span class="evt-desc">3 random buildings take 20 damage!</span></li><li data-name="dimensional rift" data-desc="lose 6% of all currencies!"><span class="evt-icon">🔮</span><span class="evt-name">32. Dimensional Rift</span><span class="evt-desc">Lose 6% of all currencies!</span></li><li data-name="anti-matter leak" data-desc="employees take 30 damage!"><span class="evt-icon">☢️</span><span class="evt-name">33. Anti-matter Leak</span><span class="evt-desc">Employees take 30 damage!</span></li><li data-name="tidal forces" data-desc="production halved for 5s!"><span class="evt-icon">🌊</span><span class="evt-name">34. Tidal Forces</span><span class="evt-desc">Production halved for 5s!</span></li><li data-name="micrometeorites" data-desc="all buildings take 8 damage!"><span class="evt-icon">✨</span><span class="evt-name">35. Micrometeorites</span><span class="evt-desc">All buildings take 8 damage!</span></li><li data-name="dust storm" data-desc="lose 15% electricity!"><span class="evt-icon">🌫️</span><span class="evt-name">36. Dust Storm</span><span class="evt-desc">Lose 15% electricity!</span></li><li data-name="static discharge" data-desc="finances take 25 damage!"><span class="evt-icon">⚡</span><span class="evt-name">37. Static Discharge</span><span class="evt-desc">Finances take 25 damage!</span></li><li data-name="power surge" data-desc="lose 40% electricity!"><span class="evt-icon">💥</span><span class="evt-name">38. Power Surge</span><span class="evt-desc">Lose 40% electricity!</span></li><li data-name="system glitch" data-desc="lose 4% krs!"><span class="evt-icon">⚠️</span><span class="evt-name">39. System Glitch</span><span class="evt-desc">Lose 4% KRs!</span></li><li data-name="overload" data-desc="network hubs take 25 damage!"><span class="evt-icon">🔥</span><span class="evt-name">40. Overload</span><span class="evt-desc">Network Hubs take 25 damage!</span></li></ol>
         </article>
 
         <article class="event-group pos" data-type="positive">
