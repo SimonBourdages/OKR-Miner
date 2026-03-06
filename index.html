@@ -889,10 +889,27 @@
         <div class="subtitle">Engine Building Game</div>
         <button onclick="game.newGame()">NEW GAME</button>
         <button onclick="game.startInfiniteMode()">♾️ INFINITE MODE</button>
+        <button onclick="game.showDebugStartDialog()">🧪 DEBUG MODE</button>
         <button onclick="game.continueGame()">CONTINUE</button>
         <button onclick="game.showLoadCode()">📋 LOAD CODE</button>
         <button onclick="game.clearSave()">CLEAR SAVE</button>
         <div id="versionTag" style="margin-top:16px;color:#666;font-size:10px;letter-spacing:1px;"></div>
+    </div>
+
+    <div id="debugStartModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:320;overflow-y:auto;padding:20px;">
+        <div style="max-width:560px;margin:40px auto;text-align:center;background:rgba(0,20,10,0.95);border:1px solid #00ff88;border-radius:10px;padding:20px;">
+            <h2 style="color:#00ff88;font-size:24px;margin-bottom:10px;">🧪 Debug Start</h2>
+            <p style="color:#8cf;font-size:13px;line-height:1.5;margin-bottom:14px;">Choose a level to boot into. Debug starts include optimized pre-placed buildings and +999,999 bonus resources (KR bonus is capped to stay inside the selected level).</p>
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
+                <label for="debugStartLevelSelect" style="color:#00ff88;font-size:13px;">Start level:</label>
+                <select id="debugStartLevelSelect" onchange="game.updateDebugStartSummary()" style="background:#111;color:#00ff88;border:1px solid #00ff88;border-radius:6px;padding:7px 10px;font-family:inherit;font-size:13px;min-width:300px;"></select>
+            </div>
+            <div id="debugStartSummary" style="text-align:left;background:rgba(0,0,0,0.45);border:1px solid #234;border-radius:8px;padding:10px 12px;color:#9fe;font-size:12px;line-height:1.5;min-height:86px;"></div>
+            <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
+                <button onclick="game.startDebugModeFromMenu()" style="background:#00ff88;color:#000;border:none;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:bold;cursor:pointer;border-radius:6px;">▶ Start Debug Run</button>
+                <button onclick="game.hideDebugStartDialog()" style="background:#333;color:#fff;border:1px solid #666;padding:10px 20px;font-family:inherit;font-size:13px;cursor:pointer;border-radius:6px;">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <!-- Save Code Modal -->
@@ -1100,6 +1117,8 @@
             { okr: 5e12,    unlock: [], title: '🏆 KR Singularity', desc: 'You have achieved digital transcendence. The universe is yours.' },
             { okr: 1e15,    unlock: [], title: '♾️ INFINITE BEYOND', desc: 'Beyond all measurement. You ARE the KRs now.' }
         ];
+        var DEBUG_RESOURCE_BONUS = 999999;
+        var DEBUG_BUILDING_ORDER = ['processor', 'collector', 'multiplier', 'synthesizer', 'generator', 'bank', 'gpu', 'repairbot'];
 
         function getPlayableRadius(state) {
             return GameLogic.getPlayableRadius(state);
@@ -2063,6 +2082,298 @@
         // GAME STATE MANAGEMENT
         // =========================================================
 
+        OKRFarmingGame.prototype.showDebugStartDialog = function() {
+            var modal = document.getElementById('debugStartModal');
+            var select = document.getElementById('debugStartLevelSelect');
+            if (!modal || !select) return;
+
+            var maxLevel = Math.max(1, MILESTONES.length);
+            select.innerHTML = '';
+            for (var i = 1; i <= maxLevel; i++) {
+                var opt = document.createElement('option');
+                var milestone = MILESTONES[i - 1];
+                var title = milestone ? milestone.title.replace(/[⭐🏆]/g, '').trim() : '';
+                opt.value = String(i);
+                opt.textContent = 'Level ' + i + (title ? (' — ' + title) : '');
+                select.appendChild(opt);
+            }
+
+            var suggestedLevel = 1;
+            if (this.state && this.state.unlockedMilestones) {
+                suggestedLevel = Math.max(1, Math.min(maxLevel, this.state.unlockedMilestones.length));
+            }
+            select.value = String(suggestedLevel);
+            this.updateDebugStartSummary();
+            modal.style.display = 'block';
+        };
+
+        OKRFarmingGame.prototype.hideDebugStartDialog = function() {
+            var modal = document.getElementById('debugStartModal');
+            if (modal) modal.style.display = 'none';
+        };
+
+        OKRFarmingGame.prototype.startDebugModeFromMenu = function() {
+            var select = document.getElementById('debugStartLevelSelect');
+            var requested = parseInt(select && select.value ? select.value : '1', 10);
+            this.hideDebugStartDialog();
+            this.startDebugMode(requested);
+        };
+
+        OKRFarmingGame.prototype.startDebugMode = function(level) {
+            var targetLevel = Math.max(1, Math.min(MILESTONES.length, parseInt(level, 10) || 1));
+            var debugState = this.buildDebugStateForLevel(targetLevel);
+            var buildingPlan = this.calculateOptimalDebugBuildingPlan(targetLevel, debugState);
+            var preplacedNodes = this.buildDebugNodesFromPlan(buildingPlan, debugState);
+
+            this.infiniteMode = false;
+            this.state = debugState;
+            this.nodes = preplacedNodes;
+            this.unlockedAchievements = {};
+            this.startGame();
+
+            var summary = this.formatDebugPlanSummary(buildingPlan, 5);
+            this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2 - 120, 'Debug Level ' + targetLevel + ' Ready', '#0ff', 18);
+            this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2 - 92, '+KR ' + this.formatNumber(this.state.debugOkrBonusApplied || 0) + ' | +HC/$ ' + this.formatNumber(DEBUG_RESOURCE_BONUS), '#ff0', 13);
+            this.logMessage('🧪', 'Debug mode started (Level ' + targetLevel + ')', summary, 'info');
+            this.saveGame(true);
+        };
+
+        OKRFarmingGame.prototype.buildDebugStateForLevel = function(level) {
+            var targetLevel = Math.max(1, Math.min(MILESTONES.length, parseInt(level, 10) || 1));
+            var state = {
+                currencies: { ac: 50 + DEBUG_RESOURCE_BONUS, el: DEBUG_RESOURCE_BONUS },
+                totalOKRs: 0,
+                unlockedMilestones: [0],
+                unlockedBuildings: ['collector', 'processor'],
+                electricityEnabled: false,
+                shipsEnabled: false,
+                repairBotsEnabled: false,
+                thievesEnabled: false,
+                competitorIntroPlayed: true,
+                aiChoice: null,
+                gpuEnabled: false,
+                eventsEnabled: false,
+                upgradesEnabled: false,
+                themesEnabled: false,
+                activeTheme: 'emerald'
+            };
+
+            for (var i = 1; i < targetLevel; i++) {
+                state.unlockedMilestones.push(i);
+                GameLogic.applyMilestoneUnlock(state, MILESTONES[i]);
+            }
+
+            if (targetLevel >= 5 && !state.aiChoice) state.aiChoice = 'equal';
+
+            var currentMilestone = MILESTONES[targetLevel - 1] || { okr: 0 };
+            var nextMilestone = MILESTONES[targetLevel] || null;
+            var safeBonus = DEBUG_RESOURCE_BONUS;
+            if (nextMilestone) {
+                safeBonus = Math.max(0, Math.min(DEBUG_RESOURCE_BONUS, nextMilestone.okr - currentMilestone.okr - 1));
+            }
+            state.totalOKRs = currentMilestone.okr + safeBonus;
+            state.debugOkrBonusApplied = safeBonus;
+
+            return state;
+        };
+
+        OKRFarmingGame.prototype.createSimulationNodesFromPlan = function(plan) {
+            var nodes = [];
+            for (var oi = 0; oi < DEBUG_BUILDING_ORDER.length; oi++) {
+                var type = DEBUG_BUILDING_ORDER[oi];
+                var count = plan[type] || 0;
+                for (var c = 0; c < count; c++) {
+                    nodes.push({ type: type, level: 1, hp: 100, maxHp: 100 });
+                }
+            }
+            return nodes;
+        };
+
+        OKRFarmingGame.prototype.evaluateDebugPlan = function(plan, state) {
+            var simNodes = this.createSimulationNodesFromPlan(plan);
+            var snapshot = GameLogic.computeProductionSnapshot({
+                nodes: simNodes,
+                buildings: BUILDINGS,
+                state: state,
+                themes: THEMES,
+                upgradePower: UPGRADE_POWER,
+                gpuCapacity: GPU_CAPACITY,
+                baseElGain: 10
+            });
+
+            var score = snapshot.okrGain + snapshot.acGain * 0.35 + Math.max(0, snapshot.currentElRate) * 0.2;
+            if (snapshot.currentElRate < 0) score -= Math.abs(snapshot.currentElRate) * 8;
+
+            return {
+                snapshot: snapshot,
+                score: score
+            };
+        };
+
+        OKRFarmingGame.prototype.calculateOptimalDebugBuildingPlan = function(level, state) {
+            var targetLevel = Math.max(1, Math.min(MILESTONES.length, parseInt(level, 10) || 1));
+            var unlocked = state.unlockedBuildings || [];
+            var plan = {};
+            var productiveTypes = [];
+
+            for (var i = 0; i < DEBUG_BUILDING_ORDER.length; i++) {
+                var type = DEBUG_BUILDING_ORDER[i];
+                if (unlocked.indexOf(type) >= 0) {
+                    plan[type] = 0;
+                }
+            }
+
+            if (plan.collector !== undefined) plan.collector = 2 + Math.floor(targetLevel / 3);
+            if (plan.processor !== undefined) plan.processor = 3 + targetLevel;
+            if (plan.multiplier !== undefined) plan.multiplier = 1 + Math.floor(targetLevel / 4);
+            if (plan.generator !== undefined && state.electricityEnabled) plan.generator = 2 + Math.floor(targetLevel / 2);
+            if (plan.bank !== undefined) plan.bank = Math.max(1, Math.floor(targetLevel / 5));
+            if (plan.repairbot !== undefined && state.repairBotsEnabled) plan.repairbot = Math.max(1, Math.floor(targetLevel / 6));
+            if (plan.gpu !== undefined && state.gpuEnabled) plan.gpu = 2 + Math.floor(targetLevel / 3);
+            if (plan.synthesizer !== undefined) {
+                var desiredAI = 1 + targetLevel;
+                if (state.gpuEnabled && plan.gpu !== undefined) {
+                    desiredAI = Math.min(desiredAI, plan.gpu * (GPU_CAPACITY[1] || 1));
+                }
+                plan.synthesizer = Math.max(plan.synthesizer || 0, desiredAI);
+            }
+
+            for (var pi = 0; pi < DEBUG_BUILDING_ORDER.length; pi++) {
+                var pType = DEBUG_BUILDING_ORDER[pi];
+                if (plan[pType] === undefined) continue;
+                if (pType === 'repairbot') continue;
+                productiveTypes.push(pType);
+            }
+
+            var maxNodes = Math.min(84, 10 + targetLevel * 5);
+            var total = 0;
+            for (var k in plan) {
+                if (Object.prototype.hasOwnProperty.call(plan, k)) total += plan[k];
+            }
+
+            while (total < maxNodes) {
+                var currentEval = this.evaluateDebugPlan(plan, state);
+                var bestType = null;
+                var bestScore = currentEval.score;
+
+                for (var t = 0; t < productiveTypes.length; t++) {
+                    var trialType = productiveTypes[t];
+                    if (trialType === 'synthesizer' && state.gpuEnabled && plan.gpu !== undefined) {
+                        var gpuCap = (plan.gpu || 0) * (GPU_CAPACITY[1] || 1);
+                        if ((plan.synthesizer || 0) + 1 > gpuCap) continue;
+                    }
+
+                    var trialPlan = {};
+                    for (var tk in plan) {
+                        if (Object.prototype.hasOwnProperty.call(plan, tk)) trialPlan[tk] = plan[tk];
+                    }
+                    trialPlan[trialType] = (trialPlan[trialType] || 0) + 1;
+                    var trialEval = this.evaluateDebugPlan(trialPlan, state);
+                    if (trialEval.score > bestScore) {
+                        bestScore = trialEval.score;
+                        bestType = trialType;
+                    }
+                }
+
+                if (!bestType) break;
+                plan[bestType] = (plan[bestType] || 0) + 1;
+                total++;
+            }
+
+            if (state.electricityEnabled && plan.generator !== undefined) {
+                var safety = 0;
+                while (safety < 30) {
+                    var evalResult = this.evaluateDebugPlan(plan, state);
+                    if (evalResult.snapshot.currentElRate >= -2) break;
+                    plan.generator++;
+                    safety++;
+                }
+            }
+
+            return plan;
+        };
+
+        OKRFarmingGame.prototype.buildDebugNodesFromPlan = function(plan, state) {
+            var orderedTypes = [];
+            for (var oi = 0; oi < DEBUG_BUILDING_ORDER.length; oi++) {
+                var type = DEBUG_BUILDING_ORDER[oi];
+                var count = plan[type] || 0;
+                for (var c = 0; c < count; c++) orderedTypes.push(type);
+            }
+
+            var nodes = [];
+            var fX = this.canvas.width / 2;
+            var fY = this.canvas.height / 2;
+            var playRadius = getPlayableRadius(state);
+            var maxRadius = Math.max(120, playRadius - 40);
+            var idx = 0;
+            var ring = 0;
+
+            while (idx < orderedTypes.length) {
+                var radius = Math.min(maxRadius, 90 + ring * 58);
+                var slots = Math.max(6, Math.floor((Math.PI * 2 * radius) / 62));
+
+                for (var s = 0; s < slots && idx < orderedTypes.length; s++) {
+                    var angle = (s / slots) * Math.PI * 2 + ring * 0.33;
+                    var x = fX + Math.cos(angle) * radius;
+                    var y = fY + Math.sin(angle) * radius;
+
+                    if (window.innerWidth > 768 && x > this.canvas.width - 190) x -= 120;
+
+                    nodes.push({
+                        type: orderedTypes[idx],
+                        x: x,
+                        y: y,
+                        age: 0,
+                        lastProduce: 0,
+                        level: 1,
+                        hp: 100,
+                        maxHp: 100,
+                        damageFlash: 0
+                    });
+                    idx++;
+                }
+
+                ring++;
+                if (ring > 90) break;
+            }
+
+            return nodes;
+        };
+
+        OKRFarmingGame.prototype.formatDebugPlanSummary = function(plan, maxItems) {
+            var parts = [];
+            var limit = maxItems || 6;
+            for (var i = 0; i < DEBUG_BUILDING_ORDER.length; i++) {
+                var type = DEBUG_BUILDING_ORDER[i];
+                var count = plan[type] || 0;
+                if (count <= 0 || !BUILDINGS[type]) continue;
+                parts.push(BUILDINGS[type].name + ' x' + count);
+                if (parts.length >= limit) break;
+            }
+            return parts.length ? parts.join(' · ') : 'No buildings planned';
+        };
+
+        OKRFarmingGame.prototype.updateDebugStartSummary = function() {
+            var select = document.getElementById('debugStartLevelSelect');
+            var summary = document.getElementById('debugStartSummary');
+            if (!select || !summary) return;
+
+            var level = Math.max(1, Math.min(MILESTONES.length, parseInt(select.value, 10) || 1));
+            var debugState = this.buildDebugStateForLevel(level);
+            var plan = this.calculateOptimalDebugBuildingPlan(level, debugState);
+            var evaluation = this.evaluateDebugPlan(plan, debugState).snapshot;
+            var planSummary = this.formatDebugPlanSummary(plan, 8);
+
+            summary.innerHTML =
+                '<div style="color:#ff0;margin-bottom:6px;">Level ' + level + ' loadout preview</div>' +
+                '<div style="margin-bottom:6px;">' + planSummary + '</div>' +
+                '<div style="color:#8cf;">Projected KR/s: ' + evaluation.okrGain.toFixed(1) +
+                ' · HC/s: ' + evaluation.acGain.toFixed(1) +
+                ' · $/s: ' + evaluation.currentElRate.toFixed(1) + '</div>' +
+                '<div style="color:#aaa;margin-top:6px;">Start bonus: +' + this.formatNumber(debugState.debugOkrBonusApplied || 0) + ' KR, +' + this.formatNumber(DEBUG_RESOURCE_BONUS) + ' HC, +' + this.formatNumber(DEBUG_RESOURCE_BONUS) + ' $.</div>';
+        };
+
         OKRFarmingGame.prototype.newGame = function() {
             this.infiniteMode = false;
             this.state = {
@@ -2299,6 +2610,7 @@
             this.hideUpgradeUnlockVideo();
             this.hideAiTakeoverVideo();
             this.hideCompetitorIntroVideo();
+            this.hideDebugStartDialog();
 
             // Show game UI, hide menus
             document.getElementById('menu').style.display = 'none';
@@ -6800,6 +7112,7 @@
             this.hideUpgradeUnlockVideo();
             this.hideAiTakeoverVideo();
             this.hideCompetitorIntroVideo();
+            this.hideDebugStartDialog();
             this.stopMusic();
             // Show video as menu background
             var vidIntro = document.getElementById('videoIntro');

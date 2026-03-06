@@ -40,6 +40,11 @@
    - Added a new autoplay cinematic (`spaceship-resource-raid-video.mp4`) that triggers once when the first competitor ship appears.
    - Wired it into the shared managed-video flow so gameplay auto-pauses during playback and resumes with the same countdown UX used by upgrade cinematics.
 
+7. **Debug-level bootstrap mode**
+   - Added a menu debug flow that lets you choose a starting level before launching.
+   - Debug starts now generate an optimized pre-placed building layout for the selected level.
+   - Debug runs begin with +999,999 HC and +999,999 $ to accelerate scenario testing.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**
