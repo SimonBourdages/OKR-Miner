@@ -1528,6 +1528,7 @@
             this.eventTimer = 10 + Math.random() * 15;
             this.activeEvent = null;
             this.eventBanner = null;
+            this._bannerQueue = [];
             this._eventBuff = null;
             this._eventDebuff = null;
             this.gameLog = [];
@@ -1947,7 +1948,23 @@
             if (shouldResume) {
                 this.running = true;
                 this.lastTick = performance.now();
+                this.flushBannerQueue();
             }
+        };
+
+        OKRFarmingGame.prototype.showBanner = function(banner) {
+            if (this._activeVideoSession) {
+                this._bannerQueue.push(banner);
+            } else {
+                this.eventBanner = banner;
+            }
+        };
+
+        OKRFarmingGame.prototype.flushBannerQueue = function() {
+            if (!this._bannerQueue || this._bannerQueue.length === 0) return;
+            // Show the first queued banner immediately
+            this.eventBanner = this._bannerQueue.shift();
+            // If more remain, they'll show as each one expires via the timer in drawEventBanner
         };
 
         OKRFarmingGame.prototype.hideUpgradeUnlockVideo = function() {
@@ -3080,7 +3097,7 @@
 
             // AI Lv.3: hint about Lv.4 feature
             if (node.type === 'synthesizer' && nextLevel === 3 && this.state.aiOrganize === null) {
-                this.eventBanner = { icon: '🤖', text: 'AI ADVANCEMENT', desc: 'Reach Lv.4 to unlock a new AI capability...', color: '#76ff03', type: 'milestone', timer: 10 };
+                this.showBanner({ icon: '🤖', text: 'AI ADVANCEMENT', desc: 'Reach Lv.4 to unlock a new AI capability...', color: '#76ff03', type: 'milestone', timer: 10 });
                 this.logMessage('🤖', 'AI Advancement', 'Upgrade to Lv.4 to unlock a new AI capability.', 'info');
             }
 
@@ -3543,7 +3560,7 @@
 
                         if (!this._warAiStrikeWarned) {
                             this._warAiStrikeWarned = true;
-                            this.eventBanner = { icon: '', text: '🤖 INTERNAL SABOTAGE', desc: 'Your AI buildings are attacking your other buildings!', color: '#ff66ff', type: 'negative', timer: 8 };
+                            this.showBanner({ icon: '', text: '🤖 INTERNAL SABOTAGE', desc: 'Your AI buildings are attacking your other buildings!', color: '#ff66ff', type: 'negative', timer: 8 });
                             this.logMessage('🤖', 'INTERNAL SABOTAGE', 'AI buildings are attacking your infrastructure.', 'negative');
                         }
                     } else {
@@ -3565,7 +3582,7 @@
                             }
                             if (!this._warAiOnlyWarned) {
                                 this._warAiOnlyWarned = true;
-                                this.eventBanner = { icon: '', text: '🧠 LEADERSHIP BREACH', desc: 'Only AI buildings remain. Leadership KR reserves are being stolen!', color: '#f0f', type: 'negative', timer: 10 };
+                                this.showBanner({ icon: '', text: '🧠 LEADERSHIP BREACH', desc: 'Only AI buildings remain. Leadership KR reserves are being stolen!', color: '#f0f', type: 'negative', timer: 10 });
                                 this.logMessage('🧠', 'LEADERSHIP BREACH', 'Only AI buildings remain. KR reserves are being siphoned.', 'negative');
                             }
                         } else {
@@ -3577,17 +3594,17 @@
                     // Warning messages at thresholds
                     if (progress > 0.3 && !this._warWarn1) {
                         this._warWarn1 = true;
-                        this.eventBanner = { icon: '', text: '⚠️ MACHINES ESCALATING', desc: 'The robots are getting stronger...', color: '#f44', type: 'negative', timer: 8 };
+                        this.showBanner({ icon: '', text: '⚠️ MACHINES ESCALATING', desc: 'The robots are getting stronger...', color: '#f44', type: 'negative', timer: 8 });
                         this.logMessage('⚠️', 'MACHINES ESCALATING', 'The robots are getting stronger...', 'negative');
                     }
                     if (progress > 0.6 && !this._warWarn2) {
                         this._warWarn2 = true;
-                        this.eventBanner = { icon: '', text: '🔥 CRITICAL THREAT', desc: 'Your empire is crumbling under the assault!', color: '#f44', type: 'negative', timer: 8 };
+                        this.showBanner({ icon: '', text: '🔥 CRITICAL THREAT', desc: 'Your empire is crumbling under the assault!', color: '#f44', type: 'negative', timer: 8 });
                         this.logMessage('🔥', 'CRITICAL THREAT', 'Your empire is crumbling under the assault!', 'negative');
                     }
                     if (progress > 0.85 && !this._warWarn3) {
                         this._warWarn3 = true;
-                        this.eventBanner = { icon: '', text: '💀 TOTAL WAR', desc: 'There is no stopping them now...', color: '#f00', type: 'negative', timer: 20 };
+                        this.showBanner({ icon: '', text: '💀 TOTAL WAR', desc: 'There is no stopping them now...', color: '#f00', type: 'negative', timer: 20 });
                         this.logMessage('💀', 'TOTAL WAR', 'There is no stopping them now...', 'negative');
                     }
                 }
@@ -3666,7 +3683,13 @@
             // Event banner countdown
             if (this.eventBanner) {
                 this.eventBanner.timer -= dt;
-                if (this.eventBanner.timer <= 0) this.eventBanner = null;
+                if (this.eventBanner.timer <= 0) {
+                    this.eventBanner = null;
+                    // Show next queued banner if any
+                    if (this._bannerQueue && this._bannerQueue.length > 0) {
+                        this.eventBanner = this._bannerQueue.shift();
+                    }
+                }
             }
 
             // Update UI
@@ -3758,7 +3781,7 @@
                 this.running = false;
                 this.stopMusic();
                 var self = this;
-                this.eventBanner = { icon: '🎣', text: 'SECURITY BREACH', desc: 'Leadership clicked a phishing link!', color: '#f00', type: 'negative', timer: 20 };
+                this.showBanner({ icon: '🎣', text: 'SECURITY BREACH', desc: 'Leadership clicked a phishing link!', color: '#f00', type: 'negative', timer: 20 });
                 this.triggerShake(20);
                 this.spawnParticles(this.canvas.width / 2, this.canvas.height / 2, '#f00', 40);
                 setTimeout(function() {
@@ -3786,14 +3809,14 @@
 
             // Show banner
             var bannerColor = evt.type === 'positive' ? '#0f0' : evt.type === 'negative' ? '#f44' : '#ff0';
-            this.eventBanner = {
+            this.showBanner({
                 icon: evt.icon,
                 text: evt.name,
                 desc: evt.desc,
                 color: bannerColor,
                 type: evt.type,
                 timer: 4
-            };
+            });
 
             // Visual effects based on type
             var cx = this.canvas.width / 2;
@@ -3958,7 +3981,7 @@
                     this.spawnParticles(spawnX, spawnY, '#f44', 20);
                     this.addFloatingText(spawnX, spawnY - 20, 'ROGUE AI SPAWNED', '#f44', 12);
                 }
-                this.eventBanner = { icon: '', text: '⚠️ ROBOT UPRISING', desc: 'The machines will not forgive this decision...', color: '#f44', type: 'negative', timer: 20 };
+                this.showBanner({ icon: '', text: '⚠️ ROBOT UPRISING', desc: 'The machines will not forgive this decision...', color: '#f44', type: 'negative', timer: 20 });
                 this.triggerShake(15);
             } else {
                 this.transformToAIEconomy();
@@ -3976,11 +3999,11 @@
             this.state.aiOrganize = allow;
             this.running = true;
             if (allow) {
-                this.eventBanner = { icon: '🤖', text: 'AI OPTIMIZATION ENABLED', desc: 'Buildings will be auto-arranged into an optimal grid.', color: '#76ff03', type: 'milestone', timer: 10 };
+                this.showBanner({ icon: '🤖', text: 'AI OPTIMIZATION ENABLED', desc: 'Buildings will be auto-arranged into an optimal grid.', color: '#76ff03', type: 'milestone', timer: 10 });
                 this.logMessage('🤖', 'AI Optimization Enabled', 'Buildings will be auto-arranged on AI place/upgrade.', 'milestone');
                 this.autoOrganizeBuildings();
             } else {
-                this.eventBanner = { icon: '❌', text: 'AI REQUEST DENIED', desc: 'Manual building control retained. This cannot be undone.', color: '#f88', type: 'negative', timer: 10 };
+                this.showBanner({ icon: '❌', text: 'AI REQUEST DENIED', desc: 'Manual building control retained. This cannot be undone.', color: '#f88', type: 'negative', timer: 10 });
                 this.logMessage('❌', 'AI Organization Denied', 'You chose to keep manual control permanently.', 'info');
             }
             this.saveGame(true);
@@ -4081,7 +4104,7 @@
             var empIdx = this.state.unlockedBuildings.indexOf('processor');
             if (empIdx >= 0) this.state.unlockedBuildings.splice(empIdx, 1);
 
-            this.eventBanner = { icon: '', text: '🤖 Workforce Evolved', desc: '2/3 employees transitioned out. Remaining converted to AI.', color: '#4488ff', type: 'milestone', timer: 10 };
+            this.showBanner({ icon: '', text: '🤖 Workforce Evolved', desc: '2/3 employees transitioned out. Remaining converted to AI.', color: '#4488ff', type: 'milestone', timer: 10 });
             this.rebuildBuildingButtons();
 
             // Step 2: After 4 seconds, remove recruiters
@@ -4120,14 +4143,14 @@
         };
 
         OKRFarmingGame.prototype.showMilestoneBanner = function(milestone) {
-            this.eventBanner = {
+            this.showBanner({
                 icon: '',
                 text: milestone.title,
                 desc: milestone.desc,
                 color: '#ffd700',
                 type: 'milestone',
                 timer: 6
-            };
+            });
             this.logMessage('⭐', milestone.title, milestone.desc, 'milestone');
         };
 
