@@ -845,8 +845,8 @@
             <span class="stat-value" id="currencyDisplay">50</span>
         </div>
         <div id="elRow" class="stat-row" style="display:none;">
-            <span class="stat-label">💲 $</span>
-            <span class="stat-value" id="elDisplay" style="color:#ffd700;">0</span><span id="elCapDisplay" style="color:#888;font-size:9px;"></span>
+            <span class="stat-label">💲</span>
+            <span class="stat-value" id="elDisplay" style="color:#ffd700;">0</span><span id="elCapDisplay" style="color:#888;font-size:9px;"></span><span style="color:#ffd700;"> $</span>
         </div>
         <div style="margin-top:6px;border-top:1px solid #234;padding-top:4px;cursor:pointer;color:#888;font-size:10px;text-align:center;" onclick="var r=document.getElementById('ratesSection');r.style.display=r.style.display==='none'?'block':'none';">▼ Rates</div>
         <div id="ratesSection" style="display:none;">
@@ -1014,12 +1014,12 @@
                 <input id="bugContact" type="text" placeholder="e.g. your@email.com or @username" style="width:100%;padding:8px;background:#111;color:#fff;border:1px solid #456;border-radius:4px;font-family:inherit;font-size:14px;box-sizing:border-box;" />
             </div>
             <div id="bugGameState" style="margin-bottom:12px;padding:8px;background:#0a0a0a;border:1px solid #333;border-radius:4px;font-size:10px;color:#666;max-height:60px;overflow:hidden;"></div>
-            <div style="margin-bottom:12px;">
-                <label style="color:#8cf;font-size:12px;display:block;margin-bottom:4px;">Screenshot (auto-captured)</label>
-                <div style="border:1px solid #456;border-radius:6px;overflow:hidden;background:#111;">
+            <details style="margin-bottom:12px;">
+                <summary style="color:#8cf;font-size:12px;cursor:pointer;">Screenshot (click to expand)</summary>
+                <div style="border:1px solid #456;border-radius:6px;overflow:hidden;background:#111;margin-top:6px;">
                     <img id="bugScreenshot" style="width:100%;display:block;" />
                 </div>
-            </div>
+            </details>
             <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
                 <button onclick="game.submitBugReport()" style="background:#ff9800;color:#000;border:none;padding:10px 30px;font-family:inherit;font-size:14px;font-weight:bold;cursor:pointer;border-radius:6px;">Submit to GitHub</button>
                 <button onclick="game.closeBugReport()" style="background:#333;color:#fff;border:1px solid #666;padding:10px 30px;font-family:inherit;font-size:14px;cursor:pointer;border-radius:6px;">Cancel</button>
@@ -1927,7 +1927,7 @@
                     '<div class="b-header"><span class="b-dot" style="background:' + b.color + '"></span><span class="b-name">' + b.name + '</span></div>' +
                     '<div class="b-cost">' + b.cost + ' HC</div>' +
                     '<div class="b-effect">' + b.desc + '</div>' +
-                    (type === 'repairbot' ? '<div style="color:#0ff;font-size:9px;">🍕 x<span class="pizza-count">' + self.repairBots.length + '</span></div>' : '') +
+                    (type === 'repairbot' ? '<div style="color:#0ff;font-size:9px;">🔧 x<span class="pizza-count">' + self.repairBots.length + '</span></div>' : '') +
                     '<div class="b-preview" id="preview-' + type + '"></div>';
                 if (type === 'repairbot') {
                     btn.addEventListener('click', function() { self.buyRepairBot(); });
@@ -2450,20 +2450,10 @@
             }
 
             // Check if outside circular playable area
-            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
+            var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
             var distFromCenter = Math.sqrt((x - fX) * (x - fX) + (y - fY) * (y - fY));
             if (distFromCenter > playRadius) {
                 this.addFloatingText(x, y - 20, 'Outside play area!', '#f84');
-                return;
-            }
-
-            // Don't place in the building panel area
-            if (window.innerWidth > 768 && x > this.canvas.width - 180) {
-                this.addFloatingText(x, y - 20, 'Building panel area!', '#f84');
-                return;
-            }
-            if (window.innerWidth <= 768 && x > this.canvas.width - 100) {
-                this.addFloatingText(x, y - 20, 'Building panel!', '#f84');
                 return;
             }
 
@@ -2687,7 +2677,7 @@
                 age: 0, targetIdx: -1, repairing: false, orbitAngle: Math.random() * Math.PI * 2
             });
             this.repairBotCost = Math.floor(this.repairBotCost * 1.5);
-            this.addFloatingText(fX, fY - 80, '🍕 IT Support deployed!', '#0ff', 14);
+            this.addFloatingText(fX, fY - 80, '🔧 IT Support deployed!', '#0ff', 14);
             this.spawnParticles(fX, fY - 60, '#0ff', 10);
             this.playSound('complete');
             this.trackEvent('repairbot');
@@ -2753,6 +2743,11 @@
             if (this._eventDebuff) {
                 okrGain *= this._eventDebuff.mult;
                 acGain *= this._eventDebuff.mult;
+            }
+
+            // Base HC generation from Leadership in AI era
+            if (this.state.aiChoice === 'equal') {
+                acGain += 5;
             }
 
             this.currentOkrRate = okrGain;
@@ -3300,7 +3295,7 @@
             var bannerW = Math.min(500, w - 40);
             var bannerH = 60;
             var bannerX = (w - bannerW) / 2;
-            var bannerY = 60;
+            var bannerY = 120;
 
             // Glow behind
             ctx.shadowColor = b.color;
@@ -3472,6 +3467,10 @@
 
                 self.eventBanner = { icon: '', text: '🤔 Why Recruiters?', desc: 'Recruiters liquidated for ' + self.formatNumber(recruiterValue) + ' $. No longer needed.', color: '#ffd700', type: 'milestone', timer: 5 };
                 self.rebuildBuildingButtons();
+
+                // Grant HC buffer since recruiters are gone
+                self.state.currencies.ac += 50000;
+                self.addFloatingText(self.canvas.width / 2, self.canvas.height / 2, '+50K HC transition bonus!', '#ffd700', 16);
 
                 // Step 3: After 4 more seconds, introduce GPU
                 setTimeout(function() {
@@ -4136,13 +4135,12 @@
 
             var distToFactory = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var tooCloseToFactory = distToFactory < 60;
-            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
+            var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
             var distFromCenter = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var outsidePlayArea = distFromCenter > playRadius;
-            var inBuildingPanel = (window.innerWidth > 768 && mx > this.canvas.width - 180) || (window.innerWidth <= 768 && mx > this.canvas.width - 100);
             var canAfford = this.state.currencies.ac >= b.cost;
 
-            var blocked = tooCloseToFactory || outsidePlayArea || inBuildingPanel || overlapsExisting;
+            var blocked = tooCloseToFactory || outsidePlayArea || overlapsExisting;
 
             var ringColor, ghostAlpha;
             if (blocked) {
@@ -4203,9 +4201,6 @@
             } else if (outsidePlayArea) {
                 ctx.fillStyle = '#f66';
                 ctx.fillText('Outside play area!', mx, my + 35);
-            } else if (inBuildingPanel) {
-                ctx.fillStyle = '#f66';
-                ctx.fillText('Building panel!', mx, my + 35);
             } else if (!canAfford) {
                 ctx.fillStyle = '#f66';
                 ctx.fillText('Need ' + b.cost + ' HC', mx, my + 35);
@@ -4387,7 +4382,7 @@
         OKRFarmingGame.prototype.drawAsteroidBelt = function(ctx, w, h) {
             var fX = w / 2;
             var fY = h / 2;
-            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
+            var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
             var time = Date.now() * 0.0001; // slow rotation
 
             ctx.save();
