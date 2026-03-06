@@ -634,36 +634,15 @@
                 padding: 8px 12px;
             }
 
-            /* Buildings panel: horizontal scroll row above controls bar */
-            #buildings {
-                top: auto;
-                right: 0;
-                left: 0;
-                bottom: 46px;
-                transform: none;
-                flex-direction: row;
-                overflow-x: auto;
-                overflow-y: hidden;
-                -webkit-overflow-scrolling: touch;
-                padding: 4px 8px;
-                background: rgba(0, 0, 0, 0.6);
-                gap: 6px;
-            }
-
-            .building-btn {
-                min-width: 120px;
-                flex-shrink: 0;
-                font-size: 11px;
-                padding: 6px 10px;
-            }
+            /* Buildings panel: keep left-side layout from 768px breakpoint */
 
             .building-btn .b-preview {
                 display: none;
             }
 
-            /* Repair bot panel: stack above buildings row */
+            /* Repair bot panel: compact */
             #repairBotPanel {
-                bottom: 120px;
+                bottom: 50px;
             }
 
             /* Hint text: move above buildings row */
