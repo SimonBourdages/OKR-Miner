@@ -947,8 +947,8 @@
         var UPGRADE_POWER = { 1: 1.0, 2: 2.0, 3: 4.5 }; // multiplier on output
 
         var BUILDINGS = {
-            collector:   { name: 'Collector',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 HC/s',          symbol: '', metrics: ['ac'] },
-            processor:   { name: 'Processor',   cost: 150,  acPerSec: 0,   okrPerSec: 5,   elCost: 3,  color: '#2196f3', desc: '+5 KR/s',         symbol: '', metrics: ['okr'] },
+            collector:   { name: 'Recruiter',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 HC/s',          symbol: '', metrics: ['ac'] },
+            processor:   { name: 'Employee',   cost: 150,  acPerSec: 0,   okrPerSec: 5,   elCost: 3,  color: '#2196f3', desc: '+5 KR/s',         symbol: '', metrics: ['okr'] },
             multiplier:  { name: 'Multiplier',  cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#9c27b0', desc: 'x1.5 all rates',   symbol: '', metrics: ['okr', 'ac', 'el', 'mult'], multiplier: 1.5 },
             synthesizer: { name: 'Synthesizer', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 KR/s',        symbol: '', metrics: ['okr'] },
             generator:   { name: 'Generator',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 EL/s', symbol: '', metrics: ['el'] },
@@ -1621,7 +1621,7 @@
             var curMult = 1;
             var curAc = 0;
             var curOkr = 0;
-            var curEl = 10; // Base 10 EL/s from KR Factory
+            var curEl = 10; // Base 10 EL/s from Leadership
             var curElDrain = 0;
             var curInterest = 0;
             for (var i = 0; i < this.nodes.length; i++) {
@@ -2227,7 +2227,7 @@
             // Accumulate production from all buildings
             var acGain = 0;
             var okrGain = 0;
-            var elGain = 10; // Base 10 EL/s from KR Factory
+            var elGain = 10; // Base 10 EL/s from Leadership
             var elDrain = 0;
             var totalInterest = 0;
             for (var i = 0; i < this.nodes.length; i++) {
@@ -2481,7 +2481,7 @@
                 }
             }
 
-            // Thief ships — visible attack runs on KR Factory
+            // Thief ships — visible attack runs on Leadership
             if (this.state.thievesEnabled) {
                 this.thiefSpawnTimer += dt;
                 var milestoneIdx = this.state.unlockedMilestones.length;
@@ -3825,7 +3825,7 @@
         };
 
         // =========================================================
-        // DRAWING - KR Factory
+        // DRAWING - Leadership
         // =========================================================
 
         OKRFarmingGame.prototype.drawOKRFactory = function(ctx, cx, cy) {
@@ -3900,7 +3900,7 @@
             ctx.fillStyle = '#0ff';
             ctx.font = 'bold 11px Segoe UI';
             ctx.textAlign = 'center';
-            ctx.fillText('KR Factory', cx, cy + 10 * s);
+            ctx.fillText('Leadership', cx, cy + 10 * s);
         };
 
         // =========================================================
@@ -6166,4 +6166,5 @@
     </script>
 </body>
 </html>
+
 
