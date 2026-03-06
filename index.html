@@ -869,6 +869,10 @@
             <span class="stat-label">$</span>
             <span class="stat-value" style="color:#ffd700;"><span id="elDisplay">0</span><span id="elCapDisplay" style="color:#999;"></span></span>
         </div>
+        <div id="tflopsRow" class="stat-row" style="display:none;">
+            <span class="stat-label">TFLOPS</span>
+            <span class="stat-value" style="color:#76ff03;"><span id="tflopsDisplay">0</span> / <span id="tflopsRequired" style="color:#999;">0</span></span>
+        </div>
         <div style="margin-top:6px;border-top:1px solid #234;padding-top:4px;cursor:pointer;color:#888;font-size:10px;text-align:center;" onclick="var r=document.getElementById('ratesSection');r.style.display=r.style.display==='none'?'block':'none';">▼ Rates</div>
         <div id="ratesSection" style="display:none;">
             <div class="stat-row">
@@ -1196,7 +1200,8 @@
 
         var UPGRADE_COSTS = GameLogic.UPGRADE_COSTS;
         var UPGRADE_POWER = GameLogic.UPGRADE_POWER;
-        var GPU_CAPACITY = GameLogic.GPU_CAPACITY;
+        var GPU_TFLOPS = GameLogic.GPU_TFLOPS;
+        var AI_TFLOPS_COST = GameLogic.AI_TFLOPS_COST;
 
         var BUILDINGS = {
             collector:   { name: 'Recruiter',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 HC/s',          symbol: '', metrics: ['ac'] },
@@ -1206,7 +1211,7 @@
             generator:   { name: 'Finances',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 15, elCost: 0, color: '#ff9800', desc: '+15 $/s', symbol: '', metrics: ['el'] },
             bank:        { name: 'Investment',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% $ interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
             repairbot:   { name: 'IT Support',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Heals AI buildings',  symbol: '', metrics: ['hp'], repairRate: 15 },
-            gpu:         { name: 'GPU',         cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#76ff03', desc: 'Powers 1 AI unit',  symbol: '', metrics: ['gpu'], gpuCapacity: 1 }
+            gpu:         { name: 'GPU',         cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,  color: '#76ff03', desc: '+5 TFLOPS',  symbol: '', metrics: ['gpu'] }
         };
 
         // Metric icons as small inline SVGs (16x16)
@@ -1216,7 +1221,7 @@
             el: '<svg width="14" height="14" viewBox="0 0 14 14"><polygon points="8,0 4,6 7,6 5,14 11,6 8,6" fill="#ff9800"/></svg>',
             hp: '<svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="5" width="12" height="4" rx="1" fill="#f44336"/><rect x="5" y="1" width="4" height="12" rx="1" fill="#f44336"/></svg>',
             mult: '<svg width="14" height="14" viewBox="0 0 14 14"><line x1="2" y1="2" x2="12" y2="12" stroke="#ce93d8" stroke-width="2.5"/><line x1="12" y1="2" x2="2" y2="12" stroke="#ce93d8" stroke-width="2.5"/></svg>',
-            gpu: '<svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="3" width="10" height="8" rx="1" fill="#76ff03"/><rect x="4" y="5" width="6" height="4" fill="#33691e"/></svg>'
+            gpu: '<svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="3" width="10" height="8" rx="1" fill="#76ff03"/><text x="7" y="10" text-anchor="middle" font-size="6" fill="#1b5e20" font-weight="bold">TF</text></svg>'
         };
 
         var ACHIEVEMENTS = {
@@ -2238,7 +2243,8 @@
                 state: state,
                 themes: THEMES,
                 upgradePower: UPGRADE_POWER,
-                gpuCapacity: GPU_CAPACITY,
+                gpuTflops: GPU_TFLOPS,
+                aiTflopsCost: AI_TFLOPS_COST,
                 baseElGain: 10
             });
 
@@ -2274,7 +2280,7 @@
             if (plan.synthesizer !== undefined) {
                 var desiredAI = 1 + targetLevel;
                 if (state.gpuEnabled && plan.gpu !== undefined) {
-                    desiredAI = Math.min(desiredAI, plan.gpu * (GPU_CAPACITY[1] || 1));
+                    desiredAI = Math.min(desiredAI, Math.floor(plan.gpu * (GPU_TFLOPS[1] || 5) / (AI_TFLOPS_COST[1] || 4)));
                 }
                 plan.synthesizer = Math.max(plan.synthesizer || 0, desiredAI);
             }
@@ -2300,8 +2306,8 @@
                 for (var t = 0; t < productiveTypes.length; t++) {
                     var trialType = productiveTypes[t];
                     if (trialType === 'synthesizer' && state.gpuEnabled && plan.gpu !== undefined) {
-                        var gpuCap = (plan.gpu || 0) * (GPU_CAPACITY[1] || 1);
-                        if ((plan.synthesizer || 0) + 1 > gpuCap) continue;
+                        var gpuTflops = (plan.gpu || 0) * (GPU_TFLOPS[1] || 5);
+                        if (((plan.synthesizer || 0) + 1) * (AI_TFLOPS_COST[1] || 4) > gpuTflops) continue;
                     }
 
                     var trialPlan = {};
@@ -3066,7 +3072,8 @@
                 state: this.state,
                 themes: THEMES,
                 upgradePower: UPGRADE_POWER,
-                gpuCapacity: GPU_CAPACITY,
+                gpuTflops: GPU_TFLOPS,
+                aiTflopsCost: AI_TFLOPS_COST,
                 baseElGain: 10
             });
 
@@ -3094,6 +3101,8 @@
                 }
             }
             this._fundingCap = effectiveFundingCap;
+            this._totalTflops = snapshot.totalTflops || 0;
+            this._tflopsRequired = snapshot.tflopsRequired || 0;
 
             // Apply event buffs/debuffs
             if (this._eventBuff) {
@@ -4004,6 +4013,16 @@
                 if (this.UNDERFUNDED) {
                     elRateEl.textContent += ' ⚠';
                 }
+            }
+
+            var tflopsRow = document.getElementById('tflopsRow');
+            if (tflopsRow) tflopsRow.style.display = this.state.gpuEnabled ? '' : 'none';
+            if (this.state.gpuEnabled) {
+                var tflopsEl = document.getElementById('tflopsDisplay');
+                var tflopsReqEl = document.getElementById('tflopsRequired');
+                if (tflopsEl) tflopsEl.textContent = this._totalTflops || 0;
+                if (tflopsReqEl) tflopsReqEl.textContent = this._tflopsRequired || 0;
+                if (tflopsEl) tflopsEl.style.color = (this._totalTflops || 0) >= (this._tflopsRequired || 0) ? '#76ff03' : '#f44';
             }
 
             // Event countdown

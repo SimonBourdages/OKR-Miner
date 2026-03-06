@@ -8,7 +8,7 @@ const BUILDINGS = {
     synthesizer: { cost: 2000, acPerSec: 0, okrPerSec: 100, elCost: 10 },
     generator: { cost: 75, acPerSec: 0, okrPerSec: 0, elPerSec: 15, elCost: 0 },
     bank: { cost: 300, acPerSec: 0, okrPerSec: 0, elCost: 0, interestRate: 0.02 },
-    gpu: { cost: 500, acPerSec: 0, okrPerSec: 0, elCost: 5 }
+    gpu: { cost: 500, acPerSec: 0, okrPerSec: 0, elCost: 0 }
 };
 
 const THEMES = {
@@ -40,7 +40,7 @@ describe('game-logic constants and helpers', () => {
     test('exports canonical level maps', () => {
         expect(logic.UPGRADE_COSTS[3]).toBe(6);
         expect(logic.UPGRADE_POWER[4]).toBe(13.5);
-        expect(logic.GPU_CAPACITY[2]).toBe(3);
+        expect(logic.GPU_TFLOPS[2]).toBe(15);
     });
 
     test('computes playable radius by unlocked milestones', () => {
@@ -82,7 +82,7 @@ describe('production snapshot calculations', () => {
             state: makeState({ electricityEnabled: false }),
             themes: THEMES,
             upgradePower: logic.UPGRADE_POWER,
-            gpuCapacity: logic.GPU_CAPACITY,
+            gpuTflops: logic.GPU_TFLOPS, aiTflopsCost: logic.AI_TFLOPS_COST,
             baseElGain: 10
         });
 
@@ -105,7 +105,7 @@ describe('production snapshot calculations', () => {
             state: makeState({ electricityEnabled: true, activeTheme: null, currencies: { ac: 0, el: 0 } }),
             themes: THEMES,
             upgradePower: logic.UPGRADE_POWER,
-            gpuCapacity: logic.GPU_CAPACITY,
+            gpuTflops: logic.GPU_TFLOPS, aiTflopsCost: logic.AI_TFLOPS_COST,
             baseElGain: 10
         });
 
@@ -124,7 +124,7 @@ describe('production snapshot calculations', () => {
             state: makeState({ activeTheme: null }),
             themes: THEMES,
             upgradePower: logic.UPGRADE_POWER,
-            gpuCapacity: logic.GPU_CAPACITY,
+            gpuTflops: logic.GPU_TFLOPS, aiTflopsCost: logic.AI_TFLOPS_COST,
             baseElGain: 10
         });
 
@@ -142,7 +142,7 @@ describe('production snapshot calculations', () => {
             state: makeState({ electricityEnabled: true, activeTheme: null }),
             themes: THEMES,
             upgradePower: logic.UPGRADE_POWER,
-            gpuCapacity: logic.GPU_CAPACITY,
+            gpuTflops: logic.GPU_TFLOPS, aiTflopsCost: logic.AI_TFLOPS_COST,
             baseElGain: 10
         });
 
@@ -161,13 +161,14 @@ describe('production snapshot calculations', () => {
             state: makeState({ activeTheme: null, gpuEnabled: true }),
             themes: THEMES,
             upgradePower: logic.UPGRADE_POWER,
-            gpuCapacity: logic.GPU_CAPACITY,
+            gpuTflops: logic.GPU_TFLOPS, aiTflopsCost: logic.AI_TFLOPS_COST,
             baseElGain: 10
         });
 
         expect(snapshot.totalAIs).toBe(2);
-        expect(snapshot.totalGpuCap).toBe(1);
-        expect(snapshot.okrGain).toBeCloseTo(100, 8);
+        expect(snapshot.totalTflops).toBe(5);
+        expect(snapshot.tflopsRequired).toBe(8);
+        expect(snapshot.okrGain).toBeCloseTo(125, 8);
     });
 
     test('computes funding cap from bank levels', () => {
@@ -180,7 +181,7 @@ describe('production snapshot calculations', () => {
             state: makeState({ electricityEnabled: true, activeTheme: null }),
             themes: THEMES,
             upgradePower: logic.UPGRADE_POWER,
-            gpuCapacity: logic.GPU_CAPACITY,
+            gpuTflops: logic.GPU_TFLOPS, aiTflopsCost: logic.AI_TFLOPS_COST,
             baseElGain: 10
         });
 

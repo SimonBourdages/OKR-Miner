@@ -9,7 +9,8 @@
 
     var UPGRADE_COSTS = Object.freeze({ 1: 1.0, 2: 2.5, 3: 6.0, 4: 0 });
     var UPGRADE_POWER = Object.freeze({ 1: 1.0, 2: 2.0, 3: 4.5, 4: 13.5 });
-    var GPU_CAPACITY = Object.freeze({ 1: 1, 2: 3, 3: 5, 4: 15 });
+    var GPU_TFLOPS = Object.freeze({ 1: 5, 2: 15, 3: 35, 4: 100 });
+    var AI_TFLOPS_COST = Object.freeze({ 1: 4, 2: 8, 3: 18, 4: 54 });
 
     function getLevel(node) {
         if (!node || typeof node.level !== 'number') return 1;
@@ -93,7 +94,8 @@
         var state = opts.state || {};
         var themes = opts.themes || {};
         var upgradePower = opts.upgradePower || UPGRADE_POWER;
-        var gpuCapacity = opts.gpuCapacity || GPU_CAPACITY;
+        var gpuTflops = opts.gpuTflops || GPU_TFLOPS;
+        var aiTflopsCost = opts.aiTflopsCost || AI_TFLOPS_COST;
         var baseElGain = opts.baseElGain === undefined ? 10 : opts.baseElGain;
 
         var mult = calculateGlobalMultiplier(nodes, buildings, upgradePower);
@@ -102,7 +104,8 @@
         var elGain = baseElGain;
         var elDrain = 0;
         var totalInterest = 0;
-        var totalGpuCap = 0;
+        var totalTflopsGenerated = 0;
+        var totalTflopsRequired = 0;
         var totalAIs = 0;
         var aiBaseOkrForGpuCalc = 0;
 
@@ -115,10 +118,11 @@
             var levelPower = upgradePower[level] || 1;
 
             if (node.type === 'gpu') {
-                totalGpuCap += gpuCapacity[level] || 1;
+                totalTflopsGenerated += gpuTflops[level] || 5;
             }
             if (node.type === 'synthesizer') {
                 totalAIs++;
+                totalTflopsRequired += aiTflopsCost[level] || 4;
                 aiBaseOkrForGpuCalc += (building.okrPerSec || 0) * levelPower;
             }
 
@@ -146,9 +150,9 @@
         if (activeTheme && activeTheme.bonus === 'okr') okrGain *= activeTheme.bonusMult;
         if (activeTheme && activeTheme.bonus === 'el') elGain *= activeTheme.bonusMult;
 
-        if (state.gpuEnabled && totalAIs > totalGpuCap) {
-            var gpuRatio = totalGpuCap / totalAIs;
-            okrGain -= aiBaseOkrForGpuCalc * (1 - gpuRatio) * mult;
+        if (state.gpuEnabled && totalTflopsRequired > totalTflopsGenerated) {
+            var tflopsRatio = totalTflopsGenerated / Math.max(1, totalTflopsRequired);
+            okrGain -= aiBaseOkrForGpuCalc * (1 - tflopsRatio) * mult;
         }
 
         var fundingCap = null;
@@ -176,7 +180,8 @@
             totalInterest: totalInterest,
             fundingCap: fundingCap,
             underfunded: underfunded,
-            totalGpuCap: totalGpuCap,
+            totalTflops: totalTflopsGenerated,
+            tflopsRequired: totalTflopsRequired,
             totalAIs: totalAIs
         };
     }
@@ -233,7 +238,8 @@
     return {
         UPGRADE_COSTS: UPGRADE_COSTS,
         UPGRADE_POWER: UPGRADE_POWER,
-        GPU_CAPACITY: GPU_CAPACITY,
+        GPU_TFLOPS: GPU_TFLOPS,
+        AI_TFLOPS_COST: AI_TFLOPS_COST,
         getPlayableRadius: getPlayableRadius,
         getNodeHitRadius: getNodeHitRadius,
         calculateUpgradeCost: calculateUpgradeCost,

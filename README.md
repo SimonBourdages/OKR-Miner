@@ -175,14 +175,23 @@ Autonomous drones that heal the most damaged **AI buildings only**. Not placed o
 *Multiple IT Support drones target different AI buildings. Each heals the lowest-HP AI not already being healed. During the AI takeover transition, 1/3 of destroyed Employees are converted into IT Support drones.*
 
 ### GPU (AI Power Unit)
-Required to run AI units. Only unlocked after choosing Equal Rights in the story.
+Required to run AI units. Only unlocked after choosing Equal Rights in the story. GPUs generate TFLOPS — a real-time compute resource that is **not stored**. Each AI consumes TFLOPS to function; if your total TFLOPS drops below total demand, excess AIs produce nothing. GPUs cost a one-time HC fee with no ongoing $ drain.
 
-| Level | AI Capacity | $ Cost/s | Upgrade Cost |
-|---|---|---|---|
-| Lv.1 | Powers 1 AI | 5 $/s | 500 HC |
-| Lv.2 | Powers 3 AIs | 10 $/s | 1,250 HC |
-| Lv.3 | Powers 5 AIs | 22.5 $/s | 3,000 HC |
-| Lv.4 LEGENDARY | Powers 15 AIs | 67.5 $/s | Merge only |
+| Level | TFLOPS Output | Upgrade Cost |
+|---|---|---|
+| Lv.1 | 5 TFLOPS | 500 HC |
+| Lv.2 | 15 TFLOPS | 1,250 HC |
+| Lv.3 | 35 TFLOPS | 3,000 HC |
+| Lv.4 LEGENDARY | 100 TFLOPS | Merge only |
+
+**AI TFLOPS consumption per level:**
+
+| AI Level | TFLOPS Required |
+|---|---|
+| Lv.1 | 4 TFLOPS |
+| Lv.2 | 8 TFLOPS |
+| Lv.3 | 18 TFLOPS |
+| Lv.4 LEGENDARY | 54 TFLOPS |
 
 **Appearance:**
 | Level | Look |
