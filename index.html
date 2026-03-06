@@ -2091,7 +2091,7 @@
             }
 
             // Check if outside circular playable area
-            var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
+            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
             var distFromCenter = Math.sqrt((x - fX) * (x - fX) + (y - fY) * (y - fY));
             if (distFromCenter > playRadius) {
                 this.addFloatingText(x, y - 20, 'Outside play area!', '#f84');
@@ -3518,7 +3518,7 @@
 
             var distToFactory = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var tooCloseToFactory = distToFactory < 60;
-            var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
+            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
             var distFromCenter = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var outsidePlayArea = distFromCenter > playRadius;
             var inBuildingPanel = (window.innerWidth > 768 && mx > this.canvas.width - 180) || (window.innerWidth <= 768 && mx > this.canvas.width - 100);
@@ -3770,7 +3770,7 @@
         OKRFarmingGame.prototype.drawAsteroidBelt = function(ctx, w, h) {
             var fX = w / 2;
             var fY = h / 2;
-            var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
+            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
             var time = Date.now() * 0.0001; // slow rotation
 
             ctx.save();
