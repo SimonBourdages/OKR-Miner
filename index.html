@@ -4245,8 +4245,6 @@
             ctx.translate(this.camera.offsetX, this.camera.offsetY);
             ctx.scale(this.camera.zoom, this.camera.zoom);
 
-            // Grid scrolls with the world
-            this.drawPixelGrid(ctx, w, h);
             this.drawAsteroidBelt(ctx, w, h);
 
             // Connections: MST network plus hub-driven extra leadership branches
