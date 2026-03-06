@@ -5091,16 +5091,16 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // Dark overlay outside the circle — use world-space bounds
+            // Dark overlay outside the circle — drawn in screen space
             ctx.save();
-            var worldLeft = (0 - this.camera.offsetX) / this.camera.zoom;
-            var worldTop = (0 - this.camera.offsetY) / this.camera.zoom;
-            var worldRight = (w - this.camera.offsetX) / this.camera.zoom;
-            var worldBottom = (h - this.camera.offsetY) / this.camera.zoom;
-            var margin = 500; // extra margin for safety
+            var screenCX = fX * this.camera.zoom + this.camera.offsetX;
+            var screenCY = fY * this.camera.zoom + this.camera.offsetY;
+            var screenR = playRadius * this.camera.zoom;
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // reset to screen space
+            ctx.translate(this.screenShake.x, this.screenShake.y);
             ctx.beginPath();
-            ctx.rect(worldLeft - margin, worldTop - margin, worldRight - worldLeft + margin * 2, worldBottom - worldTop + margin * 2);
-            ctx.arc(fX, fY, playRadius, 0, Math.PI * 2, true); // cut out circle
+            ctx.rect(0, 0, w, h);
+            ctx.arc(screenCX, screenCY, screenR, 0, Math.PI * 2, true); // cut out circle
             ctx.closePath();
             ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
             ctx.fill();
