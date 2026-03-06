@@ -723,7 +723,7 @@
         <button onclick="game.buyRepairBot()" style="background:rgba(0,20,10,0.9);border:2px solid #00ff88;border-radius:8px;padding:10px 14px;color:#00ff88;cursor:pointer;font-family:inherit;font-size:12px;text-align:left;min-width:160px;">
             <div style="display:flex;align-items:center;gap:6px;">
                 <span style="width:8px;height:8px;border-radius:50%;background:#00e5ff;display:inline-block;"></span>
-                <span style="font-weight:bold;font-size:14px;">Repair Bot</span>
+                <span style="font-weight:bold;font-size:14px;">Morale Event</span>
             </div>
             <div style="color:#ff0;"><span id="repairBotCost">200</span> AC</div>
             <div style="color:#8f8;font-size:11px;">Heals lowest HP</div>
@@ -732,7 +732,7 @@
                     <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="5" width="12" height="4" rx="1" fill="#f44336"/><rect x="5" y="1" width="4" height="12" rx="1" fill="#f44336"/></svg>
                 </span>
             </div>
-            <div style="color:#0ff;font-size:10px;">Bots: <span id="repairBotCount">0</span></div>
+            <div style="color:#0ff;font-size:10px;">Morale: <span id="repairBotCount">0</span></div>
         </button>
     </div>
 
@@ -887,8 +887,8 @@
             { okr: 5000,    unlock: ['bank'], title: '🏦 Bank Unlocked!', desc: 'Banks earn interest on your AC. Smart money management pays off!' },
             { okr: 50000,   unlock: ['synthesizer'], title: '⚛️ Synthesizer Unlocked!', desc: 'The ultimate OKR machine! Synthesizers produce 100 KR/s but need lots of power.' },
             { okr: 500000,  unlock: [], title: '🛸 Spaceship Threat!', desc: 'Enemy ships are targeting your buildings! They deal damage on impact. Watch out!', enableShips: true },
-            { okr: 1000000, unlock: [], title: '🔧 Repair Bots Available!', desc: 'Buy repair drones to automatically fix damaged buildings.', enableRepairBots: true },
-            { okr: 5e6,     unlock: [], title: '☠️ OKR Thieves Incoming!', desc: 'Pirate ships will try to steal your OKRs from the factory! Click them to destroy!', enableThieves: true },
+            { okr: 1000000, unlock: [], title: '🔧 Morale Events Available!', desc: 'Buy repair drones to automatically fix damaged buildings.', enableRepairMorale: true },
+            { okr: 5e6,     unlock: [], title: '☠️ Competitors Incoming!', desc: 'Competitor ships will try to poach your OKRs from the factory! Click them to destroy!', enableThieves: true },
             { okr: 50e6,    unlock: [], title: '🌟 Random Events Active!', desc: 'Space events now occur! Some help, some hurt. Prepare for anything.', enableEvents: true },
             { okr: 100e6,   unlock: [], title: '🎨 Themes Unlocked!', desc: 'You can now change the visual theme! Each theme provides a small production bonus.', enableThemes: true },
             { okr: 500e6,   unlock: [], title: '⬆️ Upgrades Unlocked!', desc: 'You can now click existing buildings to upgrade them to Lv.2 and Lv.3!', enableUpgrades: true },
@@ -900,9 +900,9 @@
         ];
 
         function getPlayableRadius(state) {
-            if (!state) return 200;
+            if (!state) return 300;
             var milestones = state.unlockedMilestones ? state.unlockedMilestones.length : 1;
-            return 200 + milestones * 20;
+            return 300 + milestones * 20;
         }
 
         var THEMES = {
@@ -953,7 +953,7 @@
             synthesizer: { name: 'AI', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 KR/s',        symbol: '', metrics: ['okr'] },
             generator:   { name: 'Finances',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 el/s', symbol: '', metrics: ['el'] },
             bank:        { name: 'Bank',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% AC interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
-            repairbot:   { name: 'Repair Bot',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Heals lowest HP',  symbol: '', metrics: ['hp'], repairRate: 15 }
+            repairbot:   { name: 'Morale Event',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Boosts team morale',  symbol: '', metrics: ['hp'], repairRate: 15 }
         };
 
         // Metric icons as small inline SVGs (16x16)
@@ -1095,21 +1095,21 @@
             { name: 'Meteor Shower', desc: 'All buildings take 20 damage!', type: 'negative', icon: '☄️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.max(0,g.nodes[i].hp-20); } },
             { name: 'Solar Flare', desc: 'Lose 30% electricity!', type: 'negative', icon: '🔥', effect: function(g) { g.state.currencies.el*=0.7; } },
             { name: 'Pirate Raid', desc: 'Lose 15% AC!', type: 'negative', icon: '🛸', effect: function(g) { g.state.currencies.ac*=0.85; } },
-            { name: 'Cosmic Tax', desc: 'Lose 10% OKRs!', type: 'negative', icon: '💀', effect: function(g) { g.state.totalOKRs*=0.9; } },
+            { name: 'Cosmic Tax', desc: 'Lose 10% KRs!', type: 'negative', icon: '💀', effect: function(g) { g.state.totalOKRs*=0.9; } },
             { name: 'Black Hole Proximity', desc: 'Production halved for 10s!', type: 'negative', icon: '🌑', effect: function(g) { g._eventDebuff={mult:0.5,timer:10}; } },
             { name: 'EMP Pulse', desc: 'Generators take 30 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-30); } },
             { name: 'Space Debris', desc: 'A random building destroyed!', type: 'negative', icon: '💥', effect: function(g) { if(g.nodes.length>0){var r=Math.floor(Math.random()*g.nodes.length);g.nodes[r].hp=0;} } },
             { name: 'Gravity Well', desc: 'Lose 5% of all currencies!', type: 'negative', icon: '🌀', effect: function(g) { g.state.currencies.ac*=0.95;g.state.currencies.el*=0.95; } },
             { name: 'Radiation Leak', desc: 'Processors take 25 damage!', type: 'negative', icon: '☢️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='processor') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-25); } },
             { name: 'Ion Storm', desc: 'All buildings take 10 damage!', type: 'negative', icon: '🌪️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.max(0,g.nodes[i].hp-10); } },
-            { name: 'Data Corruption', desc: 'Lose 5% total OKRs!', type: 'negative', icon: '⚠️', effect: function(g) { g.state.totalOKRs*=0.95; } },
+            { name: 'Data Corruption', desc: 'Lose 5% total KRs!', type: 'negative', icon: '⚠️', effect: function(g) { g.state.totalOKRs*=0.95; } },
             { name: 'Fuel Shortage', desc: 'funding drops to 0!', type: 'negative', icon: '🔋', effect: function(g) { g.state.currencies.el=0; } },
             { name: 'Asteroid Impact', desc: 'Random building takes 50 damage!', type: 'negative', icon: '☄️', effect: function(g) { if(g.nodes.length>0){var r=Math.floor(Math.random()*g.nodes.length);g.nodes[r].hp=Math.max(0,g.nodes[r].hp-50);} } },
             { name: 'Trade Embargo', desc: 'Lose 20% AC!', type: 'negative', icon: '🚫', effect: function(g) { g.state.currencies.ac*=0.8; } },
             { name: 'Quantum Destabilization', desc: 'Multipliers take 40 damage!', type: 'negative', icon: '🔮', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='multiplier') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-40); } },
             { name: 'Nebula Fog', desc: 'Production at 70% for 8s!', type: 'negative', icon: '🌫️', effect: function(g) { g._eventDebuff={mult:0.7,timer:8}; } },
             { name: 'Supply Line Cut', desc: 'Collectors take 20 damage!', type: 'negative', icon: '✂️', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='collector') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-20); } },
-            { name: 'Warp Drive Failure', desc: 'Lose 3% OKRs!', type: 'negative', icon: '🌀', effect: function(g) { g.state.totalOKRs*=0.97; } },
+            { name: 'Warp Drive Failure', desc: 'Lose 3% KRs!', type: 'negative', icon: '🌀', effect: function(g) { g.state.totalOKRs*=0.97; } },
             { name: 'Plasma Leak', desc: 'Synthesizers take 35 damage!', type: 'negative', icon: '🧪', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='synthesizer') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-35); } },
             { name: 'Comet Strike', desc: '2 buildings take 30 damage each!', type: 'negative', icon: '☄️', effect: function(g) { for(var j=0;j<2;j++){if(g.nodes.length>0){var r=Math.floor(Math.random()*g.nodes.length);g.nodes[r].hp=Math.max(0,g.nodes[r].hp-30);}} } },
             { name: 'Gamma Burst', desc: 'All buildings take 15 damage!', type: 'negative', icon: '💥', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.max(0,g.nodes[i].hp-15); } },
@@ -1130,11 +1130,11 @@
             { name: 'Dust Storm', desc: 'Lose 15% electricity!', type: 'negative', icon: '🌫️', effect: function(g) { g.state.currencies.el*=0.85; } },
             { name: 'Static Discharge', desc: 'Generators take 25 damage!', type: 'negative', icon: '⚡', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='generator') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-25); } },
             { name: 'Power Surge', desc: 'Lose 40% electricity!', type: 'negative', icon: '💥', effect: function(g) { g.state.currencies.el*=0.6; } },
-            { name: 'System Glitch', desc: 'Lose 4% OKRs!', type: 'negative', icon: '⚠️', effect: function(g) { g.state.totalOKRs*=0.96; } },
+            { name: 'System Glitch', desc: 'Lose 4% KRs!', type: 'negative', icon: '⚠️', effect: function(g) { g.state.totalOKRs*=0.96; } },
             { name: 'Overload', desc: 'Multipliers take 25 damage!', type: 'negative', icon: '🔥', effect: function(g) { for(var i=0;i<g.nodes.length;i++) if(g.nodes[i].type==='multiplier') g.nodes[i].hp=Math.max(0,g.nodes[i].hp-25); } },
             // === POSITIVE EVENTS (41-80) ===
             { name: 'Stellar Bonus', desc: 'Gain 20% extra AC!', type: 'positive', icon: '⭐', effect: function(g) { g.state.currencies.ac*=1.2; } },
-            { name: 'OKR Rain', desc: 'Gain 5% bonus OKRs!', type: 'positive', icon: '🌟', effect: function(g) { var bonus=g.state.totalOKRs*0.05;g.state.totalOKRs+=bonus; } },
+            { name: 'OKR Rain', desc: 'Gain 5% bonus KRs!', type: 'positive', icon: '🌟', effect: function(g) { var bonus=g.state.totalOKRs*0.05;g.state.totalOKRs+=bonus; } },
             { name: 'Energy Surge', desc: 'funding doubled!', type: 'positive', icon: '⚡', effect: function(g) { g.state.currencies.el*=2; } },
             { name: 'Repair Nanobots', desc: 'Heal all buildings 30 HP!', type: 'positive', icon: '🔧', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+30); } },
             { name: 'Production Boost', desc: '2x production for 10s!', type: 'positive', icon: '🚀', effect: function(g) { g._eventBuff={mult:2,timer:10}; } },
@@ -1145,33 +1145,33 @@
             { name: 'Star Power', desc: 'Gain 100 electricity!', type: 'positive', icon: '⭐', effect: function(g) { g.state.currencies.el+=100; } },
             { name: 'Cosmic Windfall', desc: 'Gain 40% AC!', type: 'positive', icon: '💰', effect: function(g) { g.state.currencies.ac*=1.4; } },
             { name: 'Resource Cache', desc: 'Gain 75 HC!', type: 'positive', icon: '📦', effect: function(g) { g.state.currencies.ac+=75; } },
-            { name: 'Alien Trade', desc: 'Gain 3% bonus OKRs!', type: 'positive', icon: '👽', effect: function(g) { var bonus=g.state.totalOKRs*0.03;g.state.totalOKRs+=bonus; } },
+            { name: 'Alien Trade', desc: 'Gain 3% bonus KRs!', type: 'positive', icon: '👽', effect: function(g) { var bonus=g.state.totalOKRs*0.03;g.state.totalOKRs+=bonus; } },
             { name: 'Nova Harvest', desc: 'Gain 150 electricity!', type: 'positive', icon: '🌟', effect: function(g) { g.state.currencies.el+=150; } },
             { name: 'Crystal Discovery', desc: 'Gain 100 HC!', type: 'positive', icon: '💎', effect: function(g) { g.state.currencies.ac+=100; } },
             { name: 'Deep Space Signal', desc: '2x production for 8s!', type: 'positive', icon: '📡', effect: function(g) { g._eventBuff={mult:2,timer:8}; } },
             { name: 'Friendly Fleet', desc: 'Heal all buildings 50 HP!', type: 'positive', icon: '🛸', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+50); } },
             { name: 'Tech Upgrade', desc: '1.5x production for 15s!', type: 'positive', icon: '🔧', effect: function(g) { g._eventBuff={mult:1.5,timer:15}; } },
             { name: 'Supply Drop', desc: 'Gain 60 HC and 60 el!', type: 'positive', icon: '📦', effect: function(g) { g.state.currencies.ac+=60;g.state.currencies.el+=60; } },
-            { name: 'Quantum Luck', desc: 'Gain 7% bonus OKRs!', type: 'positive', icon: '🍀', effect: function(g) { var bonus=g.state.totalOKRs*0.07;g.state.totalOKRs+=bonus; } },
+            { name: 'Quantum Luck', desc: 'Gain 7% bonus KRs!', type: 'positive', icon: '🍀', effect: function(g) { var bonus=g.state.totalOKRs*0.07;g.state.totalOKRs+=bonus; } },
             { name: 'Galactic Aid', desc: 'Full heal and gain 30 HC!', type: 'positive', icon: '🌌', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100;g.state.currencies.ac+=30; } },
             { name: 'Nebula Mining', desc: 'Gain 80 HC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac+=80; } },
             { name: 'Treasure Probe', desc: 'Gain 25% AC!', type: 'positive', icon: '🔭', effect: function(g) { g.state.currencies.ac*=1.25; } },
             { name: 'Solar Harvest', desc: 'Gain 200 electricity!', type: 'positive', icon: '☀️', effect: function(g) { g.state.currencies.el+=200; } },
             { name: 'Warp Bonus', desc: '4x production for 3s!', type: 'positive', icon: '🌀', effect: function(g) { g._eventBuff={mult:4,timer:3}; } },
-            { name: 'Stardust Rain', desc: 'Gain 4% bonus OKRs!', type: 'positive', icon: '✨', effect: function(g) { var bonus=g.state.totalOKRs*0.04;g.state.totalOKRs+=bonus; } },
+            { name: 'Stardust Rain', desc: 'Gain 4% bonus KRs!', type: 'positive', icon: '✨', effect: function(g) { var bonus=g.state.totalOKRs*0.04;g.state.totalOKRs+=bonus; } },
             { name: 'Photon Boost', desc: '2.5x production for 6s!', type: 'positive', icon: '💫', effect: function(g) { g._eventBuff={mult:2.5,timer:6}; } },
             { name: 'Dark Energy Tap', desc: 'Gain 120 electricity!', type: 'positive', icon: '🌌', effect: function(g) { g.state.currencies.el+=120; } },
             { name: 'Gravity Assist', desc: 'Gain 15% AC!', type: 'positive', icon: '🪐', effect: function(g) { g.state.currencies.ac*=1.15; } },
             { name: 'Time Dilation', desc: '1.8x production for 12s!', type: 'positive', icon: '⏳', effect: function(g) { g._eventBuff={mult:1.8,timer:12}; } },
             { name: 'Matter Conversion', desc: 'Gain 90 HC!', type: 'positive', icon: '🔬', effect: function(g) { g.state.currencies.ac+=90; } },
-            { name: 'Flux Capacitor', desc: 'Gain 6% bonus OKRs!', type: 'positive', icon: '⚡', effect: function(g) { var bonus=g.state.totalOKRs*0.06;g.state.totalOKRs+=bonus; } },
+            { name: 'Flux Capacitor', desc: 'Gain 6% bonus KRs!', type: 'positive', icon: '⚡', effect: function(g) { var bonus=g.state.totalOKRs*0.06;g.state.totalOKRs+=bonus; } },
             { name: 'Antimatter Gift', desc: 'Gain 50 HC and 100 el!', type: 'positive', icon: '🎁', effect: function(g) { g.state.currencies.ac+=50;g.state.currencies.el+=100; } },
             { name: 'Dimensional Pocket', desc: 'Heal all buildings 40 HP!', type: 'positive', icon: '🔮', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=Math.min(g.nodes[i].maxHp||100,g.nodes[i].hp+40); } },
             { name: 'Asteroid Mining', desc: 'Gain 35% AC!', type: 'positive', icon: '⛏️', effect: function(g) { g.state.currencies.ac*=1.35; } },
-            { name: 'Comet Tail Sweep', desc: 'Gain 2% bonus OKRs!', type: 'positive', icon: '☄️', effect: function(g) { var bonus=g.state.totalOKRs*0.02;g.state.totalOKRs+=bonus; } },
+            { name: 'Comet Tail Sweep', desc: 'Gain 2% bonus KRs!', type: 'positive', icon: '☄️', effect: function(g) { var bonus=g.state.totalOKRs*0.02;g.state.totalOKRs+=bonus; } },
             { name: 'Pulsar Alignment', desc: 'Gain 180 electricity!', type: 'positive', icon: '📡', effect: function(g) { g.state.currencies.el+=180; } },
             { name: 'Cosmic Harmony', desc: 'Full heal and 1.5x for 10s!', type: 'positive', icon: '🌈', effect: function(g) { for(var i=0;i<g.nodes.length;i++) g.nodes[i].hp=g.nodes[i].maxHp||100;g._eventBuff={mult:1.5,timer:10}; } },
-            { name: 'Universe Expansion', desc: 'Gain 10% bonus OKRs!', type: 'positive', icon: '🌌', effect: function(g) { var bonus=g.state.totalOKRs*0.10;g.state.totalOKRs+=bonus; } },
+            { name: 'Universe Expansion', desc: 'Gain 10% bonus KRs!', type: 'positive', icon: '🌌', effect: function(g) { var bonus=g.state.totalOKRs*0.10;g.state.totalOKRs+=bonus; } },
             { name: 'Infinity Spark', desc: 'Gain 200 HC!', type: 'positive', icon: '✨', effect: function(g) { g.state.currencies.ac+=200; } },
             // === NEUTRAL EVENTS (81-100) ===
             { name: 'Space Whale Sighting', desc: 'A majestic space whale passes by!', type: 'neutral', icon: '🐋', effect: function(g) { g.state.currencies.ac*=1.03;g.state.currencies.el*=0.97; } },
@@ -1925,7 +1925,7 @@
             document.getElementById('controls').style.display = 'flex';
             document.getElementById('buildings').style.display = 'flex';
 
-            // Show repair bot panel only if unlocked
+            // Show morale event panel only if unlocked
             document.getElementById('repairBotPanel').style.display = this.state.repairBotsEnabled ? 'block' : 'none';
 
             this.rebuildBuildingButtons();
@@ -2027,7 +2027,7 @@
                     ts.explodeTimer = 0.5;
                     this.spawnParticles(ts.x, ts.y, '#f0f', 15);
                     this.spawnParticles(ts.x, ts.y, '#ff0', 10);
-                    this.addFloatingText(ts.x, ts.y - 20, 'Thief destroyed!', '#0f0', 14);
+                    this.addFloatingText(ts.x, ts.y - 20, 'Competitor defeated!', '#0f0', 14);
                     this.triggerShake(4);
                     this.playSound('complete');
                     this.trackEvent('thief_destroyed');
@@ -2061,7 +2061,7 @@
             }
 
             // Check if outside circular playable area
-            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
+            var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
             var distFromCenter = Math.sqrt((x - fX) * (x - fX) + (y - fY) * (y - fY));
             if (distFromCenter > playRadius) {
                 this.addFloatingText(x, y - 20, 'Outside play area!', '#f84');
@@ -2197,7 +2197,7 @@
             this.repairBotCost = Math.floor(this.repairBotCost * 1.5);
             document.getElementById('repairBotCost').textContent = this.formatNumber(this.repairBotCost);
             document.getElementById('repairBotCount').textContent = this.repairBots.length;
-            this.addFloatingText(fX, fY - 80, '🔧 Repair Bot deployed!', '#0ff', 14);
+            this.addFloatingText(fX, fY - 80, '🔧 Morale boost deployed!', '#0ff', 14);
             this.spawnParticles(fX, fY - 60, '#0ff', 10);
             this.playSound('complete');
             this.trackEvent('repairbot');
@@ -2409,7 +2409,7 @@
             }
             } // end shipsEnabled
 
-            // Standalone repair bots — each targets a different damaged building
+            // Standalone morale events — each targets a different damaged building
             var fX = this.canvas.width / 2;
             var fY = this.canvas.height / 2;
             var claimedTargets = []; // track which buildings are already claimed by a bot
@@ -2481,14 +2481,14 @@
                 }
             }
 
-            // Thief ships — visible attack runs on Leadership
+            // Competitor ships — visible attack runs on Leadership
             if (this.state.thievesEnabled) {
                 this.thiefSpawnTimer += dt;
                 var milestoneIdx = this.state.unlockedMilestones.length;
                 var maxThieves = Math.min(8, 1 + Math.floor(milestoneIdx / 3));
                 if (this.thiefShips.length < maxThieves && this.thiefSpawnTimer > 4) {
                     this.thiefSpawnTimer = 0;
-                    this.spawnThiefShip();
+                    this.spawnCompetitorShip();
                 }
 
             for (var i = this.thiefShips.length - 1; i >= 0; i--) {
@@ -2534,7 +2534,7 @@
                     if (thief.stealTimer <= 0) {
                         thief.phase = 'fleeing';
                         thief.stealing = false;
-                        this.addFloatingText(thief.x, thief.y - 20, 'Stole ' + this.formatNumber(Math.floor(thief.stolen)) + ' OKRs!', '#f44', 14);
+                        this.addFloatingText(thief.x, thief.y - 20, 'Poached ' + this.formatNumber(Math.floor(thief.stolen)) + ' KRs!', '#f44', 14);
                     }
                 } else if (thief.phase === 'fleeing') {
                     // Fly back to spawn edge
@@ -2656,7 +2656,7 @@
             this.ships.push({ x: x, y: y, vx: vx, vy: vy, age: 0, wobble: Math.random() * 10, trail: [], hitTimer: 0 });
         };
 
-        OKRFarmingGame.prototype.spawnThiefShip = function() {
+        OKRFarmingGame.prototype.spawnCompetitorShip = function() {
             var w = this.canvas.width;
             var h = this.canvas.height;
             var side = Math.floor(Math.random() * 4);
@@ -2669,7 +2669,7 @@
                 x: x, y: y,
                 spawnX: x, spawnY: y,
                 age: 0, wobble: Math.random() * 10,
-                trail: [], stealing: false,
+                trail: [], poaching: false,
                 orbitAngle: Math.random() * Math.PI * 2,
                 exploding: false, explodeTimer: 0,
                 phase: 'approaching',
@@ -3037,7 +3037,7 @@
             this.drawParticles(ctx);
             this.drawShips(ctx);
             try { this.drawRepairDrones(ctx); } catch(e) {}
-            try { this.drawThiefShips(ctx); } catch(e) {}
+            try { this.drawCompetitorShips(ctx); } catch(e) {}
             this.drawFloatingTexts(ctx);
 
             } finally { ctx.restore(); } // end camera transform
@@ -3325,11 +3325,11 @@
                 ctx.fillStyle = bot.repairing ? '#0f0' : '#888';
                 ctx.font = '7px Segoe UI';
                 ctx.textAlign = 'center';
-                ctx.fillText(bot.repairing ? '🔧 REPAIRING' : 'PATROLLING', bx, by + ds + 12);
+                ctx.fillText(bot.repairing ? '🔧 BOOSTING' : 'STANDBY', bx, by + ds + 12);
             }
         };
 
-        OKRFarmingGame.prototype.drawThiefShips = function(ctx) {
+        OKRFarmingGame.prototype.drawCompetitorShips = function(ctx) {
             var fX = this.canvas.width / 2;
             var fY = this.canvas.height / 2;
 
@@ -3356,7 +3356,7 @@
 
                 if (thief.phase === 'returning') continue; // invisible when off screen waiting
 
-                // Tractor beam when stealing
+                // Tractor beam when poaching
                 if (thief.stealing) {
                     ctx.save();
                     ctx.strokeStyle = 'rgba(255, 0, 255, ' + (0.2 + Math.sin(thief.age * 6) * 0.15).toFixed(2) + ')';
@@ -3443,11 +3443,11 @@
 
                 ctx.restore();
 
-                // "THIEF" label
+                // "COMPETITOR" label
                 ctx.fillStyle = '#f0f';
                 ctx.font = 'bold 9px Segoe UI';
                 ctx.textAlign = 'center';
-                ctx.fillText('THIEF', thief.x, thief.y + 18);
+                ctx.fillText('COMPETITOR', thief.x, thief.y + 18);
 
                 // Warning glow
                 ctx.save();
@@ -3488,7 +3488,7 @@
 
             var distToFactory = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var tooCloseToFactory = distToFactory < 60;
-            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
+            var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
             var distFromCenter = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var outsidePlayArea = distFromCenter > playRadius;
             var inBuildingPanel = (window.innerWidth > 768 && mx > this.canvas.width - 180) || (window.innerWidth <= 768 && mx < 110);
@@ -3740,7 +3740,7 @@
         OKRFarmingGame.prototype.drawAsteroidBelt = function(ctx, w, h) {
             var fX = w / 2;
             var fY = h / 2;
-            var playRadius = this.infiniteMode ? 600 : getPlayableRadius(this.state);
+            var playRadius = this.infiniteMode ? 900 : getPlayableRadius(this.state);
             var time = Date.now() * 0.0001; // slow rotation
 
             ctx.save();
@@ -5534,7 +5534,7 @@
             stateInfo += ' | el: ' + (this.state ? this.formatNumber(Math.floor(this.state.currencies.el)) : '?');
             stateInfo += ' | OKRs: ' + (this.state ? this.formatNumber(Math.floor(this.state.totalOKRs)) : '?');
             stateInfo += ' | Buildings: ' + this.nodes.length;
-            stateInfo += ' | Repair Bots: ' + this.repairBots.length;
+            stateInfo += ' | Morale Events: ' + this.repairBots.length;
             stateInfo += ' | Ships: ' + this.ships.length;
             stateInfo += ' | Infinite: ' + (this.infiniteMode ? 'Yes' : 'No');
             stateInfo += ' | Browser: ' + navigator.userAgent.split(' ').slice(-2).join(' ');
@@ -5663,16 +5663,16 @@
                     });
                 }
 
-                // Render repair bot panel if visible
+                // Render morale event panel if visible
                 var rbEl = document.getElementById('repairBotPanel');
                 if (rbEl && rbEl.style.display !== 'none') {
                     var rbBtn = rbEl.querySelector('button');
                     var rbRect = rbBtn ? drawPanelBg(rbBtn, false) : null;
                     if (rbRect) {
                         var rbLines = [
-                            { text: '🔧 Repair Bot', color: '#00ff88', bold: true },
+                            { text: '🔧 Morale Event', color: '#00ff88', bold: true },
                             { text: (document.getElementById('repairBotCost') || {textContent: '?'}).textContent + ' HC', color: '#ff0', bold: false },
-                            { text: 'Bots: ' + (document.getElementById('repairBotCount') || {textContent: '0'}).textContent, color: '#8f8', bold: false }
+                            { text: 'Morale: ' + (document.getElementById('repairBotCount') || {textContent: '0'}).textContent, color: '#8f8', bold: false }
                         ];
                         var yLine = rbRect.top + 16;
                         rbLines.forEach(function(line) {
