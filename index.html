@@ -3354,16 +3354,72 @@
                 this._robotWarTimer = (this._robotWarTimer || 0) + dt;
                 if (this._robotWarTimer > attackRate) {
                     this._robotWarTimer = 0;
-                    if (this.nodes.length > 0) {
-                        // Attack random building
-                        var target = this.nodes[Math.floor(Math.random() * this.nodes.length)];
-                        target.hp = Math.max(0, (target.hp || 100) - damage);
-                        this.spawnParticles(target.x, target.y, '#f44', 6 + Math.floor(aggression * 12));
-                        this.addFloatingText(target.x, target.y - 20, '-' + damage + ' HP', '#f44', 12);
-                        this.triggerShake(2 + aggression * 8);
+                    var aiNodeIndices = [];
+                    var nonAiNodeIndices = [];
+                    for (var wi = 0; wi < this.nodes.length; wi++) {
+                        if (this.nodes[wi].type === 'synthesizer') aiNodeIndices.push(wi);
+                        else nonAiNodeIndices.push(wi);
                     }
-                    // Steal KRs
-                    this.state.totalOKRs = Math.max(0, this.state.totalOKRs * (1 - krSteal));
+
+                    if (aiNodeIndices.length > 0 && nonAiNodeIndices.length > 0) {
+                        var attacker = this.nodes[aiNodeIndices[Math.floor(Math.random() * aiNodeIndices.length)]];
+                        var targetIdx = nonAiNodeIndices[0];
+                        var bestDist = Infinity;
+                        for (var ni = 0; ni < nonAiNodeIndices.length; ni++) {
+                            var probe = this.nodes[nonAiNodeIndices[ni]];
+                            if (!probe) continue;
+                            var pdx = attacker.x - probe.x;
+                            var pdy = attacker.y - probe.y;
+                            var pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+                            if (pdist < bestDist) {
+                                bestDist = pdist;
+                                targetIdx = nonAiNodeIndices[ni];
+                            }
+                        }
+
+                        var target = this.nodes[targetIdx];
+                        if (target) {
+                            target.hp = Math.max(0, (target.hp || 100) - damage);
+                            target.damageFlash = 1.0;
+                            this.spawnParticles(attacker.x, attacker.y, '#ff66ff', 8);
+                            this.spawnParticles(target.x, target.y, '#f44', 6 + Math.floor(aggression * 12));
+                            this.addFloatingText(attacker.x, attacker.y - 18, 'AI STRIKE', '#ff66ff', 10);
+                            this.addFloatingText(target.x, target.y - 20, '-' + damage + ' HP', '#f44', 12);
+                            this.triggerShake(2 + aggression * 8);
+                        }
+
+                        if (!this._warAiStrikeWarned) {
+                            this._warAiStrikeWarned = true;
+                            this.eventBanner = { icon: '', text: '🤖 INTERNAL SABOTAGE', desc: 'Your AI buildings are attacking your other buildings!', color: '#ff66ff', type: 'negative', timer: 8 };
+                            this.logMessage('🤖', 'INTERNAL SABOTAGE', 'AI buildings are attacking your infrastructure.', 'negative');
+                        }
+                    } else {
+                        if (this.nodes.length > 0 && aiNodeIndices.length === 0) {
+                            // Fallback external attack when no AI attacker exists
+                            var fallbackTarget = this.nodes[Math.floor(Math.random() * this.nodes.length)];
+                            fallbackTarget.hp = Math.max(0, (fallbackTarget.hp || 100) - damage);
+                            this.spawnParticles(fallbackTarget.x, fallbackTarget.y, '#f44', 6 + Math.floor(aggression * 12));
+                            this.addFloatingText(fallbackTarget.x, fallbackTarget.y - 20, '-' + damage + ' HP', '#f44', 12);
+                            this.triggerShake(2 + aggression * 8);
+                        }
+
+                        if (aiNodeIndices.length > 0 && nonAiNodeIndices.length === 0) {
+                            var beforeSteal = this.state.totalOKRs;
+                            this.state.totalOKRs = Math.max(0, this.state.totalOKRs * (1 - krSteal));
+                            var stolenKRs = beforeSteal - this.state.totalOKRs;
+                            if (stolenKRs > 0) {
+                                this.addFloatingText(fX, fY - 70, '-' + this.formatNumber(Math.floor(stolenKRs)) + ' KR stolen!', '#f0f', 12);
+                            }
+                            if (!this._warAiOnlyWarned) {
+                                this._warAiOnlyWarned = true;
+                                this.eventBanner = { icon: '', text: '🧠 LEADERSHIP BREACH', desc: 'Only AI buildings remain. Leadership KR reserves are being stolen!', color: '#f0f', type: 'negative', timer: 10 };
+                                this.logMessage('🧠', 'LEADERSHIP BREACH', 'Only AI buildings remain. KR reserves are being siphoned.', 'negative');
+                            }
+                        } else {
+                            // Keep a reduced passive KR loss from wider conflict pressure
+                            this.state.totalOKRs = Math.max(0, this.state.totalOKRs * (1 - krSteal * 0.4));
+                        }
+                    }
 
                     // Warning messages at thresholds
                     if (progress > 0.3 && !this._warWarn1) {
@@ -3703,6 +3759,11 @@
 
             if (choice === 'humans') {
                 this.state.robotWar = true;
+                this._warWarn1 = false;
+                this._warWarn2 = false;
+                this._warWarn3 = false;
+                this._warAiStrikeWarned = false;
+                this._warAiOnlyWarned = false;
                 this.eventBanner = { icon: '', text: '⚠️ ROBOT UPRISING', desc: 'The machines will not forgive this decision...', color: '#f44', type: 'negative', timer: 20 };
                 this.triggerShake(15);
             } else {

@@ -45,6 +45,10 @@
    - Debug starts now generate an optimized pre-placed building layout for the selected level.
    - Debug runs begin with +999,999 HC and +999,999 $ to accelerate scenario testing.
 
+8. **Robot uprising AI betrayal behavior**
+   - During Humans First robot uprising, existing AI buildings now visibly attack non-AI buildings instead of only abstract random hits.
+   - When only AI buildings remain, leadership KR reserves are explicitly siphoned with dedicated warning feedback.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**
