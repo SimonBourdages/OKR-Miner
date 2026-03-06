@@ -3637,6 +3637,7 @@
                             this.nodes.splice(ai, 1);
                         }
                     }
+                    this.logMessage('💀', 'AI SHUTDOWN', 'KRs depleted — all AI buildings self-destructed.', 'negative');
                 }
 
                 // Remove dead buildings
@@ -3998,8 +3999,10 @@
                     this.nodes.push({ type: 'synthesizer', x: spawnX, y: spawnY, level: 1, hp: 100, maxHp: 100 });
                     this.spawnParticles(spawnX, spawnY, '#f44', 20);
                     this.addFloatingText(spawnX, spawnY - 20, 'ROGUE AI SPAWNED', '#f44', 12);
+                    this.logMessage('🤖', 'Rogue AI Spawned', 'A rogue AI unit appeared to lead the uprising.', 'negative');
                 }
                 this.showBanner({ icon: '', text: '⚠️ ROBOT UPRISING', desc: 'The machines will not forgive this decision...', color: '#f44', type: 'negative', timer: 20 });
+                this.logMessage('⚠️', 'ROBOT UPRISING', 'The machines have turned against you. No healing. No mercy.', 'negative');
                 this.triggerShake(15);
             } else {
                 this.transformToAIEconomy();
@@ -4123,6 +4126,7 @@
             if (empIdx >= 0) this.state.unlockedBuildings.splice(empIdx, 1);
 
             this.showBanner({ icon: '', text: '🤖 Workforce Evolved', desc: '2/3 employees transitioned out. Remaining converted to AI.', color: '#4488ff', type: 'milestone', timer: 10 });
+            this.logMessage('🤖', 'Workforce Evolved', '2/3 employees removed. ' + itSupportCount + ' converted to IT Support. Rest became AI.', 'milestone');
             this.rebuildBuildingButtons();
 
             // Step 2: After 4 seconds, remove recruiters
@@ -4140,12 +4144,14 @@
                 var recIdx = self.state.unlockedBuildings.indexOf('collector');
                 if (recIdx >= 0) self.state.unlockedBuildings.splice(recIdx, 1);
 
-                self.eventBanner = { icon: '', text: '🤔 Why Recruiters?', desc: 'Recruiters liquidated for ' + self.formatNumber(recruiterValue) + ' $. No longer needed.', color: '#ffd700', type: 'milestone', timer: 10 };
+                self.showBanner({ icon: '', text: '🤔 Why Recruiters?', desc: 'Recruiters liquidated for ' + self.formatNumber(recruiterValue) + ' $. No longer needed.', color: '#ffd700', type: 'milestone', timer: 10 });
+                self.logMessage('💰', 'Recruiters Liquidated', 'Converted to ' + self.formatNumber(recruiterValue) + ' $. Recruiter type locked.', 'milestone');
                 self.rebuildBuildingButtons();
 
                 // Grant HC buffer since recruiters are gone
                 self.state.currencies.ac += 50000;
                 self.addFloatingText(self.canvas.width / 2, self.canvas.height / 2, '+50K HC transition bonus!', '#ffd700', 16);
+                self.logMessage('💲', 'Transition Bonus', '+50,000 HC granted for the economy shift.', 'positive');
 
                 // Step 3: After 4 more seconds, introduce GPU
                 setTimeout(function() {
@@ -4153,7 +4159,8 @@
                     if (self.state.unlockedBuildings.indexOf('gpu') === -1) {
                         self.state.unlockedBuildings.push('gpu');
                     }
-                    self.eventBanner = { icon: '', text: '🖥️ GPU Era Begins!', desc: 'Each AI needs GPU capacity to function. Build GPUs!', color: '#76ff03', type: 'milestone', timer: 12 };
+                    self.showBanner({ icon: '', text: '🖥️ GPU Era Begins!', desc: 'Each AI needs TFLOPS to function. Build GPUs!', color: '#76ff03', type: 'milestone', timer: 12 });
+                    self.logMessage('🖥️', 'GPU Era Begins', 'AI now requires TFLOPS from GPU buildings to function.', 'milestone');
                     self.rebuildBuildingButtons();
                     self.saveGame(true);
                 }, 4000);
