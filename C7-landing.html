@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Miner — System Access</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: #0a0a0a;
+  color: #00ff88;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+/* CRT scanline overlay */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.12) 0px,
+    rgba(0,0,0,0.12) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+a { color: #00ff88; text-decoration: none; }
+.container { max-width: 820px; margin: 0 auto; padding: 0 20px; }
+
+/* --- HERO --- */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.ascii-title {
+  font-size: 10px;
+  line-height: 1.15;
+  white-space: pre;
+  color: #00ff88;
+  text-align: center;
+  margin-bottom: 30px;
+  text-shadow: 0 0 8px rgba(0,255,136,0.5);
+  overflow-x: auto;
+}
+#terminal-output {
+  min-height: 220px;
+  font-size: 15px;
+}
+.term-line {
+  opacity: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.term-line.visible { opacity: 1; }
+.term-line.warn { color: #ffcc00; }
+.term-line.err { color: #ff4444; }
+.term-line.ok { color: #00ff88; }
+.cursor {
+  display: inline-block;
+  width: 10px;
+  background: #00ff88;
+  animation: blink 0.7s step-end infinite;
+  margin-left: 2px;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+/* --- PLAY BUTTON --- */
+.play-wrap {
+  text-align: center;
+  margin-top: 40px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.8s, transform 0.8s;
+}
+.play-wrap.shown { opacity: 1; transform: translateY(0); }
+.play-btn {
+  display: inline-block;
+  padding: 16px 48px;
+  border: 2px solid #00ff88;
+  color: #00ff88;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 20px;
+  font-weight: bold;
+  background: transparent;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0,255,136,0.6);
+  box-shadow: 0 0 15px rgba(0,255,136,0.25), inset 0 0 15px rgba(0,255,136,0.08);
+  transition: all 0.3s;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+.play-btn:hover {
+  background: rgba(0,255,136,0.12);
+  box-shadow: 0 0 30px rgba(0,255,136,0.5), inset 0 0 20px rgba(0,255,136,0.15);
+  text-shadow: 0 0 20px rgba(0,255,136,0.9);
+}
+@keyframes glow-pulse {
+  0%,100% { box-shadow: 0 0 15px rgba(0,255,136,0.25), inset 0 0 15px rgba(0,255,136,0.08); }
+  50% { box-shadow: 0 0 25px rgba(0,255,136,0.45), inset 0 0 20px rgba(0,255,136,0.12); }
+}
+
+/* --- SECTIONS --- */
+.section {
+  padding: 80px 20px;
+  border-top: 1px solid rgba(0,255,136,0.15);
+}
+.section-title {
+  font-size: 18px;
+  margin-bottom: 24px;
+  text-shadow: 0 0 6px rgba(0,255,136,0.4);
+}
+.section-title::before { content: "┌─ "; color: rgba(0,255,136,0.5); }
+.section-title::after { content: " ─┐"; color: rgba(0,255,136,0.5); }
+.section p, .section li {
+  color: rgba(0,255,136,0.75);
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.section ul { list-style: none; padding-left: 20px; }
+.section li::before { content: "├── "; color: rgba(0,255,136,0.4); }
+.section li:last-child::before { content: "└── "; color: rgba(0,255,136,0.4); }
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 20px;
+}
+.card {
+  border: 1px solid rgba(0,255,136,0.2);
+  padding: 20px;
+  background: rgba(0,255,136,0.03);
+}
+.card h3 {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #00ff88;
+}
+.card p { font-size: 13px; }
+.stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 20px;
+}
+.stat {
+  text-align: center;
+  flex: 1;
+  min-width: 120px;
+}
+.stat .num {
+  font-size: 36px;
+  font-weight: bold;
+  text-shadow: 0 0 12px rgba(0,255,136,0.5);
+  display: block;
+}
+.stat .lbl {
+  font-size: 12px;
+  color: rgba(0,255,136,0.55);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.progress-bar {
+  height: 8px;
+  background: rgba(0,255,136,0.1);
+  margin: 8px 0 16px;
+  border: 1px solid rgba(0,255,136,0.2);
+}
+.progress-bar .fill {
+  height: 100%;
+  background: #00ff88;
+  box-shadow: 0 0 6px rgba(0,255,136,0.5);
+  width: 0;
+  transition: width 1.2s ease-out;
+}
+
+/* --- FOOTER --- */
+footer {
+  text-align: center;
+  padding: 40px 20px;
+  border-top: 1px solid rgba(0,255,136,0.15);
+  font-size: 12px;
+  color: rgba(0,255,136,0.4);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 600px) {
+  .ascii-title { font-size: 6px; }
+  #terminal-output { font-size: 13px; }
+  .play-btn { font-size: 16px; padding: 14px 32px; }
+  .grid { grid-template-columns: 1fr; }
+  .section { padding: 50px 15px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="container">
+    <pre class="ascii-title" aria-hidden="true">
+  ██████╗ ██╗  ██╗██████╗     ███╗   ███╗██╗███╗   ██╗███████╗██████╗
+ ██╔═══██╗██║ ██╔╝██╔══██╗    ████╗ ████║██║████╗  ██║██╔════╝██╔══██╗
+ ██║   ██║█████╔╝ ██████╔╝    ██╔████╔██║██║██╔██╗ ██║█████╗  ██████╔╝
+ ██║   ██║██╔═██╗ ██╔══██╗    ██║╚██╔╝██║██║██║╚██╗██║██╔══╝  ██╔══██╗
+ ╚██████╔╝██║  ██╗██║  ██║    ██║ ╚═╝ ██║██║██║ ╚████║███████╗██║  ██║
+  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝
+    </pre>
+    <div id="terminal-output"></div>
+    <div class="play-wrap" id="play-wrap">
+      <a href="https://game.thisai.fun" class="play-btn">&gt; LAUNCH PROGRAM_</a>
+    </div>
+  </div>
+</div>
+
+<!-- Section 1: Mission Briefing -->
+<div class="section">
+  <div class="container">
+    <div class="section-title">MISSION_BRIEFING.txt</div>
+    <p>&gt; You are the newly appointed CTO of a fledgling AI startup.</p>
+    <p>&gt; Your mission: recruit talent, deploy GPUs, ship products, and hit your OKRs before the board loses faith.</p>
+    <p>&gt; But space is hostile. Random events will test every decision you make.</p>
+    <ul>
+      <li>Manage a crew of Recruiters, Employees, and AI Agents</li>
+      <li>Mine computational resources across procedural star systems</li>
+      <li>Navigate 100+ random events — from funding rounds to phishing attacks</li>
+      <li>Build an engine that compounds. Every cycle matters.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Section 2: System Specs -->
+<div class="section">
+  <div class="container">
+    <div class="section-title">SYSTEM_SPECS.dat</div>
+    <div class="grid">
+      <div class="card">
+        <h3>[MODULE] Recruiter</h3>
+        <p>Scours the galaxy for elite operatives. Each recruiter unlocks new hiring pipelines and expands your crew capacity.</p>
+      </div>
+      <div class="card">
+        <h3>[MODULE] Employee</h3>
+        <p>Your workforce. Assign them to projects, manage burnout, and watch productivity multiply — or crash.</p>
+      </div>
+      <div class="card">
+        <h3>[MODULE] AI Agent</h3>
+        <p>Autonomous workers that never sleep. Powerful but unpredictable. Deploy with caution.</p>
+      </div>
+      <div class="card">
+        <h3>[MODULE] GPU Cluster</h3>
+        <p>Raw compute. The fuel for your AI models. Scarce, expensive, and everyone wants yours.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 3: Threat Analysis -->
+<div class="section">
+  <div class="container">
+    <div class="section-title">THREAT_ANALYSIS.log</div>
+    <p>&gt; Scanning environment for known hazards...</p>
+    <div style="margin-top:20px">
+      <p>PHISHING ATTACKS</p>
+      <div class="progress-bar"><div class="fill" data-width="65"></div></div>
+      <p>TALENT POACHING</p>
+      <div class="progress-bar"><div class="fill" data-width="40"></div></div>
+      <p>GPU SUPPLY SHORTAGE</p>
+      <div class="progress-bar"><div class="fill" data-width="82"></div></div>
+      <p>BOARD CONFIDENCE DECAY</p>
+      <div class="progress-bar"><div class="fill" data-width="55"></div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><span class="num">100</span><span class="lbl">Random Events</span></div>
+      <div class="stat"><span class="num">6</span><span class="lbl">Decision Levels</span></div>
+      <div class="stat"><span class="num">5%</span><span class="lbl">Phishing Risk</span></div>
+      <div class="stat"><span class="num">∞</span><span class="lbl">Replayability</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 4: Transmission -->
+<div class="section">
+  <div class="container">
+    <div class="section-title">INCOMING_TRANSMISSION.enc</div>
+    <p>&gt; DECRYPTING...</p>
+    <p>&gt; This is not a simulation. The decisions you make will cascade. Every hire, every GPU allocation, every ignored warning compounds into your outcome.</p>
+    <p>&gt; The board is watching. Your competitors are moving. The clock is ticking.</p>
+    <p>&gt; There is only one question: can you ship before the runway ends?</p>
+    <div class="play-wrap shown" style="margin-top:40px">
+      <a href="https://game.thisai.fun" class="play-btn">&gt; LAUNCH PROGRAM_</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <p>&gt; © 2026 OKR Miner | Built with coffee and robots</p>
+    <p style="margin-top:8px">SESSION_ID: 0x4F4B525F4D494E4552 | STATUS: ONLINE</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  var lines = [
+    { text: "> INITIALIZING OKR_MINER v6.0...", cls: "ok", delay: 600 },
+    { text: "> LOADING MODULES: RECRUITER... EMPLOYEE... AI... GPU...", cls: "ok", delay: 800 },
+    { text: "> WARNING: LEVEL 6 DECISION POINT DETECTED", cls: "warn", delay: 700 },
+    { text: "> 100 RANDOM EVENTS LOADED", cls: "ok", delay: 500 },
+    { text: "> 5% PHISHING RISK IDENTIFIED", cls: "err", delay: 600 },
+    { text: "> SYSTEM READY. AWAITING OPERATOR.", cls: "ok", delay: 400 }
+  ];
+
+  var output = document.getElementById("terminal-output");
+  var playWrap = document.getElementById("play-wrap");
+  var charSpeed = 28;
+
+  function typeLine(lineObj, callback) {
+    var el = document.createElement("div");
+    el.className = "term-line visible " + lineObj.cls;
+    output.appendChild(el);
+
+    var cursor = document.createElement("span");
+    cursor.className = "cursor";
+    cursor.innerHTML = "&nbsp;";
+    el.appendChild(cursor);
+
+    var i = 0;
+    var text = lineObj.text;
+
+    function typeChar() {
+      if (i < text.length) {
+        el.insertBefore(document.createTextNode(text.charAt(i)), cursor);
+        i++;
+        setTimeout(typeChar, charSpeed);
+      } else {
+        el.removeChild(cursor);
+        setTimeout(function() {
+          if (callback) callback();
+        }, lineObj.delay);
+      }
+    }
+    typeChar();
+  }
+
+  function runSequence(index) {
+    if (index >= lines.length) {
+      // Add final blinking cursor
+      var cursorLine = document.createElement("div");
+      cursorLine.className = "term-line visible ok";
+      cursorLine.innerHTML = "> <span class='cursor'>&nbsp;</span>";
+      output.appendChild(cursorLine);
+      // Reveal play button
+      setTimeout(function() {
+        playWrap.className = "play-wrap shown";
+      }, 300);
+      return;
+    }
+    typeLine(lines[index], function() {
+      runSequence(index + 1);
+    });
+  }
+
+  // Animate progress bars on scroll
+  var animated = false;
+  function animateBars() {
+    if (animated) return;
+    var bars = document.querySelectorAll(".progress-bar .fill");
+    var trigger = window.innerHeight * 0.85;
+    for (var i = 0; i < bars.length; i++) {
+      var rect = bars[i].getBoundingClientRect();
+      if (rect.top < trigger) {
+        animated = true;
+        for (var j = 0; j < bars.length; j++) {
+          bars[j].style.width = bars[j].getAttribute("data-width") + "%";
+        }
+        break;
+      }
+    }
+  }
+
+  window.addEventListener("scroll", animateBars);
+  setTimeout(function() { runSequence(0); }, 500);
+})();
+</script>
+</body>
+</html>

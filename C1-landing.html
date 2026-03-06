@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Miner — Enter the Void</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#030712;color:#e2e8f0;font-family:'Inter',sans-serif;overflow-x:hidden}
+canvas#starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ── Shared ── */
+.section{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:4rem 1.5rem;text-align:center}
+.reveal{opacity:0;transform:translateY(60px);transition:opacity .9s ease,transform .9s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.accent{color:#00ff88}
+.cyan{color:#22d3ee}
+
+/* ── Hero ── */
+#hero{min-height:100vh;justify-content:center}
+.hero-title{font-family:'Orbitron',sans-serif;font-size:clamp(3rem,10vw,8rem);font-weight:900;letter-spacing:.08em;color:#fff;text-shadow:0 0 20px rgba(0,255,136,.6),0 0 60px rgba(0,255,136,.3),0 0 120px rgba(0,255,136,.15);animation:glow-pulse 3s ease-in-out infinite}
+.hero-sub{font-size:clamp(1rem,2.5vw,1.4rem);color:#94a3b8;margin:1.2rem 0 2.5rem;letter-spacing:.15em;text-transform:uppercase}
+@keyframes glow-pulse{0%,100%{text-shadow:0 0 20px rgba(0,255,136,.6),0 0 60px rgba(0,255,136,.3),0 0 120px rgba(0,255,136,.15);filter:brightness(1)}50%{text-shadow:0 0 30px rgba(0,255,136,.9),0 0 80px rgba(0,255,136,.5),0 0 160px rgba(0,255,136,.25);filter:brightness(1.15)}}
+
+/* ── CTA Button ── */
+.cta{display:inline-block;padding:1rem 3rem;font-family:'Orbitron',sans-serif;font-size:clamp(.9rem,2vw,1.2rem);font-weight:700;color:#030712;background:#00ff88;border-radius:4px;text-decoration:none;letter-spacing:.12em;text-transform:uppercase;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s}
+.cta:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 0 30px rgba(0,255,136,.6),0 0 80px rgba(0,255,136,.25)}
+.cta::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 40%,rgba(255,255,255,.25) 50%,transparent 60%);animation:shine 4s linear infinite}
+@keyframes shine{0%{transform:translateX(-100%) rotate(25deg)}100%{transform:translateX(100%) rotate(25deg)}}
+
+/* ── Section Titles ── */
+.section-tag{font-family:'Orbitron',sans-serif;font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:#00ff88;margin-bottom:.75rem}
+.section-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,5vw,3.5rem);font-weight:700;color:#fff;margin-bottom:1.5rem;line-height:1.2}
+.section-body{max-width:640px;font-size:clamp(.95rem,1.8vw,1.15rem);line-height:1.75;color:#94a3b8}
+
+/* ── Stats Grid ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1.5rem;max-width:700px;margin:2.5rem auto 0;width:100%}
+.stat{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.12);border-radius:8px;padding:1.5rem 1rem}
+.stat-num{font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:900;color:#00ff88}
+.stat-label{font-size:.85rem;color:#64748b;margin-top:.3rem}
+
+/* ── Choice Section ── */
+#choice{background:radial-gradient(ellipse at center,rgba(34,211,238,.06) 0%,transparent 70%)}
+.choice-glow{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,.3),transparent 70%);margin:0 auto 2rem;animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.2);opacity:1}}
+
+/* ── Events Section ── */
+#events{background:radial-gradient(ellipse at center,rgba(139,92,246,.06) 0%,transparent 70%)}
+.event-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;max-width:600px;margin:2rem auto 0}
+.pill{padding:.4rem 1rem;border-radius:999px;font-size:.8rem;border:1px solid rgba(139,92,246,.25);color:#a78bfa;background:rgba(139,92,246,.06);white-space:nowrap}
+
+/* ── Final CTA ── */
+#final{background:radial-gradient(ellipse at center,rgba(0,255,136,.05) 0%,transparent 60%)}
+.final-warning{font-size:.85rem;color:#64748b;margin-top:1.5rem;font-style:italic}
+
+/* ── Footer ── */
+footer{position:relative;z-index:1;text-align:center;padding:2rem;font-size:.8rem;color:#475569;border-top:1px solid rgba(255,255,255,.05)}
+
+/* ── Mobile ── */
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr);gap:1rem}.section{padding:3rem 1.25rem}}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
+<!-- Hero -->
+<section id="hero" class="section">
+  <div class="reveal">
+    <h1 class="hero-title">OKR MINER</h1>
+    <p class="hero-sub">Engine-building in the void of space</p>
+    <a href="https://game.thisai.fun" class="cta">Enter the Void</a>
+  </div>
+</section>
+
+<!-- Build -->
+<section id="build" class="section">
+  <div class="reveal">
+    <p class="section-tag">Systems Online</p>
+    <h2 class="section-title">Build Your <span class="accent">Empire</span></h2>
+    <p class="section-body">
+      Hire Recruiters. Manage finances. Deploy autonomous AI across an ever-expanding
+      circular asteroid belt. Eight building types. Eleven levels of escalating ambition.
+      Every Key Result you achieve pushes the frontier further into uncharted space.
+    </p>
+    <div class="stats">
+      <div class="stat"><div class="stat-num">11</div><div class="stat-label">Levels</div></div>
+      <div class="stat"><div class="stat-num">8</div><div class="stat-label">Buildings</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">Themes</div></div>
+      <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Strategies</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Choice -->
+<section id="choice" class="section">
+  <div class="reveal">
+    <div class="choice-glow"></div>
+    <p class="section-tag">Level 6</p>
+    <h2 class="section-title">The Choice <span class="cyan">Awaits</span></h2>
+    <p class="section-body">
+      Halfway through your ascent, the AI you built becomes&hellip; something more.
+      A decision will be placed before you&mdash;one that reshapes everything that follows.
+      There is no right answer. Only <em>your</em> answer.
+    </p>
+  </div>
+</section>
+
+<!-- Events -->
+<section id="events" class="section">
+  <div class="reveal">
+    <p class="section-tag">Expect the Unexpected</p>
+    <h2 class="section-title"><span class="accent">100</span> Random Events</h2>
+    <p class="section-body">
+      Solar flares. Rogue auditors. Surprise funding rounds. A 5% chance
+      of an instant phishing attack game-over lurks behind every quarter.
+      The void doesn't play fair&mdash;neither should you.
+    </p>
+    <div class="event-pills">
+      <span class="pill">Solar Flare</span>
+      <span class="pill">Funding Round</span>
+      <span class="pill">Phishing Attack</span>
+      <span class="pill">Talent Exodus</span>
+      <span class="pill">AI Uprising</span>
+      <span class="pill">Asteroid Strike</span>
+      <span class="pill">Rogue Auditor</span>
+      <span class="pill">Data Breach</span>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section id="final" class="section">
+  <div class="reveal">
+    <p class="section-tag">Your Frontier Awaits</p>
+    <h2 class="section-title">Play <span class="accent">Now</span></h2>
+    <p class="section-body" style="margin-bottom:2.5rem">
+      Free. No install. Just you, the void, and impossible OKRs.
+    </p>
+    <a href="https://game.thisai.fun" class="cta">Enter the Void</a>
+    <p class="final-warning">Caution: 5 % of commanders never make it past the inbox.</p>
+  </div>
+</section>
+
+<footer>&copy; 2026 OKR Miner | Built with coffee and robots</footer>
+
+<script>
+(function () {
+  /* ── Starfield ── */
+  var canvas = document.getElementById('starfield');
+  var ctx = canvas.getContext('2d');
+  var stars = [];
+  var STAR_COUNT = 320;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function createStar() {
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.6 + 0.3,
+      dx: (Math.random() - 0.5) * 0.15,
+      dy: Math.random() * 0.25 + 0.05,
+      a: Math.random()
+    };
+  }
+  for (var i = 0; i < STAR_COUNT; i++) stars.push(createStar());
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      s.x += s.dx;
+      s.y += s.dy;
+      s.a += 0.005 + Math.random() * 0.008;
+      var alpha = 0.4 + 0.6 * Math.abs(Math.sin(s.a));
+      var py = (s.y - scrollY * s.dy * 0.8) % canvas.height;
+      if (py < 0) py += canvas.height;
+      if (s.x < 0) s.x = canvas.width;
+      if (s.x > canvas.width) s.x = 0;
+      ctx.beginPath();
+      ctx.arc(s.x, py, s.r, 0, 6.2832);
+      ctx.fillStyle = 'rgba(255,255,255,' + alpha.toFixed(2) + ')';
+      ctx.fill();
+    }
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  /* ── Scroll Reveal ── */
+  var reveals = document.querySelectorAll('.reveal');
+  function checkReveal() {
+    for (var i = 0; i < reveals.length; i++) {
+      var rect = reveals[i].getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.82) {
+        reveals[i].classList.add('visible');
+      }
+    }
+  }
+  window.addEventListener('scroll', checkReveal);
+  checkReveal();
+})();
+</script>
+</body>
+</html>

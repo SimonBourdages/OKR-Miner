@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Miner — By the Numbers</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#050510;color:#e0e0e0;font-family:'Inter',sans-serif;overflow-x:hidden}
+.neon{color:#00ff88}
+.cyan{color:#00d4ff}
+
+/* Stars background */
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background:radial-gradient(1px 1px at 10% 20%,#fff 50%,transparent 100%),
+  radial-gradient(1px 1px at 40% 60%,#aaf 50%,transparent 100%),
+  radial-gradient(1.5px 1.5px at 70% 30%,#00ff88 50%,transparent 100%),
+  radial-gradient(1px 1px at 85% 75%,#fff 50%,transparent 100%),
+  radial-gradient(1px 1px at 25% 85%,#00d4ff 50%,transparent 100%),
+  radial-gradient(1px 1px at 55% 10%,#fff 50%,transparent 100%),
+  radial-gradient(1.5px 1.5px at 90% 50%,#aaf 50%,transparent 100%);
+  background-size:200% 200%;animation:drift 60s linear infinite;z-index:-1;pointer-events:none}
+@keyframes drift{0%{background-position:0 0}100%{background-position:100% 100%}}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem 1rem;position:relative}
+.hero h1{font-family:'Orbitron',sans-serif;font-size:clamp(2.5rem,7vw,5rem);font-weight:900;
+  background:linear-gradient(135deg,#00ff88,#00d4ff);-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem;
+  animation:glow 3s ease-in-out infinite alternate}
+@keyframes glow{0%{filter:drop-shadow(0 0 8px rgba(0,255,136,.4))}100%{filter:drop-shadow(0 0 20px rgba(0,212,255,.6))}}
+.hero .tagline{font-family:'Orbitron',sans-serif;font-size:clamp(1rem,2.5vw,1.6rem);font-weight:700;
+  color:#c0c0c0;line-height:1.8;max-width:800px}
+.hero .tagline .highlight{color:#00ff88;font-size:clamp(1.2rem,3vw,2rem)}
+.scroll-hint{position:absolute;bottom:2rem;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(12px)}}
+.scroll-hint span{display:block;width:24px;height:24px;border-right:3px solid #00ff88;
+  border-bottom:3px solid #00ff88;transform:rotate(45deg);margin:0 auto}
+
+/* Stat sections */
+.stat-section{min-height:80vh;display:flex;align-items:center;justify-content:center;
+  padding:4rem 1.5rem;position:relative;border-top:1px solid rgba(0,255,136,.08)}
+.stat-section:nth-child(even){background:linear-gradient(180deg,rgba(0,20,40,.3),transparent)}
+.stat-inner{max-width:900px;width:100%;text-align:center}
+.stat-number{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(4rem,12vw,8rem);
+  line-height:1;margin-bottom:.5rem;opacity:0;transform:translateY(30px);transition:all .8s ease}
+.stat-number.visible{opacity:1;transform:translateY(0)}
+.stat-label{font-family:'Orbitron',sans-serif;font-size:clamp(1.2rem,3vw,1.8rem);font-weight:700;
+  color:#c0c0c0;margin-bottom:1rem;opacity:0;transform:translateY(20px);transition:all .8s ease .2s}
+.stat-label.visible{opacity:1;transform:translateY(0)}
+.stat-desc{font-size:clamp(.95rem,2vw,1.15rem);color:#888;max-width:600px;margin:0 auto;
+  line-height:1.7;opacity:0;transform:translateY(20px);transition:all .8s ease .4s}
+.stat-desc.visible{opacity:1;transform:translateY(0)}
+
+/* Building grid */
+.building-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;
+  max-width:700px;margin:1.5rem auto 0;opacity:0;transform:translateY(20px);transition:all .8s ease .5s}
+.building-grid.visible{opacity:1;transform:translateY(0)}
+.building-card{background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);border-radius:10px;
+  padding:1rem .5rem;font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;color:#00ff88;
+  transition:all .3s ease}
+.building-card:hover{background:rgba(0,255,136,.12);border-color:#00ff88;
+  box-shadow:0 0 20px rgba(0,255,136,.15);transform:translateY(-3px)}
+.building-icon{font-size:1.8rem;margin-bottom:.4rem}
+
+/* Mystery section */
+.mystery{background:radial-gradient(ellipse at center,rgba(0,212,255,.06),transparent 70%)}
+.mystery .stat-number{background:linear-gradient(135deg,#ff6b6b,#00d4ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* Danger section */
+.danger .stat-number{color:#ff4444}
+.danger-bar{width:100%;max-width:500px;height:12px;background:rgba(255,255,255,.08);
+  border-radius:6px;margin:1.5rem auto 0;overflow:hidden;opacity:0;transition:all .8s ease .5s}
+.danger-bar.visible{opacity:1}
+.danger-fill{width:0;height:100%;background:linear-gradient(90deg,#ff4444,#ff6b6b);border-radius:6px;
+  transition:width 2s ease .8s}
+.danger-fill.visible{width:5%}
+
+/* CTA */
+.cta-section{min-height:50vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:4rem 1.5rem;
+  background:radial-gradient(ellipse at center,rgba(0,255,136,.04),transparent 60%)}
+.cta-section h2{font-family:'Orbitron',sans-serif;font-size:clamp(1.5rem,4vw,2.5rem);
+  font-weight:900;color:#fff;margin-bottom:2rem}
+.play-btn{display:inline-block;padding:1.2rem 3.5rem;font-family:'Orbitron',sans-serif;
+  font-size:clamp(1.1rem,2.5vw,1.4rem);font-weight:900;color:#050510;text-decoration:none;
+  background:linear-gradient(135deg,#00ff88,#00d4ff);border-radius:50px;
+  box-shadow:0 0 30px rgba(0,255,136,.3),0 0 60px rgba(0,255,136,.1);
+  transition:all .3s ease;animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 30px rgba(0,255,136,.3),0 0 60px rgba(0,255,136,.1)}
+  50%{box-shadow:0 0 40px rgba(0,255,136,.5),0 0 80px rgba(0,255,136,.2)}}
+.play-btn:hover{transform:scale(1.08);box-shadow:0 0 50px rgba(0,255,136,.5),0 0 100px rgba(0,255,136,.2)}
+
+/* Footer */
+footer{text-align:center;padding:2rem 1rem;color:#555;font-size:.85rem;
+  border-top:1px solid rgba(255,255,255,.05)}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <h1>OKR Miner</h1>
+  <p class="tagline">
+    <span class="highlight">11 Levels</span> • <span class="highlight">8 Buildings</span> •
+    <span class="highlight">100 Events</span> •
+    <span class="highlight">1 Choice That Changes Everything</span>
+  </p>
+  <div class="scroll-hint"><span></span></div>
+</section>
+
+<!-- Stat: 11 Levels -->
+<section class="stat-section">
+  <div class="stat-inner">
+    <div class="stat-number neon" data-target="11">0</div>
+    <div class="stat-label">Levels of Progression</div>
+    <div class="stat-desc">Climb through Objective Reviews, unlock new buildings, confront harder events, and reshape your company from a scrappy startup to a galactic powerhouse.</div>
+  </div>
+</section>
+
+<!-- Stat: 8 Buildings -->
+<section class="stat-section">
+  <div class="stat-inner">
+    <div class="stat-number cyan" data-target="8">0</div>
+    <div class="stat-label">Building Types</div>
+    <div class="stat-desc">Every building is an engine part. Choose wisely.</div>
+    <div class="building-grid">
+      <div class="building-card"><div class="building-icon">👤</div>Recruiter</div>
+      <div class="building-card"><div class="building-icon">🧑‍💼</div>Employee</div>
+      <div class="building-card"><div class="building-icon">🌐</div>Network Hub</div>
+      <div class="building-card"><div class="building-icon">🤖</div>AI</div>
+      <div class="building-card"><div class="building-icon">💰</div>Finances</div>
+      <div class="building-card"><div class="building-icon">📈</div>Investment</div>
+      <div class="building-card"><div class="building-icon">🛠️</div>IT Support</div>
+      <div class="building-card"><div class="building-icon">⚡</div>GPU</div>
+    </div>
+  </div>
+</section>
+
+<!-- Stat: 100 Events -->
+<section class="stat-section">
+  <div class="stat-inner">
+    <div class="stat-number neon" data-target="100">0</div>
+    <div class="stat-label">Random Events</div>
+    <div class="stat-desc">Market crashes. Rogue interns. Surprise audits. Alien investors. Every playthrough is different — the galaxy never plays fair.</div>
+  </div>
+</section>
+
+<!-- Stat: 5 Themes -->
+<section class="stat-section">
+  <div class="stat-inner">
+    <div class="stat-number cyan" data-target="5">0</div>
+    <div class="stat-label">Visual Themes</div>
+    <div class="stat-desc">From neon-soaked cyberpunk to deep-space minimalism — unlock new looks as you progress through the stars.</div>
+  </div>
+</section>
+
+<!-- Stat: 1 Choice (mystery) -->
+<section class="stat-section mystery">
+  <div class="stat-inner">
+    <div class="stat-number" data-target="1">0</div>
+    <div class="stat-label">Choice That Changes Everything</div>
+    <div class="stat-desc">At Level 6, a question appears. There is no right answer. What you decide will echo through every level that follows. We can't say more.</div>
+  </div>
+</section>
+
+<!-- Stat: 5% Phishing -->
+<section class="stat-section danger">
+  <div class="stat-inner">
+    <div class="stat-number" data-target="5" data-suffix="%">0</div>
+    <div class="stat-label">Chance of Instant Phishing Attack</div>
+    <div class="stat-desc">Every turn, there's a 5% chance a phishing attack wipes you out. No warning. No second chance. Stay sharp or get hacked.</div>
+    <div class="danger-bar"><div class="danger-fill"></div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Ready to Mine Your Objectives?</h2>
+  <a href="https://game.thisai.fun" class="play-btn">PLAY NOW</a>
+</section>
+
+<!-- Footer -->
+<footer>© 2026 OKR Miner | Built with coffee and robots</footer>
+
+<script>
+(function() {
+  var counters = document.querySelectorAll('.stat-number');
+  var animated = {};
+
+  function animateCounter(el, index) {
+    if (animated[index]) return;
+    animated[index] = true;
+    var target = parseInt(el.getAttribute('data-target'), 10);
+    var suffix = el.getAttribute('data-suffix') || '';
+    var duration = 1800;
+    var start = 0;
+    var startTime = null;
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      var progress = Math.min((timestamp - startTime) / duration, 1);
+      var current = Math.floor(easeOut(progress) * target);
+      el.textContent = current + suffix;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = target + suffix;
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function revealElements() {
+    var sections = document.querySelectorAll('.stat-inner');
+    for (var i = 0; i < sections.length; i++) {
+      var rect = sections[i].getBoundingClientRect();
+      var inView = rect.top < window.innerHeight * 0.8 && rect.bottom > 0;
+      if (inView) {
+        var children = sections[i].children;
+        for (var j = 0; j < children.length; j++) {
+          children[j].classList.add('visible');
+        }
+      }
+    }
+    for (var k = 0; k < counters.length; k++) {
+      var cRect = counters[k].getBoundingClientRect();
+      if (cRect.top < window.innerHeight * 0.85 && cRect.bottom > 0) {
+        animateCounter(counters[k], k);
+      }
+    }
+    // Danger bar fill
+    var dangerFill = document.querySelector('.danger-fill');
+    if (dangerFill) {
+      var dRect = dangerFill.parentElement.getBoundingClientRect();
+      if (dRect.top < window.innerHeight * 0.85) {
+        dangerFill.classList.add('visible');
+        dangerFill.parentElement.classList.add('visible');
+      }
+    }
+  }
+
+  window.addEventListener('scroll', revealElements);
+  window.addEventListener('resize', revealElements);
+  revealElements();
+})();
+</script>
+</body>
+</html>

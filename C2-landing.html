@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Miner — Discover the Features</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#0a0a12;color:#e0e0e0;font-family:'Inter',sans-serif;overflow-x:hidden}
+/* Stars */
+#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.star{position:absolute;border-radius:50%;background:#fff}
+.star--sm{width:1px;height:1px;opacity:.4}
+.star--md{width:2px;height:2px;opacity:.6}
+.star--lg{width:3px;height:3px;opacity:.8;box-shadow:0 0 4px 1px rgba(0,255,136,.3)}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+/* Utility */
+section{position:relative;z-index:1}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+/* Hero */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:60px 20px;background:radial-gradient(ellipse at 50% 20%,#0d1b2a 0%,#0a0a12 70%)}
+.hero h1{font-family:'Orbitron',sans-serif;font-size:clamp(2.2rem,6vw,4.5rem);font-weight:900;background:linear-gradient(135deg,#00ff88,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;letter-spacing:2px}
+.hero .tagline{font-size:clamp(1rem,3vw,1.6rem);color:#8899aa;font-weight:300;margin-bottom:40px;letter-spacing:4px;text-transform:uppercase}
+.hero .scroll-hint{margin-top:40px;color:#445566;font-size:.85rem;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+/* Section titles */
+.section-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.4rem,4vw,2.2rem);text-align:center;margin-bottom:12px;color:#00ff88}
+.section-sub{text-align:center;color:#667788;margin-bottom:48px;font-size:1rem;max-width:600px;margin-left:auto;margin-right:auto}
+/* Cards grid */
+.cards-section{padding:100px 20px}
+.cards-grid{display:grid;grid-template-columns:1fr;gap:24px;max-width:1100px;margin:0 auto}
+@media(min-width:640px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:960px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
+.card{background:linear-gradient(145deg,#111827,#0d1117);border:1px solid #1a2332;border-radius:16px;padding:32px 24px;text-align:center;transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease;position:relative;overflow:hidden}
+.card:hover{transform:scale(1.05);border-color:#00ff88;box-shadow:0 0 30px rgba(0,255,136,.15),0 0 60px rgba(0,255,136,.05)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#00ff88,transparent);opacity:0;transition:opacity .3s}
+.card:hover::before{opacity:1}
+.card-icon{font-size:2.8rem;margin-bottom:16px;display:block}
+.card h3{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:#00ff88;margin-bottom:10px}
+.card p{color:#8899aa;font-size:.9rem;line-height:1.6}
+.badge{position:absolute;top:16px;right:16px;background:linear-gradient(135deg,#ff6b00,#ff3366);color:#fff;font-size:.65rem;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:1px}
+/* About */
+.about-section{padding:100px 20px;background:linear-gradient(180deg,transparent 0%,#0d1b2a 50%,transparent 100%)}
+.about-content{max-width:700px;margin:0 auto;text-align:center;line-height:1.8;color:#8899aa;font-size:1.05rem}
+.about-content strong{color:#00d4ff}
+/* Stats */
+.stats-section{padding:80px 20px}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;max-width:800px;margin:0 auto}
+@media(min-width:640px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+.stat{text-align:center}
+.stat-num{font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,4vw,2.4rem);color:#00ff88;font-weight:700}
+.stat-label{color:#556677;font-size:.85rem;margin-top:4px}
+/* CTA */
+.cta-section{padding:100px 20px;text-align:center}
+.play-btn{display:inline-block;padding:18px 60px;background:linear-gradient(135deg,#00ff88,#00d4ff);color:#0a0a12;font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;text-decoration:none;border-radius:50px;letter-spacing:2px;text-transform:uppercase;transition:transform .3s ease,box-shadow .3s ease}
+.play-btn:hover{transform:scale(1.08);box-shadow:0 0 40px rgba(0,255,136,.35),0 0 80px rgba(0,212,255,.15)}
+.cta-sub{margin-top:16px;color:#556677;font-size:.85rem}
+/* Footer */
+footer{text-align:center;padding:40px 20px;color:#334455;font-size:.8rem;border-top:1px solid #1a2332}
+footer a{color:#00ff88;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container fade-in">
+    <h1>OKR Miner</h1>
+    <p class="tagline">Build. Choose. Survive.</p>
+    <p style="color:#556677;max-width:520px;margin:0 auto;line-height:1.7">
+      A space-themed engine builder where every decision matters. Manage buildings,
+      face random events, and decide the fate of AI — all in one session.
+    </p>
+    <p class="scroll-hint">&#9660; Scroll to explore</p>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="cards-section" id="features">
+  <div class="container">
+    <h2 class="section-title fade-in">Core Features</h2>
+    <p class="section-sub fade-in">Everything that makes OKR Miner tick</p>
+    <div class="cards-grid">
+
+      <div class="card fade-in">
+        <span class="card-icon">&#127959;</span>
+        <h3>Buildings</h3>
+        <p>8 unique building types — Recruiter, Employee, Network Hub, AI, Finances,
+        Investment, IT Support, and GPU — each with distinct upgrade paths.</p>
+      </div>
+
+      <div class="card fade-in">
+        <span class="card-icon">&#129302;</span>
+        <h3>AI Choice</h3>
+        <p>At Level 6 you face a critical decision about AI rights that reshapes
+        your entire strategy. Choose wisely — there's no going back.</p>
+      </div>
+
+      <div class="card fade-in">
+        <span class="card-icon">&#127912;</span>
+        <h3>Visual Themes</h3>
+        <p>Switch between 5 stunning visual themes on the fly. From neon grids
+        to deep-space nebulae, find the vibe that fits your play style.</p>
+      </div>
+
+      <div class="card fade-in">
+        <span class="card-icon">&#127922;</span>
+        <h3>Random Events</h3>
+        <p>100 hand-crafted random events keep every run fresh. Market crashes,
+        power surges, rogue AI — expect the unexpected.</p>
+      </div>
+
+      <div class="card fade-in">
+        <span class="card-icon">&#127942;</span>
+        <h3>Achievements</h3>
+        <p>Unlock hidden achievements and earn save codes to share your
+        progress. How many can you collect in a single run?</p>
+      </div>
+
+      <div class="card fade-in">
+        <span class="card-icon">&#127760;</span>
+        <h3>Multiplayer</h3>
+        <p>Compete or cooperate with friends in real-time sessions. Compare
+        strategies and race to the top of the leaderboard.</p>
+        <span class="badge">Coming Soon</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="container">
+    <h2 class="section-title fade-in">Why OKR Miner?</h2>
+    <p class="section-sub fade-in">More than just another idle game</p>
+    <div class="about-content fade-in">
+      OKR Miner blends <strong>engine building</strong> with meaningful narrative choices.
+      Every building you place, every upgrade you unlock, and every event you survive
+      feeds into a living economy that reacts to your decisions. With
+      <strong>100 random events</strong>, <strong>5 visual themes</strong>, and a
+      branching AI storyline, no two playthroughs are the same. Whether you're a
+      min-maxer or a story chaser, there's a path for you among the stars.
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section" id="stats">
+  <div class="container">
+    <h2 class="section-title fade-in">By The Numbers</h2>
+    <p class="section-sub fade-in">A snapshot of what awaits</p>
+    <div class="stats-grid fade-in">
+      <div class="stat">
+        <div class="stat-num">8</div>
+        <div class="stat-label">Building Types</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100</div>
+        <div class="stat-label">Random Events</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">5</div>
+        <div class="stat-label">Visual Themes</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">&infin;</div>
+        <div class="stat-label">Replayability</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="play">
+  <div class="container fade-in">
+    <h2 class="section-title">Ready to Mine?</h2>
+    <p class="section-sub">Your colony awaits among the stars</p>
+    <a href="https://game.thisai.fun" class="play-btn">Play Now</a>
+    <p class="cta-sub">Free to play — no download required</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 OKR Miner | Built with coffee and robots</p>
+</footer>
+
+<script>
+(function () {
+  /* ---- Star field ---- */
+  var starContainer = document.getElementById('stars');
+  var sizes = ['star--sm', 'star--md', 'star--lg'];
+  var count = 180;
+  var i, el, size, x, y, dur;
+
+  for (i = 0; i < count; i++) {
+    el = document.createElement('div');
+    size = sizes[Math.floor(Math.random() * sizes.length)];
+    el.className = 'star ' + size;
+    x = Math.random() * 100;
+    y = Math.random() * 100;
+    dur = 2 + Math.random() * 4;
+    el.style.left = x + '%';
+    el.style.top = y + '%';
+    el.style.animation = 'twinkle ' + dur + 's ease-in-out ' + (Math.random() * dur) + 's infinite';
+    starContainer.appendChild(el);
+  }
+
+  /* ---- Scroll fade-in (IntersectionObserver with ES5 fallback) ---- */
+  var faders = document.querySelectorAll('.fade-in');
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      var j;
+      for (j = 0; j < entries.length; j++) {
+        if (entries[j].isIntersecting) {
+          entries[j].target.classList.add('visible');
+          observer.unobserve(entries[j].target);
+        }
+      }
+    }, { threshold: 0.15 });
+
+    for (i = 0; i < faders.length; i++) {
+      observer.observe(faders[i]);
+    }
+  } else {
+    for (i = 0; i < faders.length; i++) {
+      faders[i].classList.add('visible');
+    }
+  }
+})();
+</script>
+</body>
+</html>

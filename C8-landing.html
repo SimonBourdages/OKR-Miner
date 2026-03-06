@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Miner — Journey Through Space</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #050510;
+  color: #e0e0f0;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+.parallax-container { position: relative; min-height: 500vh; }
+
+/* --- Parallax Layers --- */
+.parallax-layer {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; will-change: transform;
+}
+
+/* Layer 1: Distant stars */
+.stars { z-index: 1; }
+.star {
+  position: absolute; border-radius: 50%; background: #fff;
+  animation: twinkle 3s ease-in-out infinite alternate;
+}
+@keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+/* Layer 2: Nebula blobs */
+.nebulae { z-index: 2; }
+.nebula {
+  position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.25;
+}
+
+/* Layer 3: Asteroids */
+.asteroids { z-index: 3; }
+.asteroid {
+  position: absolute; border-radius: 40% 60% 55% 45% / 50% 40% 60% 50%;
+  opacity: 0.35; border: 1px solid rgba(180, 160, 200, 0.2);
+}
+
+/* --- Content Sections --- */
+.content-layer {
+  position: relative; z-index: 10;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0 1rem;
+}
+.section {
+  width: 100%; max-width: 720px;
+  margin: 100vh 0 15vh 0;
+  padding: 2.5rem 2rem;
+  background: rgba(10, 10, 30, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(120, 100, 200, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 0 40px rgba(80, 60, 180, 0.1);
+}
+.section:first-child { margin-top: 30vh; }
+.section:last-child { margin-bottom: 30vh; }
+
+h1, h2, h3 { font-family: 'Orbitron', monospace; }
+.hero-title {
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa, #f0abfc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  text-shadow: none;
+}
+.hero-sub {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #8888aa;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.section h2 {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, #c084fc, #60a5fa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section p, .section ul {
+  line-height: 1.7;
+  color: #b0b0cc;
+  font-size: 1rem;
+}
+.section ul { padding-left: 1.2rem; margin-top: 0.5rem; }
+.section li { margin-bottom: 0.35rem; }
+.section li::marker { color: #7c3aed; }
+.emoji { font-style: normal; }
+
+/* Glow accent line */
+.glow-line {
+  width: 60px; height: 3px; margin: 1.2rem 0;
+  background: linear-gradient(90deg, #7c3aed, #3b82f6);
+  border-radius: 2px;
+}
+
+/* CTA Button */
+.cta-wrap { text-align: center; margin-top: 1.5rem; }
+.cta-btn {
+  display: inline-block;
+  padding: 1rem 3rem;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+  border-radius: 50px;
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.5), 0 0 60px rgba(59, 130, 246, 0.2);
+  transition: transform 0.25s, box-shadow 0.25s;
+  pointer-events: auto;
+  letter-spacing: 0.15em;
+}
+.cta-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 50px rgba(124, 58, 237, 0.7), 0 0 90px rgba(59, 130, 246, 0.35);
+}
+
+/* Footer */
+.footer {
+  position: relative; z-index: 10;
+  text-align: center; padding: 2rem 1rem 3rem;
+  color: #555568;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+/* Mobile: flatten parallax */
+@media (max-width: 768px) {
+  .parallax-layer { position: absolute; height: 500vh; }
+  .section { padding: 2rem 1.4rem; margin: 70vh 0 10vh 0; }
+  .section:first-child { margin-top: 20vh; }
+  .nebula { filter: blur(40px); }
+}
+</style>
+</head>
+<body>
+<div class="parallax-container">
+  <!-- Parallax layers (populated by JS) -->
+  <div class="parallax-layer stars" id="layer-stars"></div>
+  <div class="parallax-layer nebulae" id="layer-nebulae"></div>
+  <div class="parallax-layer asteroids" id="layer-asteroids"></div>
+
+  <!-- Content floating in space -->
+  <div class="content-layer">
+
+    <!-- Hero -->
+    <div class="section" style="background: transparent; border: none; box-shadow: none; backdrop-filter: none;">
+      <h1 class="hero-title">OKR MINER</h1>
+      <p class="hero-sub">Journey Through Space</p>
+      <div class="cta-wrap">
+        <a href="https://game.thisai.fun" class="cta-btn" style="font-size:0.95rem; padding:0.7rem 2rem;">Enter the Void</a>
+      </div>
+    </div>
+
+    <!-- Section 2: Build Your Space Empire -->
+    <div class="section">
+      <h2>Build Your Space Empire</h2>
+      <div class="glow-line"></div>
+      <p>Eight unique building types power your mining colony. Expand, upgrade, and combine them to forge an unstoppable engine.</p>
+      <ul>
+        <li><span class="emoji">⛏️</span> <strong>Drill Rigs</strong> — Extract raw ore from asteroid fields</li>
+        <li><span class="emoji">🔬</span> <strong>Research Labs</strong> — Unlock alien tech upgrades</li>
+        <li><span class="emoji">🏭</span> <strong>Refineries</strong> — Convert ore into precious alloys</li>
+        <li><span class="emoji">🛡️</span> <strong>Shield Arrays</strong> — Protect against cosmic storms</li>
+        <li><span class="emoji">🚀</span> <strong>Launch Pads</strong> — Send expeditions to new sectors</li>
+        <li><span class="emoji">📡</span> <strong>Comm Towers</strong> — Trade with distant civilisations</li>
+        <li><span class="emoji">⚡</span> <strong>Fusion Cores</strong> — Supercharge all adjacent buildings</li>
+        <li><span class="emoji">🧬</span> <strong>Bio Domes</strong> — Grow crew and morale each cycle</li>
+      </ul>
+    </div>
+
+    <!-- Section 3: Navigate the Asteroid Belt -->
+    <div class="section">
+      <h2>Navigate the Asteroid Belt</h2>
+      <div class="glow-line"></div>
+      <p>The belt is alive with danger and opportunity. Over <strong>100 random events</strong> shape every playthrough — no two runs are the same.</p>
+      <p style="margin-top:0.8rem;">Your play area expands in concentric circles as you level up, revealing new resources, hazards, and secrets hidden in the dark.</p>
+      <ul>
+        <li><span class="emoji">☄️</span> Asteroid collisions that reshape the map</li>
+        <li><span class="emoji">👽</span> Alien artifact discoveries</li>
+        <li><span class="emoji">🌑</span> Solar eclipses that drain power</li>
+        <li><span class="emoji">💎</span> Rare mineral veins worth a fortune</li>
+        <li><span class="emoji">🛸</span> Pirate raids on unshielded sectors</li>
+      </ul>
+    </div>
+
+    <!-- Section 4: The AI Awakening -->
+    <div class="section">
+      <h2>The AI Awakening</h2>
+      <div class="glow-line"></div>
+      <p>At <strong>Level 6</strong>, something stirs in the deepest mine shaft. An ancient artificial intelligence offers you a choice that will alter your empire forever.</p>
+      <p style="margin-top:0.8rem; color:#c084fc; font-style:italic;">"Merge with me, and transcend. Refuse, and face what sleeps beneath alone."</p>
+      <p style="margin-top:0.8rem;">Will you embrace the machine? Or trust the grit of human ingenuity? The galaxy remembers your answer.</p>
+    </div>
+
+    <!-- Section 5: Final CTA -->
+    <div class="section" style="text-align:center;">
+      <h2 style="font-size:clamp(1.6rem,5vw,2.4rem);">Your Empire Awaits</h2>
+      <div class="glow-line" style="margin:1.2rem auto;"></div>
+      <p style="max-width:500px; margin:0 auto 1.5rem;">Mine asteroids. Build engines. Make impossible choices. The void is calling — will you answer?</p>
+      <a href="https://game.thisai.fun" class="cta-btn">PLAY NOW</a>
+    </div>
+
+  </div><!-- /content-layer -->
+</div><!-- /parallax-container -->
+
+<footer class="footer">&copy; 2026 OKR Miner | Built with coffee and robots</footer>
+
+<script>
+(function () {
+  /* --- Helpers --- */
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+  function isMobile() { return window.innerWidth <= 768; }
+
+  /* --- Generate Stars (Layer 1 — far) --- */
+  var starLayer = document.getElementById('layer-stars');
+  var starCount = isMobile() ? 80 : 160;
+  for (var i = 0; i < starCount; i++) {
+    var s = document.createElement('div');
+    s.className = 'star';
+    var size = rand(1, 3);
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = rand(0, 100) + '%';
+    s.style.top = rand(0, 500) + '%';
+    s.style.animationDelay = rand(0, 5) + 's';
+    s.style.animationDuration = rand(2, 6) + 's';
+    starLayer.appendChild(s);
+  }
+
+  /* --- Generate Nebulae (Layer 2 — mid) --- */
+  var nebulaLayer = document.getElementById('layer-nebulae');
+  var nebulaColors = [
+    'radial-gradient(circle, rgba(124,58,237,0.5), transparent 70%)',
+    'radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%)',
+    'radial-gradient(circle, rgba(192,132,252,0.35), transparent 70%)',
+    'radial-gradient(circle, rgba(96,165,250,0.3), transparent 70%)',
+    'radial-gradient(circle, rgba(139,92,246,0.4), transparent 70%)',
+    'radial-gradient(circle, rgba(167,139,250,0.3), transparent 70%)'
+  ];
+  var nebulaCount = isMobile() ? 5 : 10;
+  for (var j = 0; j < nebulaCount; j++) {
+    var n = document.createElement('div');
+    n.className = 'nebula';
+    var nSize = rand(200, 500);
+    n.style.width = nSize + 'px';
+    n.style.height = nSize + 'px';
+    n.style.left = rand(-10, 90) + '%';
+    n.style.top = rand(0, 450) + '%';
+    n.style.background = nebulaColors[j % nebulaColors.length];
+    nebulaLayer.appendChild(n);
+  }
+
+  /* --- Generate Asteroids (Layer 3 — near) --- */
+  var asteroidLayer = document.getElementById('layer-asteroids');
+  var asteroidCount = isMobile() ? 6 : 14;
+  for (var k = 0; k < asteroidCount; k++) {
+    var a = document.createElement('div');
+    a.className = 'asteroid';
+    var aSize = rand(20, 70);
+    var grey = Math.floor(rand(25, 55));
+    a.style.width = aSize + 'px';
+    a.style.height = aSize + 'px';
+    a.style.left = rand(0, 95) + '%';
+    a.style.top = rand(0, 480) + '%';
+    a.style.background = 'rgb(' + grey + ',' + grey + ',' + (grey + 10) + ')';
+    a.style.transform = 'rotate(' + rand(0, 360) + 'deg)';
+    asteroidLayer.appendChild(a);
+  }
+
+  /* --- Parallax Scroll --- */
+  var layerStars = document.getElementById('layer-stars');
+  var layerNebulae = document.getElementById('layer-nebulae');
+  var layerAsteroids = document.getElementById('layer-asteroids');
+  var ticking = false;
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+      var mobile = isMobile();
+      /* Different speeds: far=slow, mid=medium, near=fast */
+      var s1 = mobile ? 0.05 : 0.15;
+      var s2 = mobile ? 0.12 : 0.3;
+      var s3 = mobile ? 0.2  : 0.5;
+      layerStars.style.transform = 'translateY(' + (-scrollY * s1) + 'px)';
+      layerNebulae.style.transform = 'translateY(' + (-scrollY * s2) + 'px)';
+      layerAsteroids.style.transform = 'translateY(' + (-scrollY * s3) + 'px)';
+      ticking = false;
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, false);
+  onScroll();
+})();
+</script>
+</body>
+</html>
