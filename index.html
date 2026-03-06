@@ -2707,7 +2707,7 @@
             document.getElementById('buildings').style.display = 'flex';
 
             // Show pizza panel only if unlocked
-            document.getElementById('repairBotPanel').style.display = this.state.repairBotsEnabled ? 'block' : 'none';
+            document.getElementById('repairBotPanel').style.display = (this.state.repairBotsEnabled && !this.state.robotWar) ? 'block' : 'none';
 
             this.rebuildBuildingButtons();
             this.updateUI();
@@ -3276,8 +3276,10 @@
             } // end shipsEnabled
 
             // Standalone IT support drones — each targets a different damaged building
+            // Disabled during robot war (Humans First path — no healing allowed)
             var fX = this.canvas.width / 2;
             var fY = this.canvas.height / 2;
+            if (!this.state.robotWar) {
             var claimedTargets = []; // track which buildings are already claimed by a bot
             for (var i = 0; i < this.repairBots.length; i++) {
                 var bot = this.repairBots[i];
@@ -3348,6 +3350,7 @@
                     }
                 }
             }
+            } // end !robotWar IT Support block
 
             // Competitor ships — visible attack runs on Leadership
             if (this.state.thievesEnabled) {
@@ -3438,8 +3441,8 @@
                 // Aggression scales with progress: calm at 0%, devastating at 90%+
                 var aggression = progress * progress * 1.15; // quadratic + 15% faster escalation
                 var attackRate = Math.max(0.05, 1.2 - aggression * 1.2); // 1.2s → 0.05s (faster)
-                var damage = Math.floor(15 + aggression * 80); // 15 → 95 damage per hit
-                var krSteal = 0.04 + aggression * 0.20; // 4% → 24% KR stolen per hit
+                var damage = Math.floor((15 + aggression * 80) * 10); // 10× destruction: 150 → 950 per hit
+                var krSteal = (0.04 + aggression * 0.20) * 100; // 100× KR drain: 4% → 24% * 100
 
                 this._robotWarTimer = (this._robotWarTimer || 0) + dt;
                 if (this._robotWarTimer > attackRate) {
