@@ -712,8 +712,8 @@
             <span class="stat-value" id="currencyDisplay">50</span>
         </div>
         <div id="elRow" class="stat-row" style="display:none;">
-            <span class="stat-label">⚡ el</span>
-            <span class="stat-value" id="elDisplay" style="color:#ff9800;">0</span>
+            <span class="stat-label">💲 $</span>
+            <span class="stat-value" id="elDisplay" style="color:#ffd700;">0</span><span id="elCapDisplay" style="color:#888;font-size:9px;"></span>
         </div>
         <div style="margin-top:6px;border-top:1px solid #234;padding-top:4px;cursor:pointer;color:#888;font-size:10px;text-align:center;" onclick="var r=document.getElementById('ratesSection');r.style.display=r.style.display==='none'?'block':'none';">▼ Rates</div>
         <div id="ratesSection" style="display:none;">
@@ -928,7 +928,7 @@
             { okr: 500,     unlock: ['generator'], title: '💲 Funding Online!', desc: 'Buildings now require funding! Finances produce $ to keep everything running.', enableElectricity: true },
             { okr: 5000,    unlock: [], title: '⬆️ Upgrades Unlocked!', desc: 'You can now click existing buildings to upgrade them to Lv.2 and Lv.3!', enableUpgrades: true },
             { okr: 50000,   unlock: ['synthesizer'], title: '🤖 AI Unlocked!', desc: 'Robot Workers produce 100 KR/s but need lots of funding.' },
-            { okr: 500000,  unlock: [], title: '🛸 Threats Incoming!', desc: 'Spaceships and Competitors are targeting you! Pizza drones available to heal damage.', enableShips: true, enableRepairBots: true, enableThieves: true },
+            { okr: 500000,  unlock: [], title: '🛸 Threats Incoming!', desc: 'Spaceships and Competitors are targeting you! IT Support available to heal damage.', enableShips: true, enableRepairBots: true, enableThieves: true },
             { okr: 5e6,     unlock: [], title: '🌟 Random Events Active!', desc: 'Space events now occur! Some help, some hurt. Prepare for anything.', enableEvents: true },
             { okr: 50e6,    unlock: [], title: '🎨 Themes Unlocked!', desc: 'You can now change the visual theme! Each theme provides a small production bonus.', enableThemes: true },
             { okr: 500e6,   unlock: [], title: '🌌 Deep Space Phase', desc: 'Your operation enters deep space. New galaxy background unlocked!' },
@@ -994,7 +994,7 @@
             synthesizer: { name: 'AI', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 KR/s',        symbol: '', metrics: ['okr'] },
             generator:   { name: 'Finances',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 $/s', symbol: '', metrics: ['el'] },
             bank:        { name: 'Investment',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% $ interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
-            repairbot:   { name: 'Pizza',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Delivers pizza to heal buildings',  symbol: '', metrics: ['hp'], repairRate: 15 },
+            repairbot:   { name: 'IT Support',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Heals AI buildings',  symbol: '', metrics: ['hp'], repairRate: 15 },
             gpu:         { name: 'GPU',         cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 5,  color: '#76ff03', desc: 'Powers 1 AI unit',  symbol: '', metrics: ['gpu'], gpuCapacity: 1 }
         };
 
@@ -2312,7 +2312,7 @@
                 age: 0, targetIdx: -1, repairing: false, orbitAngle: Math.random() * Math.PI * 2
             });
             this.repairBotCost = Math.floor(this.repairBotCost * 1.5);
-            this.addFloatingText(fX, fY - 80, '🍕 Pizza delivered!', '#0ff', 14);
+            this.addFloatingText(fX, fY - 80, '🍕 IT Support deployed!', '#0ff', 14);
             this.spawnParticles(fX, fY - 60, '#0ff', 10);
             this.playSound('complete');
             this.trackEvent('repairbot');
@@ -2378,10 +2378,20 @@
             var bankInterest = totalInterest * this.state.currencies.el * dt;
             this.state.currencies.el += bankInterest;
 
-            // electricity balance
+            // Funding ($) balance
             if (this.state.electricityEnabled) {
                 this.state.currencies.el += (elGain - elDrain) * dt;
                 if (this.state.currencies.el < 0) this.state.currencies.el = 0;
+                // $ cap: base 500, each Investment building adds capacity
+                var fundingCap = 500;
+                for (var ci = 0; ci < this.nodes.length; ci++) {
+                    if (this.nodes[ci].type === 'bank') {
+                        var capLvl = this.nodes[ci].level || 1;
+                        fundingCap += capLvl === 1 ? 500 : capLvl === 2 ? 1500 : capLvl === 3 ? 4000 : 10000;
+                    }
+                }
+                if (this.state.currencies.el > fundingCap) this.state.currencies.el = fundingCap;
+                this._fundingCap = fundingCap;
             } else {
                 elGain = 0;
                 elDrain = 0;
@@ -2550,7 +2560,7 @@
             }
             } // end shipsEnabled
 
-            // Standalone pizza drones — each targets a different damaged building
+            // Standalone IT support drones — each targets a different damaged building
             var fX = this.canvas.width / 2;
             var fY = this.canvas.height / 2;
             var claimedTargets = []; // track which buildings are already claimed by a bot
@@ -2561,11 +2571,12 @@
                 var repairTheme = THEMES[this.state.activeTheme];
                 if (repairTheme && repairTheme.bonus === 'repair') repairAmt *= repairTheme.bonusMult;
 
-                // Find lowest-HP building NOT already claimed by another bot
+                // Find lowest-HP AI building NOT already claimed by another bot
                 var lowestIdx = -1;
                 var lowestHp = Infinity;
                 for (var j = 0; j < this.nodes.length; j++) {
                     var nd = this.nodes[j];
+                    if (nd.type !== 'synthesizer' && nd.type !== 'gpu') continue; // IT Support only heals AI and GPU
                     var hp = nd.hp !== undefined ? nd.hp : 100;
                     var maxHp = nd.maxHp || 100;
                     if (hp < maxHp && hp < lowestHp && claimedTargets.indexOf(j) === -1) {
@@ -2573,10 +2584,11 @@
                         lowestIdx = j;
                     }
                 }
-                // If all damaged buildings are claimed, allow sharing
+                // If all damaged AI buildings are claimed, allow sharing
                 if (lowestIdx === -1) {
                     for (var j = 0; j < this.nodes.length; j++) {
                         var nd = this.nodes[j];
+                        if (nd.type !== 'synthesizer' && nd.type !== 'gpu') continue;
                         var hp = nd.hp !== undefined ? nd.hp : 100;
                         var maxHp = nd.maxHp || 100;
                         if (hp < maxHp && hp < lowestHp) {
@@ -3085,6 +3097,7 @@
                 var tmp = employees[i]; employees[i] = employees[j]; employees[j] = tmp;
             }
             var removeCount = Math.floor(employees.length * 2 / 3);
+            var itSupportCount = Math.floor(removeCount / 3); // 1/3 of removed become IT Support
 
             // Remove 2/3 (from end to avoid index shifting)
             var toRemove = employees.slice(0, removeCount).sort(function(a,b) { return b - a; });
@@ -3100,6 +3113,17 @@
                     this.nodes[i].type = 'synthesizer';
                     this.spawnParticles(this.nodes[i].x, this.nodes[i].y, '#4488ff', 10);
                 }
+            }
+
+            // Spawn IT Support drones from removed employees
+            var fX = this.canvas.width / 2;
+            var fY = this.canvas.height / 2;
+            for (var i = 0; i < itSupportCount; i++) {
+                this.repairBots.push({
+                    x: fX + (Math.random() - 0.5) * 100,
+                    y: fY + (Math.random() - 0.5) * 100,
+                    age: 0, targetIdx: -1, repairing: false, orbitAngle: Math.random() * Math.PI * 2
+                });
             }
 
             // Lock employees
@@ -3229,9 +3253,11 @@
 
             if (elEnabled) {
                 document.getElementById('elDisplay').textContent = this.formatNumber(Math.floor(this.state.currencies.el));
+                var capEl = document.getElementById('elCapDisplay');
+                if (capEl && this._fundingCap) capEl.textContent = ' / ' + this.formatNumber(this._fundingCap);
                 var elRateEl = document.getElementById('elRate');
                 elRateEl.textContent = (this.currentElRate >= 0 ? '+' : '') + this.currentElRate.toFixed(1);
-                elRateEl.style.color = this.currentElRate >= 0 ? '#ff9800' : '#f44';
+                elRateEl.style.color = this.currentElRate >= 0 ? '#ffd700' : '#f44';
                 if (this.UNDERFUNDED) {
                     elRateEl.textContent += ' ⚠ UNDERFUNDED';
                 }
@@ -3568,16 +3594,16 @@
                 var bot = this.repairBots[i];
                 var bx = bot.x;
                 var by = bot.y;
-                var ds = 7;
+                var ds = 6;
                 var age = bot.age || 0;
                 
-                // Heal beam to target (warm yellow instead of cyan)
+                // Repair beam to target (cyan tech beam)
                 if (bot.repairing && bot.targetIdx >= 0 && bot.targetIdx < this.nodes.length) {
                     var tgt = this.nodes[bot.targetIdx];
                     ctx.save();
-                    ctx.strokeStyle = 'rgba(255, 200, 50, ' + (0.3 + Math.sin(age * 8) * 0.2).toFixed(2) + ')';
+                    ctx.strokeStyle = 'rgba(0, 200, 255, ' + (0.3 + Math.sin(age * 8) * 0.2).toFixed(2) + ')';
                     ctx.lineWidth = 2;
-                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowColor = '#0cf';
                     ctx.shadowBlur = 6;
                     ctx.beginPath();
                     ctx.moveTo(bx, by);
@@ -3586,56 +3612,48 @@
                     ctx.shadowBlur = 0;
                     ctx.restore();
                     
-                    // Pizza crumb sparkles at target
+                    // Data sparkles at target
                     if (Math.random() < 0.15) {
-                        ctx.fillStyle = '#ffd700';
+                        ctx.fillStyle = '#0cf';
                         ctx.fillRect(tgt.x + (Math.random() - 0.5) * 12, tgt.y + (Math.random() - 0.5) * 12, 2, 2);
                     }
                 }
                 
-                // Pizza shadow
+                // Shadow
                 ctx.fillStyle = 'rgba(0,0,0,0.2)';
                 ctx.beginPath();
                 ctx.ellipse(bx, by + ds + 2, ds * 0.7, ds * 0.3, 0, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Pizza slice body — yellow triangle
+                // IT Support drone body — small laptop/wrench shape
                 ctx.save();
                 ctx.translate(bx, by);
-                var wobble = Math.sin(age * 3) * 0.15;
+                var wobble = Math.sin(age * 2) * 0.1;
                 ctx.rotate(wobble);
                 
-                // Crust (outer edge — darker yellow)
-                ctx.fillStyle = '#d4a030';
-                ctx.beginPath();
-                ctx.moveTo(0, -ds);
-                ctx.lineTo(ds, ds * 0.8);
-                ctx.lineTo(-ds, ds * 0.8);
-                ctx.closePath();
-                ctx.fill();
-                
-                // Cheese (inner — bright yellow)
-                ctx.fillStyle = '#ffd700';
-                ctx.beginPath();
-                ctx.moveTo(0, -ds * 0.7);
-                ctx.lineTo(ds * 0.75, ds * 0.6);
-                ctx.lineTo(-ds * 0.75, ds * 0.6);
-                ctx.closePath();
-                ctx.fill();
-                
-                // Pepperoni dots (red circles)
-                ctx.fillStyle = '#e53935';
-                ctx.beginPath(); ctx.arc(-ds * 0.25, ds * 0.1, ds * 0.18, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(ds * 0.2, ds * 0.35, ds * 0.15, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.arc(0, -ds * 0.25, ds * 0.13, 0, Math.PI * 2); ctx.fill();
+                // Laptop base
+                ctx.fillStyle = '#37474f';
+                ctx.fillRect(-ds, -ds * 0.3, ds * 2, ds);
+                // Screen
+                ctx.fillStyle = '#0cf';
+                ctx.fillRect(-ds * 0.8, -ds * 0.8, ds * 1.6, ds * 0.5);
+                // Screen content (scrolling code)
+                var codeY = (age * 20) % (ds * 0.4);
+                ctx.fillStyle = '#004d40';
+                ctx.fillRect(-ds * 0.6, -ds * 0.7 + codeY, ds * 0.4, 1);
+                ctx.fillRect(-ds * 0.1, -ds * 0.7 + (codeY + ds * 0.15) % (ds * 0.4), ds * 0.6, 1);
+                // Wrench icon on side
+                ctx.fillStyle = '#90a4ae';
+                ctx.fillRect(ds * 0.8, -ds * 0.5, ds * 0.3, ds * 0.8);
+                ctx.fillRect(ds * 0.7, -ds * 0.6, ds * 0.5, ds * 0.2);
                 
                 ctx.restore();
                 
                 // Status label
-                ctx.fillStyle = bot.repairing ? '#ffd700' : '#888';
+                ctx.fillStyle = bot.repairing ? '#0cf' : '#888';
                 ctx.font = '7px Segoe UI';
                 ctx.textAlign = 'center';
-                ctx.fillText(bot.repairing ? '🍕 DELIVERING' : '🍕 READY', bx, by + ds + 14);
+                ctx.fillText(bot.repairing ? '🔧 REPAIRING' : '💻 STANDBY', bx, by + ds + 14);
             }
         };
 
