@@ -58,6 +58,10 @@
    - Increased Finances building funding output from `+5 $/s` to `+15 $/s` (3x), scaling all upgrade levels accordingly.
    - Raised the default starting funding cap to `1,000,000 $` in shared funding-cap logic.
 
+11. **Achievement reset support**
+   - Added a Reset Achievements action directly inside the achievements panel.
+   - Reset now clears browser-persistent achievements and removes achievement unlocks from local save payloads.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**

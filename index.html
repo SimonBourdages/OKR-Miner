@@ -451,11 +451,29 @@
             color: #8cf;
         }
 
-        #achievementsList .close-btn {
+        #achievementsList .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
             margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        #achievementsList .close-btn {
             background: rgba(255, 0, 0, 0.2);
             border: 1px solid #f00;
             color: #f88;
+            border-radius: 6px;
+            padding: 8px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        #achievementsList .reset-btn {
+            background: rgba(255, 136, 0, 0.2);
+            border: 1px solid #f80;
+            color: #ffb366;
             border-radius: 6px;
             padding: 8px 24px;
             cursor: pointer;
@@ -944,7 +962,10 @@
     <div id="achievementsList">
         <h2 style="color:#00ff88;font-size:28px;margin-bottom:20px;">🏆 Achievements</h2>
         <div class="ach-grid" id="achGrid"></div>
-        <button class="close-btn" onclick="game.hideAchievements()">Close</button>
+        <div class="actions">
+            <button class="close-btn" onclick="game.hideAchievements()">Close</button>
+            <button class="reset-btn" onclick="game.resetAchievements()">Reset Achievements</button>
+        </div>
     </div>
 
     <div id="eventHistoryPanel" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:200;overflow-y:auto;padding:30px;">
@@ -6891,6 +6912,36 @@
 
         OKRFarmingGame.prototype.hideAchievements = function() {
             document.getElementById('achievementsList').style.display = 'none';
+        };
+
+        OKRFarmingGame.prototype.resetAchievements = function() {
+            var confirmed = window.confirm('Reset all achievements for this browser? This cannot be undone.');
+            if (!confirmed) return;
+
+            this.unlockedAchievements = {};
+            this.savePersistentAchievements();
+
+            var saveSyncFailed = false;
+            var savedRaw = localStorage.getItem(SAVE_KEY);
+            if (savedRaw) {
+                try {
+                    var savedData = JSON.parse(savedRaw);
+                    if (savedData && typeof savedData === 'object') {
+                        savedData.achievements = {};
+                        localStorage.setItem(SAVE_KEY, JSON.stringify(savedData));
+                    }
+                } catch (e) {
+                    saveSyncFailed = true;
+                }
+            }
+
+            if (this.state) this.saveGame(true);
+            this.showAchievements();
+            this.playSound('click');
+            this.logMessage('🧹', 'Achievements reset', 'All achievements were cleared for this browser.', 'warning');
+            if (saveSyncFailed) {
+                this.logMessage('⚠', 'Achievement reset warning', 'Local save achievements could not be updated.', 'warning');
+            }
         };
 
         OKRFarmingGame.prototype.showLog = function() {
