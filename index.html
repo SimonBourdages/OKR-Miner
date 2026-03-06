@@ -3349,17 +3349,17 @@
                 var bot = this.repairBots[i];
                 var bx = bot.x;
                 var by = bot.y;
-                var ds = 5;
+                var ds = 7;
                 var age = bot.age || 0;
                 
-                // Repair beam to target
+                // Heal beam to target (warm yellow instead of cyan)
                 if (bot.repairing && bot.targetIdx >= 0 && bot.targetIdx < this.nodes.length) {
                     var tgt = this.nodes[bot.targetIdx];
                     ctx.save();
-                    ctx.strokeStyle = 'rgba(0, 255, 255, ' + (0.3 + Math.sin(age * 8) * 0.2).toFixed(2) + ')';
+                    ctx.strokeStyle = 'rgba(255, 200, 50, ' + (0.3 + Math.sin(age * 8) * 0.2).toFixed(2) + ')';
                     ctx.lineWidth = 2;
-                    ctx.shadowColor = '#0ff';
-                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowBlur = 6;
                     ctx.beginPath();
                     ctx.moveTo(bx, by);
                     ctx.lineTo(tgt.x, tgt.y);
@@ -3367,41 +3367,56 @@
                     ctx.shadowBlur = 0;
                     ctx.restore();
                     
+                    // Pizza crumb sparkles at target
                     if (Math.random() < 0.15) {
-                        ctx.fillStyle = '#0ff';
+                        ctx.fillStyle = '#ffd700';
                         ctx.fillRect(tgt.x + (Math.random() - 0.5) * 12, tgt.y + (Math.random() - 0.5) * 12, 2, 2);
                     }
                 }
                 
-                // Thruster glow
-                ctx.fillStyle = 'rgba(0, 200, 255, 0.3)';
+                // Pizza shadow
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
                 ctx.beginPath();
-                ctx.arc(bx, by + ds + 2, ds * 0.6, 0, Math.PI * 2);
+                ctx.ellipse(bx, by + ds + 2, ds * 0.7, ds * 0.3, 0, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Drone body — rotating diamond
+                // Pizza slice body — yellow triangle
                 ctx.save();
                 ctx.translate(bx, by);
-                ctx.rotate(age * 2);
-                ctx.fillStyle = '#00e5ff';
+                var wobble = Math.sin(age * 3) * 0.15;
+                ctx.rotate(wobble);
+                
+                // Crust (outer edge — darker yellow)
+                ctx.fillStyle = '#d4a030';
                 ctx.beginPath();
                 ctx.moveTo(0, -ds);
-                ctx.lineTo(ds, 0);
-                ctx.lineTo(0, ds);
-                ctx.lineTo(-ds, 0);
+                ctx.lineTo(ds, ds * 0.8);
+                ctx.lineTo(-ds, ds * 0.8);
                 ctx.closePath();
                 ctx.fill();
-                ctx.fillStyle = '#fff';
+                
+                // Cheese (inner — bright yellow)
+                ctx.fillStyle = '#ffd700';
                 ctx.beginPath();
-                ctx.arc(0, 0, ds * 0.3, 0, Math.PI * 2);
+                ctx.moveTo(0, -ds * 0.7);
+                ctx.lineTo(ds * 0.75, ds * 0.6);
+                ctx.lineTo(-ds * 0.75, ds * 0.6);
+                ctx.closePath();
                 ctx.fill();
+                
+                // Pepperoni dots (red circles)
+                ctx.fillStyle = '#e53935';
+                ctx.beginPath(); ctx.arc(-ds * 0.25, ds * 0.1, ds * 0.18, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(ds * 0.2, ds * 0.35, ds * 0.15, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(0, -ds * 0.25, ds * 0.13, 0, Math.PI * 2); ctx.fill();
+                
                 ctx.restore();
                 
                 // Status label
-                ctx.fillStyle = bot.repairing ? '#0f0' : '#888';
+                ctx.fillStyle = bot.repairing ? '#ffd700' : '#888';
                 ctx.font = '7px Segoe UI';
                 ctx.textAlign = 'center';
-                ctx.fillText(bot.repairing ? '🔧  DELIVERING' : ' READY', bx, by + ds + 12);
+                ctx.fillText(bot.repairing ? '🍕 DELIVERING' : '🍕 READY', bx, by + ds + 14);
             }
         };
 
