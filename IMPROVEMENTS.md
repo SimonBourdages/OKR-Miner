@@ -62,6 +62,11 @@
    - Added a Reset Achievements action directly inside the achievements panel.
    - Reset now clears browser-persistent achievements and removes achievement unlocks from local save payloads.
 
+12. **Menu intro polish and minimap visibility toggle**
+   - Minimap rendering is now disabled behind a `MINIMAP_ENABLED` flag while keeping the full minimap drawing code for future re-enable.
+   - Menu background now keeps the intro video element and shows the intro's first frame as a static background layer.
+   - Intro overlay title/button styling is aligned with the main menu font sizing and color scheme.
+
 ## Recommended next optimization passes
 
 1. **Spatial partitioning for proximity checks**

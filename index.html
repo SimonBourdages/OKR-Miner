@@ -514,27 +514,29 @@
         }
 
         #videoOverlay h1 {
-            font-size: 64px;
+            font-size: 48px;
             color: #00ff88;
-            text-shadow: 0 0 30px #00ff88, 0 0 60px #08f;
-            letter-spacing: 10px;
-            margin-bottom: 30px;
+            text-shadow: 0 0 20px #00ff88, 0 0 40px #08f;
+            letter-spacing: 6px;
+            margin-bottom: 10px;
         }
 
         #skipIntroBtn {
-            background: rgba(0, 255, 136, 0.15);
+            background: rgba(0, 255, 136, 0.1);
             color: #00ff88;
             border: 2px solid #00ff88;
             border-radius: 8px;
-            padding: 12px 32px;
+            padding: 14px 40px;
             font-family: inherit;
             font-size: 18px;
             cursor: pointer;
+            min-width: 220px;
             transition: all 0.2s;
         }
 
         #skipIntroBtn:hover {
-            background: rgba(0, 255, 136, 0.4);
+            background: rgba(0, 255, 136, 0.3);
+            transform: scale(1.05);
         }
 
         #upgradeUnlockVideoModal {
@@ -777,14 +779,15 @@
         @media (max-width: 600px) {
             /* Video intro: scale down title and button */
             #videoOverlay h1 {
-                font-size: 32px;
-                letter-spacing: 4px;
+                font-size: 30px;
+                letter-spacing: 3px;
                 margin-bottom: 20px;
             }
 
             #skipIntroBtn {
-                font-size: 14px;
-                padding: 10px 24px;
+                font-size: 15px;
+                padding: 12px 28px;
+                min-width: 180px;
             }
 
             /* Main menu: compact layout */
@@ -1142,6 +1145,8 @@
         var DEBUG_RESOURCE_BONUS = 999999;
         var DEBUG_FUNDING_BONUS = 1000000;
         var DEBUG_BUILDING_ORDER = ['processor', 'collector', 'multiplier', 'synthesizer', 'generator', 'bank', 'gpu', 'repairbot'];
+        // Minimap rendering is temporarily hidden; keep the implementation for future UI re-enable.
+        var MINIMAP_ENABLED = false;
 
         function getPlayableRadius(state) {
             return GameLogic.getPlayableRadius(state);
@@ -1760,24 +1765,16 @@
                 if (introDiv._ended) return;
                 introDiv._ended = true;
                 introDiv.style.pointerEvents = 'none';
-                // Hide overlay text but keep video playing as menu background
-                var overlay = document.getElementById('videoOverlay');
-                if (overlay) overlay.style.display = 'none';
-                // Lower z-index so menu shows on top
-                introDiv.style.zIndex = '0';
+                self.setIntroAsMenuBackgroundFrame();
             }
 
             if (videoEl) {
-                videoEl.addEventListener('ended', function() {
-                    // Loop video for menu background
-                    try { videoEl.currentTime = 0; videoEl.play(); } catch(e) {}
-                });
+                videoEl.addEventListener('ended', endIntro);
                 videoEl.addEventListener('error', endIntro);
             }
 
             if (skipBtn) {
                 skipBtn.addEventListener('click', function() {
-                    if (videoEl) { try { videoEl.pause(); } catch(e) {} }
                     endIntro();
                 });
             }
@@ -1788,6 +1785,22 @@
                     endIntro();
                 }
             }, 30000);
+        };
+
+        OKRFarmingGame.prototype.setIntroAsMenuBackgroundFrame = function() {
+            var introDiv = document.getElementById('videoIntro');
+            var videoEl = document.getElementById('introVideo');
+            var overlay = document.getElementById('videoOverlay');
+            if (overlay) overlay.style.display = 'none';
+            if (introDiv) {
+                introDiv.style.display = 'flex';
+                introDiv.style.pointerEvents = 'none';
+                introDiv.style.zIndex = '0';
+            }
+            if (videoEl) {
+                try { videoEl.pause(); } catch (e) {}
+                try { videoEl.currentTime = 0; } catch (e) {}
+            }
         };
 
         OKRFarmingGame.prototype.setupUpgradeUnlockVideo = function() {
@@ -4090,8 +4103,8 @@
 
             } finally { ctx.restore(); } // end screen shake
 
-            // Minimap is drawn outside the screen-shake transform so it stays fixed
-            this.drawMinimap(ctx, w, h);
+            // Minimap rendering is temporarily hidden (kept for future use via MINIMAP_ENABLED).
+            if (MINIMAP_ENABLED) this.drawMinimap(ctx, w, h);
         };
 
         // =========================================================
@@ -6309,6 +6322,7 @@
         // =========================================================
 
         OKRFarmingGame.prototype.drawMinimap = function(ctx, w, h) {
+            // Kept for future use while MINIMAP_ENABLED is false.
             if (!this.state) return;
 
             var mmW   = 120;
@@ -7271,11 +7285,8 @@
             // Show video as menu background
             var vidIntro = document.getElementById('videoIntro');
             if (vidIntro) {
-                vidIntro.style.display = 'flex';
-                vidIntro.style.zIndex = '0';
                 vidIntro.style.opacity = '1';
-                var vid = document.getElementById('introVideo');
-                if (vid) { try { vid.play(); } catch(e) {} }
+                this.setIntroAsMenuBackgroundFrame();
             }
             this.renderMenuBackground();
         };
