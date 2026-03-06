@@ -1,0 +1,27 @@
+{
+  "name": "okr-miner",
+  "version": "1.0.0",
+  "description": "A space-themed engine building game with a narrative twist. Hire talent, manage finances, deploy AI, and achieve Key Results. At a critical moment, the choice you make about AI rights will determine whether your empire thrives or falls.",
+  "main": "sw.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimonBourdages/OKR-Miner.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SimonBourdages/OKR-Miner/issues"
+  },
+  "homepage": "https://github.com/SimonBourdages/OKR-Miner#readme",
+  "private": true,
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.18",
+    "vitest": "^4.0.18"
+  }
+}
