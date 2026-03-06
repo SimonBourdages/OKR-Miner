@@ -511,6 +511,7 @@
             align-items: center;
             justify-content: center;
             background: rgba(0, 0, 0, 0.3);
+            transition: opacity 0.6s ease;
         }
 
         #videoOverlay h1 {
@@ -521,22 +522,15 @@
             margin-bottom: 10px;
         }
 
-        #skipIntroBtn {
-            background: rgba(0, 255, 136, 0.1);
-            color: #00ff88;
-            border: 2px solid #00ff88;
-            border-radius: 8px;
-            padding: 14px 40px;
-            font-family: inherit;
-            font-size: 18px;
-            cursor: pointer;
-            min-width: 220px;
-            transition: all 0.2s;
+        /* Menu intro fade-in animation */
+        #menu.intro-fade > * {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
-
-        #skipIntroBtn:hover {
-            background: rgba(0, 255, 136, 0.3);
-            transform: scale(1.05);
+        #menu.intro-fade.reveal > * {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         #upgradeUnlockVideoModal {
@@ -990,7 +984,6 @@
         </video>
         <div id="videoOverlay">
             <h1>OKR FARMING</h1>
-            <button id="skipIntroBtn">SKIP INTRO</button>
         </div>
     </div>
 
@@ -1797,33 +1790,46 @@
         OKRFarmingGame.prototype.setupVideoIntro = function() {
             var self = this;
             var videoEl = document.getElementById('introVideo');
-            var skipBtn = document.getElementById('skipIntroBtn');
             var introDiv = document.getElementById('videoIntro');
+            var overlay = document.getElementById('videoOverlay');
+            var menu = document.getElementById('menu');
 
-            function endIntro() {
+            // Hide menu items initially for staggered reveal
+            menu.classList.add('intro-fade');
+            var children = menu.children;
+            for (var i = 0; i < children.length; i++) {
+                children[i].style.transitionDelay = (0.1 * i) + 's';
+            }
+
+            function smoothTransition() {
                 if (introDiv._ended) return;
                 introDiv._ended = true;
-                introDiv.style.pointerEvents = 'none';
-                self.setIntroAsMenuBackgroundFrame();
+
+                // Step 1: Fade out the overlay (0.6s)
+                if (overlay) overlay.style.opacity = '0';
+
+                // Step 2: After overlay fades, drop video behind and reveal menu
+                setTimeout(function() {
+                    self.setIntroAsMenuBackgroundFrame();
+                    // Step 3: Trigger staggered fade-in of menu items
+                    menu.classList.add('reveal');
+                }, 600);
+            }
+
+            // Tap/click anywhere to trigger transition
+            if (introDiv) {
+                introDiv.addEventListener('click', smoothTransition);
             }
 
             if (videoEl) {
-                videoEl.addEventListener('ended', endIntro);
-                videoEl.addEventListener('error', endIntro);
+                videoEl.addEventListener('ended', smoothTransition);
+                videoEl.addEventListener('error', smoothTransition);
             }
 
-            if (skipBtn) {
-                skipBtn.addEventListener('click', function() {
-                    endIntro();
-                });
-            }
-
-            // Fallback timeout
+            // Fallback: auto-transition after 15 seconds
             setTimeout(function() {
-                if (introDiv && introDiv.style.display !== 'none') {
-                    endIntro();
-                }
-            }, 30000);
+                smoothTransition();
+            }, 15000);
         };
 
         OKRFarmingGame.prototype.setIntroAsMenuBackgroundFrame = function() {
