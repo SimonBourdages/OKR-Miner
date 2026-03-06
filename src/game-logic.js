@@ -25,9 +25,10 @@
     }
 
     function getPlayableRadius(state) {
-        if (!state) return 450;
+        if (!state) return 900;
         var milestones = state.unlockedMilestones ? state.unlockedMilestones.length : 1;
-        return 450 + milestones * 30;
+        // Base 900px, each milestone grows radius by 50%
+        return Math.floor(900 * Math.pow(1.5, milestones - 1));
     }
 
     function getNodeHitRadius(nodeOrLevel) {

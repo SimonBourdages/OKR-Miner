@@ -44,9 +44,9 @@ describe('game-logic constants and helpers', () => {
     });
 
     test('computes playable radius by unlocked milestones', () => {
-        expect(logic.getPlayableRadius(null)).toBe(450);
-        expect(logic.getPlayableRadius({ unlockedMilestones: [0] })).toBe(480);
-        expect(logic.getPlayableRadius({ unlockedMilestones: [0, 1, 2, 3] })).toBe(570);
+        expect(logic.getPlayableRadius(null)).toBe(900);
+        expect(logic.getPlayableRadius({ unlockedMilestones: [0] })).toBe(900);
+        expect(logic.getPlayableRadius({ unlockedMilestones: [0, 1, 2, 3] })).toBe(Math.floor(900 * Math.pow(1.5, 3)));
     });
 
     test('grows node hit radius with level to match upgraded visuals', () => {
