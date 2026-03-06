@@ -8,8 +8,8 @@
     'use strict';
 
     var UPGRADE_COSTS = Object.freeze({ 1: 1.0, 2: 2.5, 3: 6.0, 4: 0 });
-    var UPGRADE_POWER = Object.freeze({ 1: 1.0, 2: 2.0, 3: 4.5, 4: 10.0 });
-    var GPU_CAPACITY = Object.freeze({ 1: 1, 2: 3, 3: 5, 4: 10 });
+    var UPGRADE_POWER = Object.freeze({ 1: 1.0, 2: 2.0, 3: 4.5, 4: 13.5 });
+    var GPU_CAPACITY = Object.freeze({ 1: 1, 2: 3, 3: 5, 4: 15 });
 
     function getLevel(node) {
         if (!node || typeof node.level !== 'number') return 1;

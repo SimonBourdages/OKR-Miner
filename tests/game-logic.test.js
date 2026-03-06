@@ -39,7 +39,7 @@ function makeState(overrides) {
 describe('game-logic constants and helpers', () => {
     test('exports canonical level maps', () => {
         expect(logic.UPGRADE_COSTS[3]).toBe(6);
-        expect(logic.UPGRADE_POWER[4]).toBe(10);
+        expect(logic.UPGRADE_POWER[4]).toBe(13.5);
         expect(logic.GPU_CAPACITY[2]).toBe(3);
     });
 

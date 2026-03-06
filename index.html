@@ -5456,124 +5456,118 @@
 
                 case 'generator':
                     if (lvl === 1) {
-                        // Lv.1 — Investment Satellite: small satellite with solar panels
-                        // Central body
-                        this._pxRect(ctx, x - 2 * s, y - 2 * s, 4 * s, 3 * s, '#e65100');
-                        this._pxRect(ctx, x - 1.5 * s, y - 1 * s, 3 * s, 1.5 * s, '#f57c00');
-                        // Solar panels (left)
-                        this._pxRect(ctx, x - 5 * s, y - 1.5 * s, 3 * s, 2 * s, '#1565c0');
-                        this._pxRect(ctx, x - 4.5 * s, y - 1 * s, 2 * s, 1 * s, '#1e88e5');
-                        // Solar panels (right)
-                        this._pxRect(ctx, x + 2 * s, y - 1.5 * s, 3 * s, 2 * s, '#1565c0');
-                        this._pxRect(ctx, x + 2.5 * s, y - 1 * s, 2 * s, 1 * s, '#1e88e5');
-                        // Panel connectors
-                        this._pxRect(ctx, x - 2 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
-                        this._pxRect(ctx, x + 2 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
-                        // Antenna
-                        this._pxRect(ctx, x - s * 0.3, y - 3 * s, s * 0.5, s, '#bbb');
-                        // $ symbol
+                        // Lv.1 — Finances: small vault/safe
+                        // Vault body
+                        this._pxRect(ctx, x - 4 * s, y - 3 * s, 8 * s, 7 * s, '#5d4037');
+                        this._pxRect(ctx, x - 3.5 * s, y - 2.5 * s, 7 * s, 6 * s, '#795548');
+                        // Vault door circle
+                        ctx.fillStyle = '#9e9e9e';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Vault handle (rotating)
+                        var handleAngle = age * 0.5;
+                        ctx.strokeStyle = '#bdbdbd';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.moveTo(x, y);
+                        ctx.lineTo(x + Math.cos(handleAngle) * 1.5 * s, y + Math.sin(handleAngle) * 1.5 * s);
+                        ctx.stroke();
+                        // Lock rivets
+                        this._pxRect(ctx, x - 3 * s, y - 2 * s, s * 0.6, s * 0.6, '#bdbdbd');
+                        this._pxRect(ctx, x + 2.5 * s, y - 2 * s, s * 0.6, s * 0.6, '#bdbdbd');
+                        this._pxRect(ctx, x - 3 * s, y + 2 * s, s * 0.6, s * 0.6, '#bdbdbd');
+                        this._pxRect(ctx, x + 2.5 * s, y + 2 * s, s * 0.6, s * 0.6, '#bdbdbd');
+                        // $ label
                         ctx.fillStyle = 'rgba(255,215,0,' + pulse.toFixed(2) + ')';
                         ctx.font = 'bold 9px Segoe UI';
                         ctx.textAlign = 'center';
-                        ctx.fillText('$', x, y + 3.5 * s);
+                        ctx.fillText('$', x, y + 5.5 * s);
                     } else if (lvl === 2) {
-                        // Lv.2 — Investment Satellite: larger with dish, rotating panels
+                        // Lv.2 — Finances: larger treasury with stacked coins
                         ctx.save();
                         ctx.fillStyle = 'rgba(255,152,0,0.1)';
                         ctx.beginPath();
                         ctx.arc(x, y, 7 * s, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.restore();
-                        // Central body (larger)
-                        this._pxRect(ctx, x - 2.5 * s, y - 2.5 * s, 5 * s, 4 * s, '#e65100');
-                        this._pxRect(ctx, x - 2 * s, y - 1.5 * s, 4 * s, 2 * s, '#f57c00');
-                        // Rotating solar panels
-                        var panelAngle = Math.sin(age * 0.5) * 0.3;
-                        // Left panels
-                        this._pxRect(ctx, x - 6 * s, y - 2 * s, 3.5 * s, 3 * s, '#1565c0');
-                        this._pxRect(ctx, x - 5.5 * s, y - 1.5 * s, 2.5 * s, 2 * s, '#1e88e5');
-                        // Right panels
-                        this._pxRect(ctx, x + 2.5 * s, y - 2 * s, 3.5 * s, 3 * s, '#1565c0');
-                        this._pxRect(ctx, x + 3 * s, y - 1.5 * s, 2.5 * s, 2 * s, '#1e88e5');
-                        // Connectors
-                        this._pxRect(ctx, x - 2.5 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
-                        this._pxRect(ctx, x + 2.5 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
-                        // Dish antenna
-                        this._pxRect(ctx, x - 1.5 * s, y - 5 * s, 3 * s, s * 0.5, '#ddd');
-                        this._pxRect(ctx, x - s * 0.3, y - 4.5 * s, s * 0.5, 2 * s, '#bbb');
-                        // Status lights
-                        this._pxRect(ctx, x - 1 * s, y + 1 * s, s * 0.5, s * 0.5, 'rgba(0,255,0,' + pulse.toFixed(2) + ')');
-                        this._pxRect(ctx, x + 0.5 * s, y + 1 * s, s * 0.5, s * 0.5, 'rgba(255,100,0,' + pulse.toFixed(2) + ')');
-                        // $ broadcast
+                        // Building base
+                        this._pxRect(ctx, x - 5 * s, y - 2 * s, 10 * s, 6 * s, '#4e342e');
+                        this._pxRect(ctx, x - 4.5 * s, y - 1.5 * s, 9 * s, 5 * s, '#6d4c41');
+                        // Pillars
+                        this._pxRect(ctx, x - 4 * s, y - 4 * s, 1.5 * s, 6 * s, '#8d6e63');
+                        this._pxRect(ctx, x + 2.5 * s, y - 4 * s, 1.5 * s, 6 * s, '#8d6e63');
+                        // Roof / pediment
+                        this._pxRect(ctx, x - 5 * s, y - 4.5 * s, 10 * s, 1 * s, '#a1887f');
+                        this._pxRect(ctx, x - 4 * s, y - 5.5 * s, 8 * s, 1 * s, '#8d6e63');
+                        // Door
+                        this._pxRect(ctx, x - 1 * s, y - 1 * s, 2 * s, 4 * s, '#3e2723');
+                        this._pxRect(ctx, x - 0.3 * s, y - 0.5 * s, s * 0.6, s * 0.6, '#ffd700');
+                        // Coin stacks beside
+                        for (var ci = 0; ci < 3; ci++) {
+                            this._pxRect(ctx, x - 4 * s, y + 2 * s - ci * s, 1.5 * s, s * 0.8, '#ffd700');
+                        }
+                        for (var ci2 = 0; ci2 < 2; ci2++) {
+                            this._pxRect(ctx, x + 2.5 * s, y + 2 * s - ci2 * s, 1.5 * s, s * 0.8, '#ffc107');
+                        }
+                        // $ sign
                         ctx.fillStyle = 'rgba(255,215,0,' + pulse.toFixed(2) + ')';
                         ctx.font = 'bold 10px Segoe UI';
                         ctx.textAlign = 'center';
-                        ctx.fillText('$$', x, y + 4 * s);
-                        // Signal waves from dish
-                        var sigWR = ((age * 2) % 3) * 2 * s;
-                        var sigWA = 1 - ((age * 2) % 3) / 3;
-                        ctx.strokeStyle = 'rgba(255,215,0,' + (sigWA * 0.3).toFixed(2) + ')';
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.arc(x, y - 5 * s, Math.max(sigWR, 1), -Math.PI * 0.8, -Math.PI * 0.2);
-                        ctx.stroke();
+                        ctx.fillText('$$', x, y + 5 * s);
                     } else {
-                        // Lv.3 — Investment Satellite: full space station broadcasting $
+                        // Lv.3 — Finances: grand treasury HQ with money flow
                         ctx.save();
                         ctx.fillStyle = 'rgba(255,193,7,' + (0.1 + Math.sin(age * 2) * 0.06).toFixed(3) + ')';
                         ctx.beginPath();
                         ctx.arc(x, y, 9 * s, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.restore();
-                        // Main station body
-                        this._pxRect(ctx, x - 3 * s, y - 3 * s, 6 * s, 5 * s, '#e65100');
-                        this._pxRect(ctx, x - 2.5 * s, y - 2 * s, 5 * s, 3 * s, '#ff9800');
-                        // Upper module
-                        this._pxRect(ctx, x - 2 * s, y - 5 * s, 4 * s, 2 * s, '#f57c00');
-                        this._pxRect(ctx, x - 1.5 * s, y - 4 * s, 3 * s, 1 * s, '#ffb74d');
-                        // Solar array left
-                        this._pxRect(ctx, x - 8 * s, y - 2 * s, 5 * s, 3 * s, '#0d47a1');
-                        this._pxRect(ctx, x - 7.5 * s, y - 1.5 * s, 4 * s, 2 * s, '#1565c0');
-                        this._pxRect(ctx, x - 7 * s, y - 1 * s, 3 * s, 1 * s, '#1e88e5');
-                        // Solar array right
-                        this._pxRect(ctx, x + 3 * s, y - 2 * s, 5 * s, 3 * s, '#0d47a1');
-                        this._pxRect(ctx, x + 3.5 * s, y - 1.5 * s, 4 * s, 2 * s, '#1565c0');
-                        this._pxRect(ctx, x + 4 * s, y - 1 * s, 3 * s, 1 * s, '#1e88e5');
-                        // Panel connectors
-                        this._pxRect(ctx, x - 3 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
-                        this._pxRect(ctx, x + 3 * s, y - s * 0.3, s * 0.5, s * 0.6, '#90a4ae');
-                        // Communication dishes
-                        this._pxRect(ctx, x - 1 * s, y - 7 * s, 2 * s, s * 0.5, '#ffd700');
-                        this._pxRect(ctx, x - s * 0.3, y - 6.5 * s, s * 0.5, 1.5 * s, '#daa520');
-                        this._pxRect(ctx, x + 2 * s, y - 6 * s, 1.5 * s, s * 0.5, '#ffd700');
-                        // Broadcasting $ signals
-                        for (var bi = 0; bi < 3; bi++) {
-                            var bR = ((age * 2 + bi * 1.0) % 4) * 2.5 * s;
-                            var bA = 1 - ((age * 2 + bi * 1.0) % 4) / 4;
-                            ctx.strokeStyle = 'rgba(255,215,0,' + (bA * 0.4).toFixed(2) + ')';
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.arc(x, y - 7 * s, Math.max(bR, 1), 0, Math.PI * 2);
-                            ctx.stroke();
+                        // Grand building
+                        this._pxRect(ctx, x - 6 * s, y - 3 * s, 12 * s, 7 * s, '#3e2723');
+                        this._pxRect(ctx, x - 5.5 * s, y - 2.5 * s, 11 * s, 6 * s, '#5d4037');
+                        // Four pillars
+                        for (var pi = 0; pi < 4; pi++) {
+                            var px2 = x - 4.5 * s + pi * 3 * s;
+                            this._pxRect(ctx, px2, y - 6 * s, 1.2 * s, 7 * s, '#8d6e63');
                         }
-                        // $ symbols floating outward
-                        for (var di = 0; di < 3; di++) {
-                            var dA = age * 1.5 + di * (Math.PI * 2 / 3);
-                            var dR = 6 * s;
-                            ctx.fillStyle = 'rgba(255,215,0,' + (pulse * 0.6).toFixed(2) + ')';
-                            ctx.font = 'bold 8px Segoe UI';
-                            ctx.textAlign = 'center';
-                            ctx.fillText('$', x + Math.cos(dA) * dR, y + Math.sin(dA) * dR);
+                        // Roof
+                        this._pxRect(ctx, x - 6 * s, y - 6.5 * s, 12 * s, 1 * s, '#a1887f');
+                        this._pxRect(ctx, x - 5 * s, y - 7.5 * s, 10 * s, 1 * s, '#8d6e63');
+                        // Triangular pediment hint
+                        this._pxRect(ctx, x - 3 * s, y - 8.5 * s, 6 * s, 1 * s, '#6d4c41');
+                        this._pxRect(ctx, x - 1.5 * s, y - 9 * s, 3 * s, s * 0.6, '#5d4037');
+                        // Vault door center
+                        ctx.fillStyle = '#757575';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2.5 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#9e9e9e';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1.5 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Vault handle
+                        var vAngle = age * 0.8;
+                        ctx.strokeStyle = '#ffd700';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(x, y);
+                        ctx.lineTo(x + Math.cos(vAngle) * 2 * s, y + Math.sin(vAngle) * 2 * s);
+                        ctx.stroke();
+                        // Orbiting coins
+                        for (var oi = 0; oi < 4; oi++) {
+                            var coinAngle = age * 1.5 + oi * (Math.PI * 2 / 4);
+                            var coinR = 7 * s;
+                            var cx3 = x + Math.cos(coinAngle) * coinR;
+                            var cy3 = y + Math.sin(coinAngle) * coinR;
+                            var cw3 = Math.abs(Math.cos(age * 3 + oi)) * 1.5 * s;
+                            this._pxRect(ctx, cx3 - cw3 / 2, cy3 - s * 0.5, cw3, s, '#ffd700');
                         }
-                        // Status LEDs
-                        this._pxRect(ctx, x - 1 * s, y + 1 * s, s * 0.5, s * 0.5, 'rgba(0,255,0,' + pulse.toFixed(2) + ')');
-                        this._pxRect(ctx, x, y + 1 * s, s * 0.5, s * 0.5, 'rgba(0,200,255,' + pulse.toFixed(2) + ')');
-                        this._pxRect(ctx, x + 1 * s, y + 1 * s, s * 0.5, s * 0.5, 'rgba(255,100,0,' + pulse.toFixed(2) + ')');
-                        // Rate label
-                        ctx.fillStyle = '#ffd700';
-                        ctx.font = 'bold 9px Segoe UI';
+                        // $ signs floating
+                        ctx.fillStyle = 'rgba(255,215,0,' + (pulse * 0.7).toFixed(2) + ')';
+                        ctx.font = 'bold 11px Segoe UI';
                         ctx.textAlign = 'center';
-                        ctx.fillText('+' + (5 * UPGRADE_POWER[3]).toFixed(0) + ' el/s', x, y - 9 * s);
+                        ctx.fillText('$$$', x, y - 10 * s);
                     }
                     break;
 

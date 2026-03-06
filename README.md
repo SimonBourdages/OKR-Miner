@@ -48,7 +48,7 @@ Generates HeadCount to hire more staff.
 | Lv.1 | +2 HC/s | 1 $/s | 50 HC (base) |
 | Lv.2 | +4 HC/s | 2 $/s | 125 HC |
 | Lv.3 | +9 HC/s | 4.5 $/s | 300 HC |
-| Lv.4 LEGENDARY | +20 HC/s | 10 $/s | Merge only |
+| Lv.4 LEGENDARY | +27 HC/s | 13.5 $/s | Merge only |
 
 *Liquidated after the AI Rights story event if Equal Rights is chosen.*
 
@@ -60,7 +60,7 @@ Generates Key Results directly.
 | Lv.1 | +5 KR/s | 3 $/s | 150 HC |
 | Lv.2 | +10 KR/s | 6 $/s | 375 HC |
 | Lv.3 | +22.5 KR/s | 13.5 $/s | 900 HC |
-| Lv.4 LEGENDARY | +50 KR/s | 30 $/s | Merge only |
+| Lv.4 LEGENDARY | +67.5 KR/s | 40.5 $/s | Merge only |
 
 *After milestone 5: 2/3 destroyed, 1/3 converted to IT Support, remaining converted to AI if you choose Equal Rights.*
 
@@ -72,7 +72,7 @@ Multiplies ALL production rates. Stacks multiplicatively.
 | Lv.1 | x1.5 | 5 $/s | 500 HC |
 | Lv.2 | x2.25 | 10 $/s | 1,250 HC |
 | Lv.3 | x5.06 | 22.5 $/s | 3,000 HC |
-| Lv.4 LEGENDARY | x57.7 | 50 $/s | Merge only |
+| Lv.4 LEGENDARY | x114.3 | 67.5 $/s | Merge only |
 
 *Two Lv.1 Network Hubs = x2.25 total (1.5 × 1.5).*
 
@@ -84,7 +84,7 @@ Massive KR output. Requires GPU capacity after the story branch.
 | Lv.1 | +100 KR/s | 10 $/s | 2,000 HC |
 | Lv.2 | +200 KR/s | 20 $/s | 5,000 HC |
 | Lv.3 | +450 KR/s | 45 $/s | 12,000 HC |
-| Lv.4 LEGENDARY | +1,000 KR/s | 100 $/s | Merge only |
+| Lv.4 LEGENDARY | +1,350 KR/s | 135 $/s | Merge only |
 
 *After choosing Equal Rights: each AI needs GPU capacity to function. Excess AIs without GPU slots produce nothing.*
 
@@ -96,7 +96,7 @@ Generates Funding ($) to keep everything running. Does not consume $ itself.
 | Lv.1 | +5 $/s | 75 HC |
 | Lv.2 | +10 $/s | 188 HC |
 | Lv.3 | +22.5 $/s | 450 HC |
-| Lv.4 LEGENDARY | +50 $/s | Merge only |
+| Lv.4 LEGENDARY | +67.5 $/s | Merge only |
 
 ### Investment (Investment Fund)
 Earns compound interest on your current $ balance every second. Also raises your $ cap.
@@ -106,7 +106,7 @@ Earns compound interest on your current $ balance every second. Also raises your
 | Lv.1 | 2% of $ per second | 300 HC |
 | Lv.2 | 4% of $ per second | 750 HC |
 | Lv.3 | 9% of $ per second | 1,800 HC |
-| Lv.4 LEGENDARY | 20% of $ per second | Merge only |
+| Lv.4 LEGENDARY | 27% of $ per second | Merge only |
 
 ### IT Support (Healing Drone)
 Autonomous drones that heal the most damaged **AI buildings only**. Not placed on the canvas — purchased from the building panel.
@@ -127,7 +127,7 @@ Required to run AI units. Only unlocked after choosing Equal Rights in the story
 | Lv.1 | Powers 1 AI | 5 $/s | 500 HC |
 | Lv.2 | Powers 3 AIs | 10 $/s | 1,250 HC |
 | Lv.3 | Powers 5 AIs | 22.5 $/s | 3,000 HC |
-| Lv.4 LEGENDARY | Powers 10 AIs | 50 $/s | Merge only |
+| Lv.4 LEGENDARY | Powers 15 AIs | 67.5 $/s | Merge only |
 
 ---
 
@@ -136,7 +136,7 @@ Required to run AI units. Only unlocked after choosing Equal Rights in the story
 - Click an existing building to upgrade it
 - Lv.2: 2× output, costs 2.5× base price
 - Lv.3: 4.5× output, costs 6× base price
-- Lv.4 LEGENDARY: 10× output, only achievable via merge
+- Lv.4 LEGENDARY: 13.5× output (≥3 Lv.3 equivalents), only achievable via merge
 - When upgrades become available the game reminds you: *"With great power comes great responsibility!"*
 
 ### Merge Mechanic
