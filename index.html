@@ -1789,7 +1789,6 @@
 
         OKRFarmingGame.prototype.setupVideoIntro = function() {
             var self = this;
-            var videoEl = document.getElementById('introVideo');
             var introDiv = document.getElementById('videoIntro');
             var overlay = document.getElementById('videoOverlay');
             var menu = document.getElementById('menu');
@@ -1816,20 +1815,10 @@
                 }, 600);
             }
 
-            // Tap/click anywhere to trigger transition
-            if (introDiv) {
-                introDiv.addEventListener('click', smoothTransition);
-            }
-
-            if (videoEl) {
-                videoEl.addEventListener('ended', smoothTransition);
-                videoEl.addEventListener('error', smoothTransition);
-            }
-
-            // Fallback: auto-transition after 15 seconds
+            // Auto-start transition after 0.5 seconds
             setTimeout(function() {
                 smoothTransition();
-            }, 15000);
+            }, 500);
         };
 
         OKRFarmingGame.prototype.setIntroAsMenuBackgroundFrame = function() {
