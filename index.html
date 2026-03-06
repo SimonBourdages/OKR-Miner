@@ -748,22 +748,7 @@
     <div id="buildings" style="display:none;">
         <!-- building buttons injected by JS -->
     </div>
-    <div id="repairBotPanel" style="display:none;position:fixed;right:10px;bottom:60px;z-index:10;">
-        <button onclick="game.buyRepairBot()" style="background:rgba(0,20,10,0.9);border:2px solid #00ff88;border-radius:8px;padding:10px 14px;color:#00ff88;cursor:pointer;font-family:inherit;font-size:12px;text-align:left;min-width:160px;">
-            <div style="display:flex;align-items:center;gap:6px;">
-                <span style="width:8px;height:8px;border-radius:50%;background:#00e5ff;display:inline-block;"></span>
-                <span style="font-weight:bold;font-size:14px;">Morale Event</span>
-            </div>
-            <div style="color:#ff0;"><span id="repairBotCost">200</span> AC</div>
-            <div style="color:#8f8;font-size:11px;">Heals lowest HP</div>
-            <div style="display:flex;gap:4px;margin-top:4px;align-items:center;">
-                <span style="display:inline-flex;align-items:center;background:rgba(255,255,255,0.08);border-radius:3px;padding:1px 4px;">
-                    <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="5" width="12" height="4" rx="1" fill="#f44336"/><rect x="5" y="1" width="4" height="12" rx="1" fill="#f44336"/></svg>
-                </span>
-            </div>
-            <div style="color:#0ff;font-size:10px;">Morale: <span id="repairBotCount">0</span></div>
-        </button>
-    </div>
+    <div id="repairBotPanel" style="display:none;"></div>
 
     <div id="menu">
         <h1>OKR FARMING</h1>
@@ -916,7 +901,7 @@
             { okr: 5000,    unlock: ['bank'], title: '🏦 Bank Unlocked!', desc: 'Banks earn interest on your AC. Smart money management pays off!' },
             { okr: 50000,   unlock: ['synthesizer'], title: '⚛️ Synthesizer Unlocked!', desc: 'The ultimate OKR machine! Synthesizers produce 100 KR/s but need lots of power.' },
             { okr: 500000,  unlock: [], title: '🛸 Spaceship Threat!', desc: 'Enemy ships are targeting your buildings! They deal damage on impact. Watch out!', enableShips: true },
-            { okr: 1000000, unlock: [], title: '🔧 Morale Events Available!', desc: 'Buy repair drones to automatically fix damaged buildings.', enableRepairMorale: true },
+            { okr: 1000000, unlock: [], title: '🔧 Pizza Available!', desc: 'Buy repair drones to automatically fix damaged buildings.', enableRepairPizza: true },
             { okr: 5e6,     unlock: [], title: '☠️ Competitors Incoming!', desc: 'Competitor ships will try to poach your OKRs from the factory! Click them to destroy!', enableThieves: true },
             { okr: 50e6,    unlock: [], title: '🌟 Random Events Active!', desc: 'Space events now occur! Some help, some hurt. Prepare for anything.', enableEvents: true },
             { okr: 100e6,   unlock: [], title: '🎨 Themes Unlocked!', desc: 'You can now change the visual theme! Each theme provides a small production bonus.', enableThemes: true },
@@ -982,7 +967,7 @@
             synthesizer: { name: 'AI', cost: 2000, acPerSec: 0,   okrPerSec: 100, elCost: 10, color: '#f44336', desc: '+100 KR/s',        symbol: '', metrics: ['okr'] },
             generator:   { name: 'Finances',   cost: 75,   acPerSec: 0,   okrPerSec: 0,   elPerSec: 5, elCost: 0, color: '#ff9800', desc: '+5 $/s', symbol: '', metrics: ['el'] },
             bank:        { name: 'Bank',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% $ interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
-            repairbot:   { name: 'Morale Event',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Boosts team morale',  symbol: '', metrics: ['hp'], repairRate: 15 }
+            repairbot:   { name: 'Pizza',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Delivers pizza to heal buildings',  symbol: '', metrics: ['hp'], repairRate: 15 }
         };
 
         // Metric icons as small inline SVGs (16x16)
@@ -1577,7 +1562,7 @@
             var container = document.getElementById('buildings');
             container.innerHTML = '';
             var self = this;
-            var allTypes = ['collector', 'processor', 'multiplier', 'synthesizer', 'generator', 'bank'];
+            var allTypes = ['collector', 'processor', 'multiplier', 'synthesizer', 'generator', 'bank', 'repairbot'];
 
             allTypes.forEach(function(type) {
                 if (self.state && self.state.unlockedBuildings && self.state.unlockedBuildings.indexOf(type) === -1) return;
@@ -1599,11 +1584,16 @@
 
                 btn.innerHTML =
                     '<div class="b-header"><span class="b-dot" style="background:' + b.color + '"></span><span class="b-name">' + b.name + '</span></div>' +
-                    '<div class="b-cost">' + b.cost + ' AC</div>' +
+                    '<div class="b-cost">' + b.cost + ' HC</div>' +
                     '<div class="b-effect">' + b.desc + '</div>' +
+                    (type === 'repairbot' ? '<div style="color:#0ff;font-size:9px;">🍕 x<span class="pizza-count">' + self.repairBots.length + '</span></div>' : '') +
                     metricsHtml +
                     '<div class="b-preview" id="preview-' + type + '"></div>';
-                btn.addEventListener('click', function() { self.selectBuilding(type); });
+                if (type === 'repairbot') {
+                    btn.addEventListener('click', function() { self.buyRepairBot(); });
+                } else {
+                    btn.addEventListener('click', function() { self.selectBuilding(type); });
+                }
                 btn.addEventListener('mouseenter', function() { self.updateBuildingPreview(type); });
                 btn.addEventListener('mouseleave', function() {
                     var el = document.getElementById('preview-' + type);
@@ -1753,7 +1743,7 @@
                 currencies: { ac: 999999999, el: 500 },
                 totalOKRs: 0,
                 unlockedMilestones: MILESTONES.map(function(m, i) { return i; }),
-                unlockedBuildings: ['collector', 'processor', 'multiplier', 'synthesizer', 'generator', 'bank'],
+                unlockedBuildings: ['collector', 'processor', 'multiplier', 'synthesizer', 'generator', 'bank', 'repairbot'],
                 electricityEnabled: true,
                 shipsEnabled: true,
                 repairBotsEnabled: true,
@@ -1957,7 +1947,7 @@
             document.getElementById('menuToggleBtn').style.display = 'block';
             document.getElementById('buildings').style.display = 'flex';
 
-            // Show morale event panel only if unlocked
+            // Show pizza panel only if unlocked
             document.getElementById('repairBotPanel').style.display = this.state.repairBotsEnabled ? 'block' : 'none';
 
             this.rebuildBuildingButtons();
@@ -2278,12 +2268,11 @@
                 age: 0, targetIdx: -1, repairing: false, orbitAngle: Math.random() * Math.PI * 2
             });
             this.repairBotCost = Math.floor(this.repairBotCost * 1.5);
-            document.getElementById('repairBotCost').textContent = this.formatNumber(this.repairBotCost);
-            document.getElementById('repairBotCount').textContent = this.repairBots.length;
-            this.addFloatingText(fX, fY - 80, '🔧 Morale boost deployed!', '#0ff', 14);
+            this.addFloatingText(fX, fY - 80, '🍕 Pizza delivered!', '#0ff', 14);
             this.spawnParticles(fX, fY - 60, '#0ff', 10);
             this.playSound('complete');
             this.trackEvent('repairbot');
+            this.rebuildBuildingButtons();
             this.updateUI();
         };
 
@@ -2492,7 +2481,7 @@
             }
             } // end shipsEnabled
 
-            // Standalone morale events — each targets a different damaged building
+            // Standalone pizza drones — each targets a different damaged building
             var fX = this.canvas.width / 2;
             var fY = this.canvas.height / 2;
             var claimedTargets = []; // track which buildings are already claimed by a bot
@@ -2889,7 +2878,9 @@
                     if (m.enableShips) this.state.shipsEnabled = true;
                     if (m.enableRepairBots) {
                         this.state.repairBotsEnabled = true;
-                        document.getElementById('repairBotPanel').style.display = 'block';
+                        if (this.state.unlockedBuildings.indexOf('repairbot') === -1) {
+                            this.state.unlockedBuildings.push('repairbot');
+                        }
                     }
                     if (m.enableThieves) this.state.thievesEnabled = true;
                     if (m.enableEvents) { this.state.eventsEnabled = true; this.eventTimer = 10 + Math.random() * 15; }
@@ -3410,7 +3401,7 @@
                 ctx.fillStyle = bot.repairing ? '#0f0' : '#888';
                 ctx.font = '7px Segoe UI';
                 ctx.textAlign = 'center';
-                ctx.fillText(bot.repairing ? '🔧 BOOSTING' : 'STANDBY', bx, by + ds + 12);
+                ctx.fillText(bot.repairing ? '🔧  DELIVERING' : ' READY', bx, by + ds + 12);
             }
         };
 
@@ -5809,7 +5800,7 @@
             stateInfo += ' | el: ' + (this.state ? this.formatNumber(Math.floor(this.state.currencies.el)) : '?');
             stateInfo += ' | OKRs: ' + (this.state ? this.formatNumber(Math.floor(this.state.totalOKRs)) : '?');
             stateInfo += ' | Buildings: ' + this.nodes.length;
-            stateInfo += ' | Morale Events: ' + this.repairBots.length;
+            stateInfo += ' | Pizzas: ' + this.repairBots.length;
             stateInfo += ' | Ships: ' + this.ships.length;
             stateInfo += ' | Infinite: ' + (this.infiniteMode ? 'Yes' : 'No');
             stateInfo += ' | Browser: ' + navigator.userAgent.split(' ').slice(-2).join(' ');
@@ -5938,16 +5929,16 @@
                     });
                 }
 
-                // Render morale event panel if visible
+                // Render pizza panel if visible
                 var rbEl = document.getElementById('repairBotPanel');
                 if (rbEl && rbEl.style.display !== 'none') {
                     var rbBtn = rbEl.querySelector('button');
                     var rbRect = rbBtn ? drawPanelBg(rbBtn, false) : null;
                     if (rbRect) {
                         var rbLines = [
-                            { text: '🔧 Morale Event', color: '#00ff88', bold: true },
+                            { text: '🔧 Pizza', color: '#00ff88', bold: true },
                             { text: (document.getElementById('repairBotCost') || {textContent: '?'}).textContent + ' HC', color: '#ff0', bold: false },
-                            { text: 'Morale: ' + (document.getElementById('repairBotCount') || {textContent: '0'}).textContent, color: '#8f8', bold: false }
+                            { text: 'Pizza: ' + (document.getElementById('repairBotCount') || {textContent: '0'}).textContent, color: '#8f8', bold: false }
                         ];
                         var yLine = rbRect.top + 16;
                         rbLines.forEach(function(line) {
