@@ -1799,6 +1799,7 @@
             this.setupCompetitorIntroVideo();
             this.rebuildBuildingButtons();
             this.updateInfiniteModeVisibility();
+            this.trackNewPlayer();
             this.renderMenuBackground();
         }
 
@@ -7861,6 +7862,44 @@
 
             // Send to Google Sheets (fire-and-forget)
             this.sendToGoogleSheets(s);
+        };
+
+        OKRFarmingGame.prototype.trackNewPlayer = function() {
+            var PLAYER_KEY = 'okrMinerPlayerId';
+            var existing = localStorage.getItem(PLAYER_KEY);
+            if (existing) return; // returning player
+            // Generate unique player ID
+            var playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            localStorage.setItem(PLAYER_KEY, playerId);
+            // Send new player event to analytics
+            try {
+                var payload = {
+                    sessionId: playerId,
+                    duration: 0,
+                    mode: 'new_player',
+                    milestones: 0,
+                    totalOKRs: 0,
+                    buildingsPlaced: 0,
+                    upgradesDone: 0,
+                    repairBotsBought: 0,
+                    shipsDestroyed: 0,
+                    thievesDestroyed: 0,
+                    eventsTriggered: 0,
+                    peakOKRRate: 0,
+                    peakACRate: 0,
+                    theme: 'none',
+                    endReason: 'new_player',
+                    buildingTypes: '{}',
+                    browser: navigator.userAgent.split(' ').slice(-2).join(' '),
+                    screen: window.innerWidth + 'x' + window.innerHeight,
+                    version: GAME_VERSION
+                };
+                fetch(ANALYTICS_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch(e) {}
         };
 
         OKRFarmingGame.prototype.sendToGoogleSheets = function(session) {
