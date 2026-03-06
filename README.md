@@ -6,6 +6,15 @@ A space-themed engine building game with a narrative twist. Hire talent, manage 
 
 Play now: [game.thisai.fun](https://game.thisai.fun)
 
+## Development & Testing
+
+- Install tooling: `npm install`
+- Run test suite: `npm test`
+- Optional coverage run: `npm run test:coverage`
+
+Automated tests run in GitHub Actions on pushes to `main` and pull requests targeting `main`.
+See `IMPROVEMENTS.md` for implemented optimization/testing updates and next optimization passes.
+
 ---
 
 ## How to Play

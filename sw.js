@@ -1,8 +1,9 @@
 // Service Worker for Team Dominos
-const CACHE_NAME = 'team-dominos-v1.0.0';
+const CACHE_NAME = 'team-dominos-v1.1.0';
 const urlsToCache = [
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './src/game-logic.js'
 ];
 
 // Install event - cache essential files

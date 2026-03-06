@@ -279,13 +279,16 @@
         .building-btn .b-preview {
             color: #00ff88;
             font-size: 10px;
-            margin-top: 4px;
-            min-height: 26px;
+            margin-top: 0;
+            max-height: 0;
+            overflow: hidden;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, max-height 0.2s, margin-top 0.2s;
         }
 
-        .building-btn:hover .b-preview {
+        .building-btn:hover .b-preview:not(:empty) {
+            margin-top: 4px;
+            max-height: 70px;
             opacity: 1;
         }
 
@@ -514,6 +517,97 @@
 
         #skipIntroBtn:hover {
             background: rgba(0, 255, 136, 0.4);
+        }
+
+        #upgradeUnlockVideoModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 350;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            padding: 16px;
+        }
+
+        #upgradeUnlockVideoModal video {
+            width: min(92vw, 960px);
+            max-height: 75vh;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        #skipUpgradeVideoBtn {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+            border-radius: 6px;
+            padding: 8px 20px;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        #skipUpgradeVideoBtn:hover {
+            background: rgba(0, 255, 136, 0.35);
+        }
+
+        .video-resume-countdown {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 14px;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.85);
+            pointer-events: none;
+            text-align: center;
+            min-width: 260px;
+        }
+
+        #aiTakeoverVideoModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 520;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            padding: 16px;
+        }
+
+        #aiTakeoverVideoModal video {
+            width: min(92vw, 960px);
+            max-height: 75vh;
+            border: 2px solid #ff4444;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        #skipAiTakeoverVideoBtn {
+            background: rgba(255, 68, 68, 0.15);
+            color: #ff8888;
+            border: 1px solid #ff4444;
+            border-radius: 6px;
+            padding: 8px 20px;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        #skipAiTakeoverVideoBtn:hover {
+            background: rgba(255, 68, 68, 0.35);
         }
 
         .hint-text {
@@ -814,6 +908,22 @@
         </div>
     </div>
 
+    <div id="upgradeUnlockVideoModal">
+        <video id="upgradeUnlockVideo" muted playsinline preload="metadata">
+            <source src="./ship-upgrade-destroys-nearby-objects.mp4" type="video/mp4">
+        </video>
+        <button id="skipUpgradeVideoBtn">SKIP CLIP</button>
+        <div id="upgradeVideoResumeCountdown" class="video-resume-countdown"></div>
+    </div>
+
+    <div id="aiTakeoverVideoModal">
+        <video id="aiTakeoverVideo" muted playsinline preload="metadata">
+            <source src="./ai-robots-replace-human-spaceships.mp4" type="video/mp4">
+        </video>
+        <button id="skipAiTakeoverVideoBtn">SKIP CLIP</button>
+        <div id="aiTakeoverVideoResumeCountdown" class="video-resume-countdown"></div>
+    </div>
+
     <div class="hint-text" id="hintText"></div>
 
     <div id="victoryScreen">
@@ -904,9 +1014,13 @@
         </div>
     </div>
 
+    <script src="./src/game-logic.js"></script>
     <script>
     (function() {
         'use strict';
+
+        var GameLogic = window.OKRMinerLogic;
+        if (!GameLogic) throw new Error('Game logic module failed to load.');
 
         // =========================================================
         // VERSION
@@ -941,9 +1055,11 @@
         ];
 
         function getPlayableRadius(state) {
-            if (!state) return 300;
-            var milestones = state.unlockedMilestones ? state.unlockedMilestones.length : 1;
-            return 300 + milestones * 20;
+            return GameLogic.getPlayableRadius(state);
+        }
+
+        function getNodeHitRadius(nodeOrLevel) {
+            return GameLogic.getNodeHitRadius(nodeOrLevel);
         }
 
         var THEMES = {
@@ -984,9 +1100,9 @@
             }
         };
 
-        var UPGRADE_COSTS = { 1: 1.0, 2: 2.5, 3: 6.0, 4: 0 }; // Lv.4 is free (merge only)
-        var UPGRADE_POWER = { 1: 1.0, 2: 2.0, 3: 4.5, 4: 10.0 }; // Lv.4 = 10x output
-        var GPU_CAPACITY = { 1: 1, 2: 3, 3: 5, 4: 10 };
+        var UPGRADE_COSTS = GameLogic.UPGRADE_COSTS;
+        var UPGRADE_POWER = GameLogic.UPGRADE_POWER;
+        var GPU_CAPACITY = GameLogic.GPU_CAPACITY;
 
         var BUILDINGS = {
             collector:   { name: 'Recruiter',   cost: 50,   acPerSec: 2,   okrPerSec: 0,   elCost: 1,  color: '#4caf50', desc: '+2 HC/s',          symbol: '', metrics: ['ac'] },
@@ -1024,7 +1140,8 @@
             'upgrade-3':    { icon: '⬆️', name: 'Maxed Out',           desc: 'Upgrade a building to level 3' },
             'collision':    { icon: '💥', name: 'Collateral Damage', desc: 'A building was destroyed during an upgrade collision' },
             'merge':        { icon: '🔄', name: 'Fusion!', desc: 'Merged two same-type buildings into a Legendary Lv.4' },
-            'phished':      { icon: '🎣', name: 'Phished!', desc: 'Your Leadership clicked a phishing link. Instant game over.' }
+            'phished':      { icon: '🎣', name: 'Phished!', desc: 'Your Leadership clicked a phishing link. Instant game over.' },
+            'ai-takeover-loss': { icon: '🤖', name: 'Taken Over', desc: 'Lose the robot war after choosing Humans First' }
         };
 
         var BG_IMAGES = {
@@ -1284,6 +1401,9 @@
             this.tutorialShown = {};
             this.connectionAnim = 0;
             this._looping = false;
+            this._lastComputedEdges = null;
+            this._activeVideoSession = null;
+            this._videoCountdownInterval = null;
 
             // Rates display
             this.currentOkrRate = 0;
@@ -1529,6 +1649,8 @@
             this._analyticsTimer = 0;
 
             this.setupVideoIntro();
+            this.setupUpgradeUnlockVideo();
+            this.setupAiTakeoverVideo();
             this.rebuildBuildingButtons();
             this.renderMenuBackground();
         }
@@ -1577,6 +1699,135 @@
             }, 30000);
         };
 
+        OKRFarmingGame.prototype.setupUpgradeUnlockVideo = function() {
+            var self = this;
+            var skipBtn = document.getElementById('skipUpgradeVideoBtn');
+            if (skipBtn) {
+                skipBtn.addEventListener('click', function() { self.stopManagedVideoPlayback(true); });
+            }
+        };
+
+        OKRFarmingGame.prototype.startManagedVideoPlayback = function(opts) {
+            var config = opts || {};
+            var modal = document.getElementById(config.modalId);
+            var video = document.getElementById(config.videoId);
+            var countdownEl = config.countdownId ? document.getElementById(config.countdownId) : null;
+            if (!modal || !video) return;
+
+            // Close any previous active video playback session before starting a new one
+            this.stopManagedVideoPlayback(false);
+
+            this._activeVideoSession = {
+                modalId: config.modalId,
+                videoId: config.videoId,
+                countdownId: config.countdownId || null,
+                resumeOnEnd: config.resumeOnEnd !== false,
+                wasRunning: !!this.running
+            };
+
+            this.running = false;
+            this.lastTick = performance.now();
+            modal.style.display = 'flex';
+
+            var self = this;
+            function updateCountdown() {
+                var session = self._activeVideoSession;
+                if (!session || session.videoId !== config.videoId || !countdownEl) return;
+
+                if (!session.resumeOnEnd || !session.wasRunning) {
+                    countdownEl.textContent = 'Game paused during cinematic';
+                    return;
+                }
+
+                if (!isFinite(video.duration) || video.duration <= 0) {
+                    countdownEl.textContent = 'Game resumes when clip ends';
+                    return;
+                }
+
+                var remaining = Math.max(0, Math.ceil(video.duration - video.currentTime));
+                countdownEl.textContent = remaining > 0 ? ('Game resumes in ' + remaining + 's') : 'Resuming...';
+            }
+
+            updateCountdown();
+            if (this._videoCountdownInterval) clearInterval(this._videoCountdownInterval);
+            this._videoCountdownInterval = setInterval(updateCountdown, 200);
+
+            video.onended = function() { self.stopManagedVideoPlayback(true); };
+            video.onerror = function() { self.stopManagedVideoPlayback(true); };
+
+            try { video.currentTime = 0; } catch(e) {}
+            var playPromise = video.play();
+            if (playPromise && playPromise.catch) {
+                playPromise.catch(function() { self.stopManagedVideoPlayback(true); });
+            }
+        };
+
+        OKRFarmingGame.prototype.stopManagedVideoPlayback = function(triggerResume) {
+            var session = this._activeVideoSession;
+
+            if (this._videoCountdownInterval) {
+                clearInterval(this._videoCountdownInterval);
+                this._videoCountdownInterval = null;
+            }
+
+            if (!session) return;
+
+            var modal = document.getElementById(session.modalId);
+            var video = document.getElementById(session.videoId);
+            var countdownEl = session.countdownId ? document.getElementById(session.countdownId) : null;
+
+            if (video) {
+                try { video.pause(); } catch(e) {}
+                try { video.currentTime = 0; } catch(e) {}
+                video.onended = null;
+                video.onerror = null;
+            }
+            if (countdownEl) countdownEl.textContent = '';
+            if (modal) modal.style.display = 'none';
+
+            var shouldResume = !!triggerResume && session.resumeOnEnd && session.wasRunning;
+            this._activeVideoSession = null;
+
+            if (shouldResume) {
+                this.running = true;
+                this.lastTick = performance.now();
+            }
+        };
+
+        OKRFarmingGame.prototype.hideUpgradeUnlockVideo = function() {
+            this.stopManagedVideoPlayback(false);
+        };
+
+        OKRFarmingGame.prototype.playUpgradeUnlockVideo = function() {
+            this.startManagedVideoPlayback({
+                modalId: 'upgradeUnlockVideoModal',
+                videoId: 'upgradeUnlockVideo',
+                countdownId: 'upgradeVideoResumeCountdown',
+                resumeOnEnd: true
+            });
+        };
+
+        OKRFarmingGame.prototype.setupAiTakeoverVideo = function() {
+            var self = this;
+            var skipBtn = document.getElementById('skipAiTakeoverVideoBtn');
+            if (skipBtn) {
+                skipBtn.addEventListener('click', function() { self.stopManagedVideoPlayback(false); });
+            }
+        };
+
+        OKRFarmingGame.prototype.hideAiTakeoverVideo = function() {
+            this.stopManagedVideoPlayback(false);
+        };
+
+        OKRFarmingGame.prototype.playAiTakeoverVideo = function() {
+            this.startManagedVideoPlayback({
+                modalId: 'aiTakeoverVideoModal',
+                videoId: 'aiTakeoverVideo',
+                countdownId: 'aiTakeoverVideoResumeCountdown',
+                resumeOnEnd: false
+            });
+        };
+
         // =========================================================
         // RESIZE
         // =========================================================
@@ -1602,24 +1853,12 @@
                 var btn = document.createElement('div');
                 btn.className = 'building-btn' + (type === self.selectedBuilding ? ' selected' : '');
                 btn.setAttribute('data-type', type);
-                // Build metric icons HTML
-                var metricsHtml = '';
-                if (b.metrics) {
-                    metricsHtml = '<div class="b-metrics">';
-                    for (var mi = 0; mi < b.metrics.length; mi++) {
-                        var mkey = b.metrics[mi];
-                        var micon = METRIC_ICONS[mkey] || '';
-                        metricsHtml += '<span class="metric-icon">' + micon + '</span>';
-                    }
-                    metricsHtml += '</div>';
-                }
 
                 btn.innerHTML =
                     '<div class="b-header"><span class="b-dot" style="background:' + b.color + '"></span><span class="b-name">' + b.name + '</span></div>' +
                     '<div class="b-cost">' + b.cost + ' HC</div>' +
                     '<div class="b-effect">' + b.desc + '</div>' +
                     (type === 'repairbot' ? '<div style="color:#0ff;font-size:9px;">🍕 x<span class="pizza-count">' + self.repairBots.length + '</span></div>' : '') +
-                    metricsHtml +
                     '<div class="b-preview" id="preview-' + type + '"></div>';
                 if (type === 'repairbot') {
                     btn.addEventListener('click', function() { self.buyRepairBot(); });
@@ -1983,6 +2222,9 @@
             this.UNDERFUNDED = false;
             this.resourceFlowIcons = [];
             this.flowSpawnTimers = {};
+            this._lastComputedEdges = null;
+            this.hideUpgradeUnlockVideo();
+            this.hideAiTakeoverVideo();
 
             // Show game UI, hide menus
             document.getElementById('menu').style.display = 'none';
@@ -2108,12 +2350,14 @@
 
             // Check if clicking on existing node
             var clickedNode = -1;
+            var closestNodeDist = Infinity;
             for (var i = 0; i < this.nodes.length; i++) {
                 var n = this.nodes[i];
                 var dx = x - n.x, dy = y - n.y;
-                if (Math.sqrt(dx*dx + dy*dy) < 25) {
+                var dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < getNodeHitRadius(n) && dist < closestNodeDist) {
                     clickedNode = i;
-                    break;
+                    closestNodeDist = dist;
                 }
             }
 
@@ -2156,6 +2400,20 @@
             var type = this.selectedBuilding;
             if (!type) return; // nothing selected
             var b = BUILDINGS[type];
+            var newNodeRadius = getNodeHitRadius(1);
+
+            // Reserve dynamic space around upgraded buildings so hitboxes fully cover visuals
+            for (var i = 0; i < this.nodes.length; i++) {
+                var existing = this.nodes[i];
+                var minDist = getNodeHitRadius(existing) + newNodeRadius;
+                var dx = x - existing.x;
+                var dy = y - existing.y;
+                if (Math.sqrt(dx * dx + dy * dy) < minDist) {
+                    this.addFloatingText(x, y - 20, 'Too close to another building!', '#f84');
+                    this.playSound('click');
+                    return;
+                }
+            }
 
             if (this.state.currencies.ac < b.cost) {
                 this.addFloatingText(x, y, 'Not enough HC!', '#f44');
@@ -2233,7 +2491,7 @@
             }
             var nextLevel = currentLevel + 1;
             var baseCost = BUILDINGS[node.type].cost;
-            var upgradeCost = Math.floor(baseCost * UPGRADE_COSTS[nextLevel]);
+            var upgradeCost = GameLogic.calculateUpgradeCost(baseCost, nextLevel, UPGRADE_COSTS);
 
             if (this.state.currencies.ac < upgradeCost) {
                 this.addFloatingText(node.x, node.y - 20, 'Need ' + upgradeCost + ' HC!', '#f44');
@@ -2253,51 +2511,84 @@
             this.playSound('complete');
             this.logMessage('⬆️', BUILDINGS[node.type].name + ' → Lv.' + nextLevel, '-' + upgradeCost + ' HC', 'info');
 
-            // Check for collisions with nearby buildings after upgrade
-            var hitRadius = 15 + node.level * 8; // hitbox grows with level
+            // Merge and collision resolution with dynamic hitboxes:
+            // if same-type overlap exists, jump to Lv.4, then destroy every other node in the final collision radius.
+            var initialHitRadius = getNodeHitRadius(node);
+            var hasSameTypeCollision = false;
+            for (var ci = 0; ci < this.nodes.length; ci++) {
+                if (ci === idx) continue;
+                var probe = this.nodes[ci];
+                var pdx = node.x - probe.x;
+                var pdy = node.y - probe.y;
+                var preMergeMinDist = initialHitRadius + getNodeHitRadius(probe);
+                if (Math.sqrt(pdx * pdx + pdy * pdy) < preMergeMinDist && probe.type === node.type) {
+                    hasSameTypeCollision = true;
+                    break;
+                }
+            }
+
+            if (hasSameTypeCollision && node.level < 4) {
+                node.level = 4;
+                this.addFloatingText(node.x, node.y - 70, '🔄 MERGE! Legendary Lv.4!', '#ffd700', 20);
+                this.spawnParticles(node.x, node.y, '#ffd700', 30);
+                this.spawnParticles(node.x, node.y, '#fff', 15);
+                this.triggerShake(12);
+                this.playSound('complete');
+                this.unlock('merge');
+            }
+
+            var finalHitRadius = getNodeHitRadius(node);
             var collisions = [];
             for (var ci = 0; ci < this.nodes.length; ci++) {
                 if (ci === idx) continue;
                 var other = this.nodes[ci];
                 var cdx = node.x - other.x;
                 var cdy = node.y - other.y;
-                var cdist = Math.sqrt(cdx * cdx + cdy * cdy);
-                if (cdist < hitRadius) {
+                var minDist = finalHitRadius + getNodeHitRadius(other);
+                if (Math.sqrt(cdx * cdx + cdy * cdy) < minDist) {
                     collisions.push(ci);
                 }
             }
 
-            // Process collisions (handle one at a time, highest priority first)
             if (collisions.length > 0) {
-                var colIdx = collisions[0];
-                var colNode = this.nodes[colIdx];
+                collisions.sort(function(a, b) { return b - a; });
+                var totalRefund = 0;
+                var destroyedCount = 0;
+                var mergedCount = 0;
 
-                if (colNode.type === node.type && node.level < 4) {
-                    // SAME TYPE — MERGE into Lv.4 Legendary!
-                    node.level = 4;
-                    // Remove the other building
-                    this.nodes.splice(colIdx, 1);
-                    // Big celebration
-                    this.addFloatingText(node.x, node.y - 70, '🔄 MERGE! Legendary Lv.4!', '#ffd700', 20);
-                    this.spawnParticles(node.x, node.y, '#ffd700', 30);
-                    this.spawnParticles(node.x, node.y, '#fff', 15);
-                    this.triggerShake(12);
-                    this.playSound('complete');
-                    this.unlock('merge');
-                    this.logMessage('🔄', 'MERGE! ' + BUILDINGS[node.type].name + ' → Lv.4 Legendary', '', 'milestone');
-                } else {
-                    // DIFFERENT TYPE — Destroy the other building, refund 50%
-                    var refund = Math.floor(BUILDINGS[colNode.type].cost * (UPGRADE_COSTS[colNode.level || 1] || 1) * 0.5);
-                    this.state.currencies.ac += refund;
+                for (var di = 0; di < collisions.length; di++) {
+                    var colIdx = collisions[di];
+                    var colNode = this.nodes[colIdx];
+                    if (!colNode) continue;
+
+                    var isSameType = colNode.type === node.type;
+                    if (isSameType) {
+                        mergedCount++;
+                        this.spawnParticles(colNode.x, colNode.y, '#ffd700', 14);
+                    } else {
+                        var refund = GameLogic.calculateCollisionRefund(colNode.type, colNode.level || 1, BUILDINGS, UPGRADE_COSTS);
+                        totalRefund += refund;
+                        this.addFloatingText(colNode.x, colNode.y - 50, '+' + refund + ' HC refund', '#ff0', 12);
+                        this.spawnParticles(colNode.x, colNode.y, '#f44', 20);
+                        this.spawnParticles(colNode.x, colNode.y, '#ff0', 10);
+                    }
                     this.addFloatingText(colNode.x, colNode.y - 30, '💥 DESTROYED!', '#f44', 16);
-                    this.addFloatingText(colNode.x, colNode.y - 50, '+' + refund + ' HC refund', '#ff0', 12);
-                    this.spawnParticles(colNode.x, colNode.y, '#f44', 20);
-                    this.spawnParticles(colNode.x, colNode.y, '#ff0', 10);
-                    this.triggerShake(8);
-                    // Remove the destroyed building
                     this.nodes.splice(colIdx, 1);
+                    destroyedCount++;
+                }
+
+                if (totalRefund > 0) {
+                    this.state.currencies.ac += totalRefund;
+                    this.addFloatingText(node.x, node.y - 95, '+' + totalRefund + ' HC total refund', '#ff0', 13);
+                }
+                if (mergedCount > 0) {
+                    this.addFloatingText(node.x, node.y - 115, 'Merged with ' + mergedCount + ' same-type buildings!', '#ffd700', 12);
+                    this.logMessage('🔄', 'MERGE! ' + BUILDINGS[node.type].name + ' reached Lv.4 Legendary', 'Merged ' + mergedCount + ' building(s)', 'milestone');
+                }
+                if (destroyedCount > 0) {
+                    this.triggerShake(Math.min(18, 8 + destroyedCount));
                     this.unlock('collision');
-                    this.logMessage('💥', BUILDINGS[colNode.type].name + ' destroyed', '+' + refund + ' HC refund', 'warning');
+                    this.logMessage('💥', destroyedCount + ' building(s) destroyed in upgrade collision', totalRefund > 0 ? ('+' + totalRefund + ' HC refund') : '', 'warning');
                 }
             }
 
@@ -2342,50 +2633,31 @@
             this.lastTick = ts;
             this.connectionAnim += dt;
 
-            // Compute global multiplier from Multiplier buildings
-            var mult = 1;
+            // Advance per-node timers
             for (var i = 0; i < this.nodes.length; i++) {
-                if (this.nodes[i].type === 'multiplier') {
-                    var mLevel = this.nodes[i].level || 1;
-                    mult *= Math.pow(BUILDINGS.multiplier.multiplier, UPGRADE_POWER[mLevel]);
-                }
+                this.nodes[i].age = (this.nodes[i].age || 0) + dt;
+                this.nodes[i].lastProduce = (this.nodes[i].lastProduce || 0) + dt;
             }
 
-            // Accumulate production from all buildings
-            var acGain = 0;
-            var okrGain = 0;
-            var elGain = 10; // Base 10 el/s from Leadership
-            var elDrain = 0;
-            var totalInterest = 0;
-            for (var i = 0; i < this.nodes.length; i++) {
-                var n = this.nodes[i];
-                n.age = (n.age || 0) + dt;
-                n.lastProduce = (n.lastProduce || 0) + dt;
-                var lvlMult = UPGRADE_POWER[n.level || 1];
-                var btype = BUILDINGS[n.type];
-                // Damaged buildings produce less, disabled buildings produce nothing
-                var hpRatio = (n.hp !== undefined ? n.hp : 100) / (n.maxHp || 100);
-                if (hpRatio <= 0) { if (btype.elCost) elDrain += btype.elCost * lvlMult; continue; }
-                var dmgMult = hpRatio < 1 ? hpRatio : 1;
-                if (btype.acPerSec) acGain += btype.acPerSec * lvlMult * dmgMult;
-                if (btype.okrPerSec) okrGain += btype.okrPerSec * lvlMult * dmgMult;
-                if (btype.elPerSec) elGain += btype.elPerSec * lvlMult * dmgMult;
-                if (btype.elCost) elDrain += btype.elCost * lvlMult;
-                if (btype.interestRate) totalInterest += btype.interestRate * UPGRADE_POWER[n.level || 1] * dmgMult;
-            }
+            // Deterministic production math (shared with automated tests)
+            var snapshot = GameLogic.computeProductionSnapshot({
+                nodes: this.nodes,
+                buildings: BUILDINGS,
+                state: this.state,
+                themes: THEMES,
+                upgradePower: UPGRADE_POWER,
+                gpuCapacity: GPU_CAPACITY,
+                baseElGain: 10
+            });
 
-            acGain *= mult;
-            okrGain *= mult;
-            elGain *= mult;
-            elDrain *= mult;
+            var mult = snapshot.multiplier;
+            var acGain = snapshot.acGain;
+            var okrGain = snapshot.okrGain;
+            var elGain = snapshot.elGain;
+            var elDrain = snapshot.elDrain;
+            var totalInterest = snapshot.totalInterest;
 
-            // Theme bonuses
-            var theme = THEMES[this.state.activeTheme];
-            if (theme && theme.bonus === 'ac') acGain *= theme.bonusMult;
-            if (theme && theme.bonus === 'okr') okrGain *= theme.bonusMult;
-            if (theme && theme.bonus === 'el') elGain *= theme.bonusMult;
-
-            // Bank interest — applies toel (funding)
+            // Bank interest — applies to el (funding)
             var bankInterest = totalInterest * this.state.currencies.el * dt;
             this.state.currencies.el += bankInterest;
 
@@ -2393,27 +2665,11 @@
             if (this.state.electricityEnabled) {
                 this.state.currencies.el += (elGain - elDrain) * dt;
                 if (this.state.currencies.el < 0) this.state.currencies.el = 0;
-                // $ cap: base 500, each Investment building adds capacity
-                var fundingCap = 500;
-                for (var ci = 0; ci < this.nodes.length; ci++) {
-                    if (this.nodes[ci].type === 'bank') {
-                        var capLvl = this.nodes[ci].level || 1;
-                        fundingCap += capLvl === 1 ? 500 : capLvl === 2 ? 1500 : capLvl === 3 ? 4000 : 10000;
-                    }
+                if (snapshot.fundingCap !== null && this.state.currencies.el > snapshot.fundingCap) {
+                    this.state.currencies.el = snapshot.fundingCap;
                 }
-                if (this.state.currencies.el > fundingCap) this.state.currencies.el = fundingCap;
-                this._fundingCap = fundingCap;
-            } else {
-                elGain = 0;
-                elDrain = 0;
             }
-
-            // UNDERFUNDED: if electricity is zero and there's drain, halve production
-            var UNDERFUNDED = this.state.electricityEnabled && (this.state.currencies.el <= 0 && elDrain > elGain);
-            if (UNDERFUNDED) {
-                okrGain *= 0.5;
-                acGain *= 0.5;
-            }
+            this._fundingCap = snapshot.fundingCap;
 
             // Apply event buffs/debuffs
             if (this._eventBuff) {
@@ -2425,36 +2681,11 @@
                 acGain *= this._eventDebuff.mult;
             }
 
-            // GPU capacity check — excess AIs produce nothing
-            if (this.state.gpuEnabled) {
-                var totalGpuCap = 0;
-                var totalAIs = 0;
-                for (var gi = 0; gi < this.nodes.length; gi++) {
-                    if (this.nodes[gi].type === 'gpu') {
-                        totalGpuCap += GPU_CAPACITY[this.nodes[gi].level || 1] || 1;
-                    }
-                    if (this.nodes[gi].type === 'synthesizer') {
-                        totalAIs++;
-                    }
-                }
-                if (totalAIs > totalGpuCap) {
-                    var gpuRatio = totalGpuCap / totalAIs;
-                    var aiOkrReduction = 0;
-                    for (var gi = 0; gi < this.nodes.length; gi++) {
-                        if (this.nodes[gi].type === 'synthesizer') {
-                            var lvlM = UPGRADE_POWER[this.nodes[gi].level || 1];
-                            aiOkrReduction += BUILDINGS.synthesizer.okrPerSec * lvlM * (1 - gpuRatio);
-                        }
-                    }
-                    okrGain -= aiOkrReduction * mult;
-                }
-            }
-
             this.currentOkrRate = okrGain;
             this.currentAcRate = acGain;
             this.currentElRate = elGain - elDrain;
             this.currentInterestRate = totalInterest;
-            this.UNDERFUNDED = UNDERFUNDED;
+            this.UNDERFUNDED = snapshot.underfunded;
 
             this.state.currencies.ac += acGain * dt;
             this.state.totalOKRs += okrGain * dt;
@@ -2504,8 +2735,10 @@
                 if (ft.life <= 0) this.floatingTexts.splice(i, 1);
             }
 
-            // Update resource flow icons
-            this.updateResourceFlowIcons(dt);
+            // Update resource flow icons using one MST computation per frame
+            var baseEdges = this.computeConnectionEdges();
+            this._lastComputedEdges = baseEdges;
+            this.updateResourceFlowIcons(dt, baseEdges);
 
             // Spaceship system
             if (this.state.shipsEnabled) {
@@ -2782,6 +3015,9 @@
                     this.running = false;
                     document.getElementById('gameOverScreen').style.display = 'flex';
                     this.stopMusic();
+                    this.unlock('ai-takeover-loss');
+                    this.playAiTakeoverVideo();
+                    this.saveGame(true);
                 }
             }
 
@@ -3028,36 +3264,15 @@
                 var m = MILESTONES[i];
                 if (this.state.totalOKRs >= m.okr) {
                     this.state.unlockedMilestones.push(i);
-
-                    // Unlock buildings
-                    for (var j = 0; j < m.unlock.length; j++) {
-                        if (this.state.unlockedBuildings.indexOf(m.unlock[j]) === -1) {
-                            this.state.unlockedBuildings.push(m.unlock[j]);
-                        }
-                    }
-
-                    // Enable features
-                    if (m.enableElectricity) this.state.electricityEnabled = true;
-                    if (m.enableShips) this.state.shipsEnabled = true;
-                    if (m.enableRepairBots) {
-                        this.state.repairBotsEnabled = true;
-                        if (this.state.unlockedBuildings.indexOf('repairbot') === -1) {
-                            this.state.unlockedBuildings.push('repairbot');
-                        }
-                    }
-                    if (m.enableThieves) this.state.thievesEnabled = true;
-                    if (m.enableEvents) { this.state.eventsEnabled = true; this.eventTimer = 10 + Math.random() * 15; }
-                    if (m.enableUpgrades) this.state.upgradesEnabled = true;
-                    if (m.enableThemes) this.state.themesEnabled = true;
-
-                    // AC reward
-                    if (m.reward) this.state.currencies.ac += m.reward;
+                    var unlockResult = GameLogic.applyMilestoneUnlock(this.state, m);
+                    if (unlockResult.eventsEnabledNow) this.eventTimer = 10 + Math.random() * 15;
 
                     // Rebuild building buttons to show newly unlocked ones
                     this.rebuildBuildingButtons();
 
                     // Big unlock banner
                     this.showMilestoneBanner(m);
+                    if (m.enableUpgrades) this.playUpgradeUnlockVideo();
 
                     // Particles + shake
                     var cx = this.canvas.width / 2;
@@ -3301,17 +3516,7 @@
         };
 
         OKRFarmingGame.prototype.formatNumber = function(n) {
-            if (n >= 1e30) return (n / 1e30).toFixed(1) + 'N';
-            if (n >= 1e27) return (n / 1e27).toFixed(1) + 'O';
-            if (n >= 1e24) return (n / 1e24).toFixed(1) + 'Sp';
-            if (n >= 1e21) return (n / 1e21).toFixed(1) + 'Sx';
-            if (n >= 1e18) return (n / 1e18).toFixed(1) + 'Qi';
-            if (n >= 1e15) return (n / 1e15).toFixed(1) + 'Q';
-            if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
-            if (n >= 1e9)  return (n / 1e9).toFixed(1) + 'B';
-            if (n >= 1e6)  return (n / 1e6).toFixed(1) + 'M';
-            if (n >= 1e3)  return (n / 1e3).toFixed(1) + 'K';
-            return Math.floor(n).toString();
+            return GameLogic.formatNumber(n);
         };
 
         // =========================================================
@@ -3348,7 +3553,7 @@
             // Connections: MST chain linking all nodes to factory
             var fX = w / 2;
             var fY = h / 2;
-            var edges = this.computeConnectionEdges();
+            var edges = this._lastComputedEdges || this.computeConnectionEdges();
             for (var i = 0; i < edges.length; i++) {
                 var e = edges[i];
                 var nodeIdx = e.from.idx;
@@ -3372,7 +3577,7 @@
                 for (var i = 0; i < this.nodes.length; i++) {
                     var n = this.nodes[i];
                     var dx = this.mouseX - n.x, dy = this.mouseY - n.y;
-                    if (Math.sqrt(dx*dx + dy*dy) < 25) {
+                    if (Math.sqrt(dx * dx + dy * dy) < getNodeHitRadius(n)) {
                         try { this.drawNodeTooltip(ctx, n); } catch(e) { console.error('tooltip error:', e); }
                         break;
                     }
@@ -3831,19 +4036,23 @@
             if (sx <= 0 && sy <= 0) return;
             if (sx < 1 || sy < 1 || sx > this.canvas.width - 1 || sy > this.canvas.height - 1) return;
 
-            var hitRadius = 25;
-
-            // If hovering over an existing node, don't show placement preview at all
-            for (var i = 0; i < this.nodes.length; i++) {
-                var n = this.nodes[i];
-                var dx = mx - n.x, dy = my - n.y;
-                if (Math.sqrt(dx * dx + dy * dy) < hitRadius) return;
-            }
-
             var type = this.selectedBuilding;
             if (!type) return; // nothing selected, no preview
             var b = BUILDINGS[type];
             if (!b) return;
+            var ghostNode = { type: type, x: mx, y: my, age: Date.now() / 1000, level: 1 };
+            var hitRadius = getNodeHitRadius(ghostNode);
+
+            var overlapsExisting = false;
+            for (var i = 0; i < this.nodes.length; i++) {
+                var n = this.nodes[i];
+                var dx = mx - n.x, dy = my - n.y;
+                var minDist = getNodeHitRadius(n) + hitRadius;
+                if (Math.sqrt(dx * dx + dy * dy) < minDist) {
+                    overlapsExisting = true;
+                    break;
+                }
+            }
 
             var distToFactory = Math.sqrt((mx - factoryX) * (mx - factoryX) + (my - factoryY) * (my - factoryY));
             var tooCloseToFactory = distToFactory < 60;
@@ -3853,7 +4062,7 @@
             var inBuildingPanel = (window.innerWidth > 768 && mx > this.canvas.width - 180) || (window.innerWidth <= 768 && mx > this.canvas.width - 100);
             var canAfford = this.state.currencies.ac >= b.cost;
 
-            var blocked = tooCloseToFactory || outsidePlayArea || inBuildingPanel;
+            var blocked = tooCloseToFactory || outsidePlayArea || inBuildingPanel || overlapsExisting;
 
             var ringColor, ghostAlpha;
             if (blocked) {
@@ -3880,7 +4089,6 @@
 
             // Draw ghost building preview
             ctx.globalAlpha = ghostAlpha;
-            var ghostNode = { type: type, x: mx, y: my, age: Date.now() / 1000, level: 1 };
             this.drawPixelNode(ctx, ghostNode);
             ctx.globalAlpha = 1.0;
 
@@ -5874,7 +6082,7 @@
         var FLOW_SINE_FREQ = 3;   // perpendicular oscillation cycles per path length
         var FLOW_ICON_SIZE = 3.5; // half-size of each icon shape in pixels
 
-        OKRFarmingGame.prototype.updateResourceFlowIcons = function(dt) {
+        OKRFarmingGame.prototype.updateResourceFlowIcons = function(dt, edges) {
             // Advance existing icons; remove those that have reached their destination
             for (var i = this.resourceFlowIcons.length - 1; i >= 0; i--) {
                 var icon = this.resourceFlowIcons[i];
@@ -5889,10 +6097,10 @@
             if (this.resourceFlowIcons.length >= FLOW_ICON_MAX) return;
 
             // Build lookup: node index -> MST edge originating from that node
-            var edges = this.computeConnectionEdges();
+            var edgeList = edges || this.computeConnectionEdges();
             var edgeByNodeIdx = {};
-            for (var e = 0; e < edges.length; e++) {
-                var edge = edges[e];
+            for (var e = 0; e < edgeList.length; e++) {
+                var edge = edgeList[e];
                 if (edge.from.idx >= 0) {
                     edgeByNodeIdx[edge.from.idx] = edge;
                 }
@@ -6514,6 +6722,8 @@
             document.getElementById('repairBotPanel').style.display = 'none';
             document.getElementById('gameOverScreen').style.display = 'none';
             document.getElementById('aiChoiceDialog').style.display = 'none';
+            this.hideUpgradeUnlockVideo();
+            this.hideAiTakeoverVideo();
             this.stopMusic();
             // Show video as menu background
             var vidIntro = document.getElementById('videoIntro');
