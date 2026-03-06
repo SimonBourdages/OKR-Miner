@@ -857,7 +857,7 @@
         <div id="progressBarContainer">
             <div id="progressBar"></div>
         </div>
-        <div class="stat-row">
+        <div id="hcRow" class="stat-row">
             <span class="stat-label">HC</span>
             <span class="stat-value" id="currencyDisplay">101</span>
         </div>
@@ -875,7 +875,7 @@
                 <span class="stat-label">KR/s</span>
                 <span class="stat-value" id="okrRate" style="color:#0f0;">0</span>
             </div>
-            <div class="stat-row">
+            <div id="hcRateRow" class="stat-row">
                 <span class="stat-label">HC/s</span>
                 <span class="stat-value" id="acRate" style="color:#ff0;">0</span>
             </div>
@@ -2048,9 +2048,11 @@
                 btn.className = 'building-btn' + (type === self.selectedBuilding ? ' selected' : '');
                 btn.setAttribute('data-type', type);
 
+                var inAI = self.state && self.state.aiChoice === 'equal' && self.state.gpuEnabled;
+                var costUnit = inAI ? '$' : 'HC';
                 btn.innerHTML =
                     '<div class="b-header"><span class="b-dot" style="background:' + b.color + '"></span><span class="b-name">' + b.name + '</span></div>' +
-                    '<div class="b-cost">' + b.cost + ' HC</div>' +
+                    '<div class="b-cost">' + b.cost + ' ' + costUnit + '</div>' +
                     '<div class="b-effect">' + b.desc + '</div>' +
                     (type === 'repairbot' ? '<div style="color:#0ff;font-size:9px;">🔧 x<span class="pizza-count">' + self.repairBots.length + '</span></div>' : '') +
                     '<div class="b-preview" id="preview-' + type + '"></div>';
@@ -2910,8 +2912,12 @@
                 }
             }
 
-            if (this.state.currencies.ac < b.cost) {
-                this.addFloatingText(x, y, 'Not enough HC!', '#f44');
+            var inAIEcon = this.state.aiChoice === 'equal' && this.state.gpuEnabled;
+            var currency = inAIEcon ? this.state.currencies.el : this.state.currencies.ac;
+            var currencyName = inAIEcon ? '$' : 'HC';
+
+            if (currency < b.cost) {
+                this.addFloatingText(x, y, 'Not enough ' + currencyName + '!', '#f44');
                 this.playSound('click');
                 return;
             }
@@ -2923,7 +2929,11 @@
                 return;
             }
 
-            this.state.currencies.ac -= b.cost;
+            if (inAIEcon) {
+                this.state.currencies.el -= b.cost;
+            } else {
+                this.state.currencies.ac -= b.cost;
+            }
             this.nodes.push({
                 type: type,
                 x: x,
@@ -2937,12 +2947,12 @@
                 spawnTime: Date.now()
             });
 
-            this.addFloatingText(x, y - 20, '-' + b.cost + ' HC', '#ff0');
+            this.addFloatingText(x, y - 20, '-' + b.cost + ' ' + currencyName, '#ff0');
             this.addFloatingText(x, y - 40, b.name + ' placed!', b.color);
             this.spawnParticles(x, y, b.color, 10);
             this.triggerShake(4);
             this.playSound('place');
-            this.logMessage('🏗️', b.name + ' placed', '-' + b.cost + ' HC', 'info');
+            this.logMessage('🏗️', b.name + ' placed', '-' + b.cost + ' ' + currencyName, 'info');
 
             // Combo system
             this.combo++;
@@ -2994,23 +3004,31 @@
             var baseCost = BUILDINGS[node.type].cost;
             var upgradeCost = GameLogic.calculateUpgradeCost(baseCost, nextLevel, UPGRADE_COSTS);
 
-            if (this.state.currencies.ac < upgradeCost) {
-                this.addFloatingText(node.x, node.y - 20, 'Need ' + upgradeCost + ' HC!', '#f44');
+            var inAIEcon2 = this.state.aiChoice === 'equal' && this.state.gpuEnabled;
+            var upgCurrency = inAIEcon2 ? this.state.currencies.el : this.state.currencies.ac;
+            var upgUnit = inAIEcon2 ? '$' : 'HC';
+
+            if (upgCurrency < upgradeCost) {
+                this.addFloatingText(node.x, node.y - 20, 'Need ' + upgradeCost + ' ' + upgUnit + '!', '#f44');
                 this.playSound('click');
                 return;
             }
 
-            this.state.currencies.ac -= upgradeCost;
+            if (inAIEcon2) {
+                this.state.currencies.el -= upgradeCost;
+            } else {
+                this.state.currencies.ac -= upgradeCost;
+            }
             node.level = nextLevel;
             if (nextLevel >= 3) this.unlock('upgrade-3');
 
             // Visual feedback
             this.addFloatingText(node.x, node.y - 30, 'UPGRADED to Lv.' + nextLevel + '!', '#ffd700', 16);
-            this.addFloatingText(node.x, node.y - 50, '-' + upgradeCost + ' HC', '#ff0');
+            this.addFloatingText(node.x, node.y - 50, '-' + upgradeCost + ' ' + upgUnit, '#ff0');
             this.spawnParticles(node.x, node.y, '#ffd700', 15);
             this.triggerShake(6);
             this.playSound('complete');
-            this.logMessage('⬆️', BUILDINGS[node.type].name + ' → Lv.' + nextLevel, '-' + upgradeCost + ' HC', 'info');
+            this.logMessage('⬆️', BUILDINGS[node.type].name + ' → Lv.' + nextLevel, '-' + upgradeCost + ' ' + upgUnit, 'info');
 
             // Merge and collision resolution with dynamic hitboxes:
             // if same-type overlap exists, jump to Lv.4, then destroy every other node in the final collision radius.
@@ -4224,6 +4242,13 @@
             document.getElementById('currencyDisplay').textContent = this.formatNumber(Math.floor(this.state.currencies.ac));
             document.getElementById('okrRate').textContent = this.currentOkrRate.toFixed(1);
             document.getElementById('acRate').textContent = this.currentAcRate.toFixed(1);
+
+            // Hide HC rows when in AI economy (recruiters gone)
+            var inAIEconomy = this.state.aiChoice === 'equal' && this.state.gpuEnabled;
+            var hcRow = document.getElementById('hcRow');
+            var hcRateRow = document.getElementById('hcRateRow');
+            if (hcRow) hcRow.style.display = inAIEconomy ? 'none' : '';
+            if (hcRateRow) hcRateRow.style.display = inAIEconomy ? 'none' : '';
 
             // Show/hide el rows based on electricity being enabled
             var elEnabled = this.state.electricityEnabled;
