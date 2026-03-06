@@ -895,22 +895,20 @@
         // =========================================================
 
         var MILESTONES = [
-            { okr: 0,       unlock: ['collector', 'processor'], title: '🚀 Launch!', desc: 'Collectors generate AC. Processors generate OKRs. Build your empire!' },
-            { okr: 50,      unlock: ['multiplier'], title: '✖️ Multiplier Unlocked!', desc: 'Multipliers boost ALL production by 1.5x each! Stack them for massive output.' },
-            { okr: 500,     unlock: ['generator'], title: '⚡ Funding Online!', desc: 'Buildings now require funding! Finances produce $ to keep everything running.', enableElectricity: true },
-            { okr: 5000,    unlock: ['bank'], title: '🏦 Bank Unlocked!', desc: 'Banks earn interest on your AC. Smart money management pays off!' },
-            { okr: 50000,   unlock: ['synthesizer'], title: '⚛️ Synthesizer Unlocked!', desc: 'The ultimate OKR machine! Synthesizers produce 100 KR/s but need lots of power.' },
-            { okr: 500000,  unlock: [], title: '🛸 Spaceship Threat!', desc: 'Enemy ships are targeting your buildings! They deal damage on impact. Watch out!', enableShips: true },
-            { okr: 1000000, unlock: [], title: '🔧 Pizza Available!', desc: 'Buy repair drones to automatically fix damaged buildings.', enableRepairPizza: true },
-            { okr: 5e6,     unlock: [], title: '☠️ Competitors Incoming!', desc: 'Competitor ships will try to poach your OKRs from the factory! Click them to destroy!', enableThieves: true },
-            { okr: 50e6,    unlock: [], title: '🌟 Random Events Active!', desc: 'Space events now occur! Some help, some hurt. Prepare for anything.', enableEvents: true },
-            { okr: 100e6,   unlock: [], title: '🎨 Themes Unlocked!', desc: 'You can now change the visual theme! Each theme provides a small production bonus.', enableThemes: true },
-            { okr: 500e6,   unlock: [], title: '⬆️ Upgrades Unlocked!', desc: 'You can now click existing buildings to upgrade them to Lv.2 and Lv.3!', enableUpgrades: true },
-            { okr: 5e9,     unlock: [], title: '🌌 Deep Space Phase', desc: 'Your operation enters deep space. New galaxy background unlocked!' },
+            { okr: 0,       unlock: ['collector', 'processor'], title: '🚀 Launch!', desc: 'Recruiters generate HC. Employees generate KRs. Build your empire!' },
+            { okr: 50,      unlock: ['multiplier'], title: '✖️ Network Hub Unlocked!', desc: 'Network Hubs boost ALL production by 1.5x each! Stack them for massive output.' },
+            { okr: 500,     unlock: ['generator'], title: '💲 Funding Online!', desc: 'Buildings now require funding! Finances produce $ to keep everything running.', enableElectricity: true },
+            { okr: 5000,    unlock: [], title: '⬆️ Upgrades Unlocked!', desc: 'You can now click existing buildings to upgrade them to Lv.2 and Lv.3!', enableUpgrades: true },
+            { okr: 50000,   unlock: ['synthesizer'], title: '🤖 AI Unlocked!', desc: 'Robot Workers produce 100 KR/s but need lots of funding.' },
+            { okr: 500000,  unlock: [], title: '🛸 Threats Incoming!', desc: 'Spaceships and Competitors are targeting you! Pizza drones available to heal damage.', enableShips: true, enableRepairBots: true, enableThieves: true },
+            { okr: 5e6,     unlock: [], title: '🌟 Random Events Active!', desc: 'Space events now occur! Some help, some hurt. Prepare for anything.', enableEvents: true },
+            { okr: 50e6,    unlock: [], title: '🎨 Themes Unlocked!', desc: 'You can now change the visual theme! Each theme provides a small production bonus.', enableThemes: true },
+            { okr: 500e6,   unlock: [], title: '🌌 Deep Space Phase', desc: 'Your operation enters deep space. New galaxy background unlocked!' },
+            { okr: 5e9,     unlock: ['bank'], title: '🏦 Bank Unlocked!', desc: 'Investment Funds earn 2% interest on your $ per second. Smart money management!' },
             { okr: 50e9,    unlock: [], title: '🔥 Hyperdrive Engaged', desc: 'Production enters overdrive! The galaxy shifts around you.' },
             { okr: 500e9,   unlock: [], title: '💎 Cosmic Mastery', desc: 'You are becoming one with the cosmos. Ultimate power approaches.' },
-            { okr: 5e12,    unlock: [], title: '🏆 OKR Singularity', desc: 'You have achieved digital transcendence. The universe is yours.' },
-            { okr: 1e15,    unlock: [], title: '♾️ INFINITE BEYOND', desc: 'Beyond all measurement. You ARE the OKRs now.' }
+            { okr: 5e12,    unlock: [], title: '🏆 KR Singularity', desc: 'You have achieved digital transcendence. The universe is yours.' },
+            { okr: 1e15,    unlock: [], title: '♾️ INFINITE BEYOND', desc: 'Beyond all measurement. You ARE the KRs now.' }
         ];
 
         function getPlayableRadius(state) {
