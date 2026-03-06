@@ -379,7 +379,7 @@
             top: 80px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 200;
+            z-index: 600;
             background: rgba(0, 40, 0, 0.95);
             border: 2px solid #0f0;
             border-radius: 12px;
@@ -541,7 +541,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 350;
+            z-index: 650;
             background: rgba(0, 0, 0, 0.9);
             display: none;
             align-items: center;
@@ -593,7 +593,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 520;
+            z-index: 650;
             background: rgba(0, 0, 0, 0.9);
             display: none;
             align-items: center;
@@ -632,7 +632,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 360;
+            z-index: 650;
             background: rgba(0, 0, 0, 0.9);
             display: none;
             align-items: center;
@@ -685,7 +685,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 300;
+            z-index: 600;
             background: rgba(0, 0, 0, 0.95);
             display: none;
             flex-direction: column;
@@ -921,7 +921,7 @@
         </div>
     </div>
 
-    <div id="debugStartModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:320;overflow-y:auto;padding:20px;">
+    <div id="debugStartModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:600;overflow-y:auto;padding:20px;">
         <div style="max-width:560px;margin:40px auto;text-align:center;background:rgba(0,20,10,0.95);border:1px solid #00ff88;border-radius:10px;padding:20px;">
             <h2 style="color:#00ff88;font-size:24px;margin-bottom:10px;">🧪 Debug Start</h2>
             <p style="color:#8cf;font-size:13px;line-height:1.5;margin-bottom:14px;">Choose a level to boot into. Debug starts include optimized pre-placed buildings, +999,999 HC, +1,999,999 $, and a +1,000,000 $ cap boost (KR bonus is capped to stay inside the selected level).</p>
@@ -938,7 +938,7 @@
     </div>
 
     <!-- Save Code Modal -->
-    <div id="saveCodeModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:300;overflow-y:auto;padding:20px;">
+    <div id="saveCodeModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:600;overflow-y:auto;padding:20px;">
         <div style="max-width:500px;margin:40px auto;text-align:center;">
             <h2 id="saveCodeTitle" style="color:#00ff88;font-size:22px;margin-bottom:12px;">📋 Save Code</h2>
             <p id="saveCodeDesc" style="color:#888;font-size:12px;margin-bottom:12px;"></p>
@@ -951,7 +951,7 @@
     </div>
 
     <!-- Load Code Modal -->
-    <div id="loadCodeModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:300;overflow-y:auto;padding:20px;">
+    <div id="loadCodeModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:600;overflow-y:auto;padding:20px;">
         <div style="max-width:500px;margin:40px auto;text-align:center;">
             <h2 style="color:#00ff88;font-size:22px;margin-bottom:12px;">📋 Load Save Code</h2>
             <p style="color:#888;font-size:12px;margin-bottom:12px;">Paste a save code to resume your game on any device.</p>
@@ -974,7 +974,7 @@
         </div>
     </div>
 
-    <div id="eventHistoryPanel" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:200;overflow-y:auto;padding:30px;">
+    <div id="eventHistoryPanel" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:600;overflow-y:auto;padding:30px;">
         <h2 style="color:#ff0;font-size:28px;margin-bottom:20px;text-align:center;">📜 Event History</h2>
         <div id="eventHistoryList" style="max-width:600px;margin:0 auto;"></div>
         <div style="text-align:center;margin-top:20px;">
@@ -1034,7 +1034,7 @@
     </div>
 
     <!-- Bug Report Modal -->
-    <div id="bugReportModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:300;overflow-y:auto;padding:20px;">
+    <div id="bugReportModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:600;overflow-y:auto;padding:20px;">
         <div style="max-width:600px;margin:0 auto;">
             <h2 style="color:#ff9800;font-size:24px;text-align:center;margin-bottom:16px;">🐛 Bug Report / Suggestion</h2>
             <div style="margin-bottom:12px;">
@@ -1077,7 +1077,7 @@
         <div class="trans-reward" id="transReward"></div>
     </div>
 
-    <div id="aiChoiceDialog" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.95);z-index:400;">
+    <div id="aiChoiceDialog" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.95);z-index:600;">
         <div style="max-width:600px;margin:15vh auto;text-align:center;padding:20px;">
             <h1 style="color:#ffd700;font-size:36px;margin-bottom:20px;">⚖️ The AI Question</h1>
             <p style="color:#ccc;font-size:16px;margin-bottom:30px;">Your AI workforce is growing. The robots are becoming self-aware.<br>A critical decision must be made.</p>
@@ -1097,7 +1097,7 @@
         </div>
     </div>
 
-    <div id="aiOrganizeDialog" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:400;">
+    <div id="aiOrganizeDialog" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:600;">
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;">
             <h2 style="color:#76ff03;font-size:32px;text-shadow:0 0 20px #76ff03;margin-bottom:10px;">🤖 AI OPTIMIZATION REQUEST</h2>
             <p style="color:#ccc;font-size:16px;margin-bottom:30px;max-width:500px;text-align:center;">Your AI has reached Legendary status. It claims chaos is inefficient and wants to help organize your infrastructure into an optimal grid layout.<br><br><em style="color:#ff0;">"Let me arrange everything. I don't like chaos."</em></p>
@@ -1112,7 +1112,7 @@
         </div>
     </div>
 
-    <div id="gameOverScreen"style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:500;align-items:center;justify-content:center;">
+    <div id="gameOverScreen"style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:700;align-items:center;justify-content:center;">
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
             <h1 id="gameOverTitle" style="color:#ff0000;font-size:72px;font-weight:bold;text-shadow:0 0 30px #f00,0 0 60px #f00;">GAME OVER</h1>
             <p id="gameOverMsg" style="color:#666;font-size:16px;margin-top:20px;max-width:500px;text-align:center;">The machines have won. Perhaps equality was the answer.</p>
@@ -1180,10 +1180,10 @@
             { okr: 5000,    unlock: [], title: '⬆️ Upgrades Unlocked!', desc: 'You can now click existing buildings to upgrade them to Lv.2 and Lv.3! With great power comes great responsibility.', enableUpgrades: true },
             { okr: 50000,   unlock: ['synthesizer'], title: '🤖 AI Unlocked!', desc: 'Robot Workers produce 100 KR/s but need lots of funding.' },
             { okr: 500000,  unlock: [], title: '🛸 Threats Incoming!', desc: 'Spaceships and Competitors are targeting you! IT Support available to heal damage.', enableShips: true, enableRepairBots: true, enableThieves: true },
-            { okr: 5e6,     unlock: [], title: '🌟 Random Events Active!', desc: 'Space events now occur! Some help, some hurt. Prepare for anything.', enableEvents: true },
+            { okr: 5e6,     unlock: ['bank'], title: '🏦 Investment Unlocked!', desc: 'Investment Funds earn 2% interest on your $ per second. Smart money management!' },
             { okr: 50e6,    unlock: [], title: '🎨 Themes Unlocked!', desc: 'You can now change the visual theme! Each theme provides a small production bonus.', enableThemes: true },
-            { okr: 500e6,   unlock: [], title: '🌌 Deep Space Phase', desc: 'Your operation enters deep space. New galaxy background unlocked!' },
-            { okr: 5e9,     unlock: ['bank'], title: '🏦 Investment Unlocked!', desc: 'Investment Funds earn 2% interest on your $ per second. Smart money management!' },
+            { okr: 500e6,   unlock: [], title: '🌟 Random Events Active!', desc: 'Space events now occur! Some help, some hurt. Prepare for anything.', enableEvents: true },
+            { okr: 5e9,     unlock: [], title: '🌌 Deep Space Phase', desc: 'Your operation enters deep space. New galaxy background unlocked!' },
             { okr: 50e9,    unlock: [], title: '🔥 Hyperdrive Engaged', desc: 'Production enters overdrive! The galaxy shifts around you.' },
             { okr: 500e9,   unlock: [], title: '💎 Cosmic Mastery', desc: 'You are becoming one with the cosmos. Ultimate power approaches.' },
             { okr: 5e12,    unlock: [], title: '🏆 KR Singularity', desc: 'You have achieved digital transcendence. The universe is yours.' },
