@@ -3988,6 +3988,10 @@
             var cy = this.canvas.height / 2;
             var playRadius = getPlayableRadius(this.state);
 
+            // Max hit radius at Lv.4 — ensure no collisions even after upgrades
+            var maxHitR = getNodeHitRadius(4); // ~80px
+            var minDist = maxHitR * 2 + 10; // ~170px between building centers
+
             // Group buildings by type
             var groups = {};
             var typeOrder = ['synthesizer', 'gpu', 'multiplier', 'generator', 'bank', 'collector', 'processor', 'repairbot'];
@@ -3997,22 +4001,29 @@
                 groups[t].push(this.nodes[i]);
             }
 
-            // Arrange in concentric rings by type, closest to center = most important
-            var ring = 0;
-            var baseSpacing = 60;
+            // Arrange in concentric rings, spacing rings far enough apart
+            var ringRadius = minDist; // first ring starts at minDist from center
             for (var ti = 0; ti < typeOrder.length; ti++) {
                 var type = typeOrder[ti];
                 if (!groups[type] || groups[type].length === 0) continue;
                 var list = groups[type];
-                var ringRadius = 80 + ring * baseSpacing;
+
+                // Calculate ring radius so buildings on same ring don't collide
+                // Circumference = 2*PI*r, need at least minDist per building
+                var neededCircumference = list.length * minDist;
+                var neededRadius = neededCircumference / (Math.PI * 2);
+                if (neededRadius > ringRadius) ringRadius = neededRadius;
+
+                // Cap to play area
                 if (ringRadius > playRadius * 0.85) ringRadius = playRadius * 0.85;
+
                 var angleStep = (Math.PI * 2) / list.length;
                 for (var ni = 0; ni < list.length; ni++) {
                     var angle = angleStep * ni - Math.PI / 2;
                     list[ni].x = cx + Math.cos(angle) * ringRadius;
                     list[ni].y = cy + Math.sin(angle) * ringRadius;
                 }
-                ring++;
+                ringRadius += minDist; // next ring further out
             }
 
             this.spawnParticles(cx, cy, '#76ff03', 20);
