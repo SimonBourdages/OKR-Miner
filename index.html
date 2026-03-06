@@ -2813,9 +2813,9 @@
             if (this.state.shipsEnabled) {
             var shipW = this.canvas.width;
             var shipH = this.canvas.height;
-            var targetShipCount = Math.min(20, Math.floor(this.currentAcRate / 5));
+            var targetShipCount = Math.min(8, Math.floor(this.currentAcRate / 12));
             this.shipSpawnTimer += dt;
-            if (this.ships.length < targetShipCount && this.shipSpawnTimer > 0.5) {
+            if (this.ships.length < targetShipCount && this.shipSpawnTimer > 1.5) {
                 this.shipSpawnTimer = 0;
                 this.spawnShip();
             }
@@ -3176,7 +3176,7 @@
             var h = this.canvas.height;
             var side = Math.floor(Math.random() * 4);
             var x, y, vx, vy;
-            var speed = 60 + Math.random() * 80;
+            var speed = 20 + Math.random() * 30;
             if (side === 0) { x = -20; y = Math.random() * h; vx = speed; vy = (Math.random() - 0.5) * speed * 0.5; }
             else if (side === 1) { x = w + 20; y = Math.random() * h; vx = -speed; vy = (Math.random() - 0.5) * speed * 0.5; }
             else if (side === 2) { x = Math.random() * w; y = -20; vx = (Math.random() - 0.5) * speed * 0.5; vy = speed; }
