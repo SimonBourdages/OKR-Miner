@@ -2732,10 +2732,10 @@
                 var warCeiling = 5e6; // can't pass this milestone
                 var progress = Math.min(1, this.state.totalOKRs / warCeiling);
                 // Aggression scales with progress: calm at 0%, devastating at 90%+
-                var aggression = progress * progress; // quadratic escalation
-                var attackRate = Math.max(0.1, 1.5 - aggression * 1.4); // 1.5s → 0.1s
-                var damage = Math.floor(10 + aggression * 60); // 10 → 70 damage per hit
-                var krSteal = 0.02 + aggression * 0.15; // 2% → 17% KR stolen per hit
+                var aggression = progress * progress * 1.15; // quadratic + 15% faster escalation
+                var attackRate = Math.max(0.05, 1.2 - aggression * 1.2); // 1.2s → 0.05s (faster)
+                var damage = Math.floor(15 + aggression * 80); // 15 → 95 damage per hit
+                var krSteal = 0.04 + aggression * 0.20; // 4% → 24% KR stolen per hit
 
                 this._robotWarTimer = (this._robotWarTimer || 0) + dt;
                 if (this._robotWarTimer > attackRate) {
