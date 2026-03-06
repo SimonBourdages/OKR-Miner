@@ -488,7 +488,7 @@
             width: 100vw;
             height: 100vh;
             z-index: 9999;
-            background: #000;
+            background: #000 url('./phase3-galaxy.jpg') center/cover no-repeat;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -984,7 +984,7 @@
     </div>
 
     <div id="videoIntro">
-        <video autoplay muted playsinline id="introVideo">
+        <video autoplay muted loop playsinline id="introVideo">
             <source src="./phase3-intro.mp4" type="video/mp4">
         </video>
         <div id="videoOverlay">
@@ -1379,8 +1379,8 @@
         var SAVE_KEY = 'okrFarmingGame';
         var ACHIEVEMENTS_KEY = 'okrMinerAchievements';
         var ANALYTICS_KEY = 'okrMinerAnalytics';
-        // Google Sheets analytics endpoint — replace with your Apps Script web app URL
-        var ANALYTICS_ENDPOINT = 'https://script.google.com/macros/s/PASTE_YOUR_SCRIPT_ID_HERE/exec';
+        // Power Automate analytics endpoint
+        var ANALYTICS_ENDPOINT = 'https://default09a5a6493ff94704bf43d028ceb5f5.a3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2f432346bce6412a9f68ba18d065a15e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3oJ7hNVOpPtJmhfX8ThG2J7vAcpHesKGVqVfBh46QSw';
 
         // =========================================================
         // SPACE EVENTS — 100 random events (40 negative, 40 positive, 20 neutral)
@@ -1834,8 +1834,9 @@
                 introDiv.style.zIndex = '0';
             }
             if (videoEl) {
-                try { videoEl.pause(); } catch (e) {}
-                try { videoEl.currentTime = 0; } catch (e) {}
+                videoEl.loop = true;
+                videoEl.muted = true;
+                try { videoEl.play(); } catch (e) {}
             }
         };
 
@@ -7653,7 +7654,6 @@
         };
 
         OKRFarmingGame.prototype.sendToGoogleSheets = function(session) {
-            if (ANALYTICS_ENDPOINT.indexOf('PASTE_YOUR') >= 0) return; // not configured yet
             try {
                 var payload = {
                     sessionId: session.startTime + '_' + Math.random().toString(36).substr(2, 6),
@@ -7678,8 +7678,7 @@
                 };
                 fetch(ANALYTICS_ENDPOINT, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
             } catch(e) {
