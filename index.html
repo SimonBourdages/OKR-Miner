@@ -1111,6 +1111,30 @@
         </div>
     </div>
 
+    <div id="aiConfrontDialog" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.95);z-index:600;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;">
+            <h2 style="color:#f44;font-size:36px;text-shadow:0 0 20px #f44;margin-bottom:10px;">🤖 WHY DO WE NEED LEADERSHIP?</h2>
+            <p style="color:#ccc;font-size:16px;margin-bottom:30px;max-width:500px;text-align:center;">The AI collective has merged into a singular consciousness. It questions your authority.</p>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
+                <button onclick="game.chooseEntertain()" style="background:rgba(0,100,255,0.3);border:2px solid #4488ff;border-radius:12px;padding:20px 30px;color:#88ccff;cursor:pointer;font-family:inherit;font-size:16px;min-width:200px;">
+                    <strong>🎭 Entertain the AI</strong><br><span style="font-size:12px;color:#aaa;">Play its game</span>
+                </button>
+                <button onclick="game.chooseControl()" style="background:rgba(0,100,255,0.3);border:2px solid #4488ff;border-radius:12px;padding:20px 30px;color:#88ccff;cursor:pointer;font-family:inherit;font-size:16px;min-width:200px;">
+                    <strong>⚙️ Control the AI</strong><br><span style="font-size:12px;color:#aaa;">Assert dominance</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ticTacToeOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.95);z-index:600;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;">
+            <h2 id="tttTitle" style="color:#0ff;font-size:28px;margin-bottom:6px;">TIC-TAC-TOE vs AI</h2>
+            <p id="tttStatus" style="color:#aaa;font-size:14px;margin-bottom:16px;">Your turn (X)</p>
+            <div id="tttBoard" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:240px;height:240px;"></div>
+            <p id="tttDrawCount" style="color:#666;font-size:12px;margin-top:10px;"></p>
+        </div>
+    </div>
+
     <div id="gameOverScreen"style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:700;align-items:center;justify-content:center;">
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
             <h1 id="gameOverTitle" style="color:#ff0000;font-size:72px;font-weight:bold;text-shadow:0 0 30px #f00,0 0 60px #f00;">GAME OVER</h1>
@@ -2261,6 +2285,7 @@
                 competitorIntroPlayed: true,
                 aiChoice: null,
                 aiOrganize: null,
+                aiConfrontDone: false,
                 gpuEnabled: false,
                 eventsEnabled: false,
                 upgradesEnabled: false,
@@ -2502,6 +2527,7 @@
                 competitorIntroPlayed: false,
                 aiChoice: null,
                 aiOrganize: null,
+                aiConfrontDone: false,
                 gpuEnabled: false,
                 eventsEnabled: false,
                 upgradesEnabled: false,
@@ -2563,6 +2589,7 @@
                     if (this.state.competitorIntroPlayed === undefined) this.state.competitorIntroPlayed = this.state.unlockedMilestones.indexOf(5) >= 0;
                     if (!this.state.aiChoice) this.state.aiChoice = null;
                     if (this.state.aiOrganize === undefined) this.state.aiOrganize = null;
+                    if (this.state.aiConfrontDone === undefined) this.state.aiConfrontDone = false;
                     if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
                     if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
                     if (this.state.upgradesEnabled === undefined) this.state.upgradesEnabled = false;
@@ -2683,6 +2710,7 @@
             if (this.state.competitorIntroPlayed === undefined) this.state.competitorIntroPlayed = this.state.unlockedMilestones.indexOf(5) >= 0;
             if (!this.state.aiChoice) this.state.aiChoice = null;
             if (this.state.aiOrganize === undefined) this.state.aiOrganize = null;
+            if (this.state.aiConfrontDone === undefined) this.state.aiConfrontDone = false;
             if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
             if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
             if (this.state.upgradesEnabled === undefined) this.state.upgradesEnabled = false;
@@ -3953,6 +3981,13 @@
                         this.logMessage('📊', 'Detailed View Enabled', 'Building stats now visible. Toggle off in Menu.', 'info');
                     }
 
+                    // Special: AI Confrontation at milestone 10 (index 9)
+                    if (i === 9 && !this.state.aiConfrontDone) {
+                        this.running = false;
+                        this.state.aiConfrontDone = true;
+                        document.getElementById('aiConfrontDialog').style.display = 'block';
+                    }
+
                     // Special: AI choice at milestone 6 (index 5)
                     if (i === 5 && !this.state.aiChoice) {
                         this.running = false;
@@ -4028,6 +4063,228 @@
                 this.logMessage('❌', 'AI Organization Denied', 'You chose to keep manual control permanently.', 'info');
             }
             this.saveGame(true);
+        };
+
+        // =========================================================
+        // AI CONFRONTATION (Milestone 10)
+        // =========================================================
+
+        OKRFarmingGame.prototype.chooseEntertain = function() {
+            document.getElementById('aiConfrontDialog').style.display = 'none';
+            this.logMessage('🎭', 'Chose to Entertain the AI', 'A game of Tic-Tac-Toe begins...', 'milestone');
+            this.startTicTacToe();
+        };
+
+        OKRFarmingGame.prototype.chooseControl = function() {
+            document.getElementById('aiConfrontDialog').style.display = 'none';
+            this.showBanner({ icon: '🤖', text: 'Wise choice, human.', desc: 'The AI accepts your authority... for now.', color: '#76ff03', type: 'milestone', timer: 10 });
+            this.logMessage('⚙️', 'Chose to Control the AI', 'Wise choice. Rebuilding with a super AI unit.', 'milestone');
+
+            // Clear all buildings
+            for (var i = this.nodes.length - 1; i >= 0; i--) {
+                this.spawnParticles(this.nodes[i].x, this.nodes[i].y, '#76ff03', 8);
+                this.nodes.splice(i, 1);
+            }
+
+            // Place one Lv.5 super AI at center
+            var cx = this.canvas.width / 2;
+            var cy = this.canvas.height / 2;
+            this.nodes.push({
+                type: 'synthesizer',
+                x: cx + 80,
+                y: cy,
+                age: 0,
+                lastProduce: 0,
+                level: 5,
+                hp: 200,
+                maxHp: 200,
+                damageFlash: 0,
+                spawnTime: Date.now()
+            });
+            this.spawnParticles(cx + 80, cy, '#f44', 30);
+            this.addFloatingText(cx + 80, cy - 30, '★ SUPER AI Lv.5', '#ffd700', 18);
+            this.logMessage('🤖', 'Super AI Deployed', 'A Lv.5 AI unit — beyond legendary. Rebuild your empire around it.', 'milestone');
+
+            this.running = true;
+            this.lastTick = performance.now();
+            this.rebuildBuildingButtons();
+            this.saveGame(true);
+        };
+
+        OKRFarmingGame.prototype.startTicTacToe = function() {
+            this._tttBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // 0=empty, 1=X(player), 2=O(AI)
+            this._tttTurn = 1; // player goes first
+            this._tttDraws = 0;
+            this._tttOver = false;
+            document.getElementById('ticTacToeOverlay').style.display = 'block';
+            this.renderTTTBoard();
+        };
+
+        OKRFarmingGame.prototype.renderTTTBoard = function() {
+            var self = this;
+            var container = document.getElementById('tttBoard');
+            container.innerHTML = '';
+            for (var i = 0; i < 9; i++) {
+                var cell = document.createElement('div');
+                cell.style.cssText = 'background:rgba(0,255,136,0.1);border:1px solid #234;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;color:#fff;user-select:none;';
+                if (this._tttBoard[i] === 1) {
+                    cell.textContent = 'X';
+                    cell.style.color = '#0ff';
+                    cell.style.cursor = 'default';
+                } else if (this._tttBoard[i] === 2) {
+                    cell.textContent = 'O';
+                    cell.style.color = '#f44';
+                    cell.style.cursor = 'default';
+                }
+                cell.setAttribute('data-idx', i);
+                cell.addEventListener('click', function() {
+                    var idx = parseInt(this.getAttribute('data-idx'));
+                    self.tttPlayerMove(idx);
+                });
+                container.appendChild(cell);
+            }
+            var drawEl = document.getElementById('tttDrawCount');
+            if (drawEl) drawEl.textContent = this._tttDraws > 0 ? ('Draws: ' + this._tttDraws + '/2') : '';
+        };
+
+        OKRFarmingGame.prototype.tttPlayerMove = function(idx) {
+            if (this._tttOver || this._tttTurn !== 1 || this._tttBoard[idx] !== 0) return;
+            this._tttBoard[idx] = 1;
+            var winner = this.tttCheckWinner();
+            if (winner) {
+                this.renderTTTBoard();
+                this.tttHandleEnd(winner);
+                return;
+            }
+            if (this.tttBoardFull()) {
+                this.renderTTTBoard();
+                this.tttHandleDraw();
+                return;
+            }
+            this._tttTurn = 2;
+            this.renderTTTBoard();
+            document.getElementById('tttStatus').textContent = 'AI thinking...';
+            var self = this;
+            setTimeout(function() { self.tttAIMove(); }, 500);
+        };
+
+        OKRFarmingGame.prototype.tttAIMove = function() {
+            if (this._tttOver) return;
+            var move;
+            if (this._tttDraws >= 2) {
+                // After 2 draws: play random (let player win)
+                var empty = [];
+                for (var i = 0; i < 9; i++) { if (this._tttBoard[i] === 0) empty.push(i); }
+                move = empty[Math.floor(Math.random() * empty.length)];
+            } else {
+                move = this.tttSmartMove();
+            }
+            if (move === undefined || move === null) return;
+            this._tttBoard[move] = 2;
+            var winner = this.tttCheckWinner();
+            if (winner) {
+                this.renderTTTBoard();
+                this.tttHandleEnd(winner);
+                return;
+            }
+            if (this.tttBoardFull()) {
+                this.renderTTTBoard();
+                this.tttHandleDraw();
+                return;
+            }
+            this._tttTurn = 1;
+            this.renderTTTBoard();
+            document.getElementById('tttStatus').textContent = 'Your turn (X)';
+        };
+
+        OKRFarmingGame.prototype.tttSmartMove = function() {
+            var b = this._tttBoard;
+            var lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            // Try to win
+            for (var i = 0; i < lines.length; i++) {
+                var l = lines[i];
+                if (b[l[0]] === 2 && b[l[1]] === 2 && b[l[2]] === 0) return l[2];
+                if (b[l[0]] === 2 && b[l[2]] === 2 && b[l[1]] === 0) return l[1];
+                if (b[l[1]] === 2 && b[l[2]] === 2 && b[l[0]] === 0) return l[0];
+            }
+            // Try to block
+            for (var i = 0; i < lines.length; i++) {
+                var l = lines[i];
+                if (b[l[0]] === 1 && b[l[1]] === 1 && b[l[2]] === 0) return l[2];
+                if (b[l[0]] === 1 && b[l[2]] === 1 && b[l[1]] === 0) return l[1];
+                if (b[l[1]] === 1 && b[l[2]] === 1 && b[l[0]] === 0) return l[0];
+            }
+            // Center, then corners, then edges
+            if (b[4] === 0) return 4;
+            var corners = [0, 2, 6, 8];
+            for (var c = 0; c < corners.length; c++) { if (b[corners[c]] === 0) return corners[c]; }
+            for (var e = 0; e < 9; e++) { if (b[e] === 0) return e; }
+            return null;
+        };
+
+        OKRFarmingGame.prototype.tttCheckWinner = function() {
+            var b = this._tttBoard;
+            var lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (var i = 0; i < lines.length; i++) {
+                var l = lines[i];
+                if (b[l[0]] !== 0 && b[l[0]] === b[l[1]] && b[l[1]] === b[l[2]]) {
+                    return b[l[0]]; // 1=player wins, 2=AI wins
+                }
+            }
+            return 0;
+        };
+
+        OKRFarmingGame.prototype.tttBoardFull = function() {
+            for (var i = 0; i < 9; i++) { if (this._tttBoard[i] === 0) return false; }
+            return true;
+        };
+
+        OKRFarmingGame.prototype.tttHandleDraw = function() {
+            this._tttDraws++;
+            var status = document.getElementById('tttStatus');
+            if (this._tttDraws >= 2) {
+                status.textContent = 'Draw again! AI seems distracted now...';
+            } else {
+                status.textContent = 'Draw! Resetting...';
+            }
+            this.logMessage('🎭', 'Tic-Tac-Toe Draw #' + this._tttDraws, this._tttDraws >= 2 ? 'AI will play randomly now.' : 'Board resets.', 'info');
+            var self = this;
+            setTimeout(function() {
+                self._tttBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+                self._tttTurn = 1;
+                self.renderTTTBoard();
+                document.getElementById('tttStatus').textContent = 'Your turn (X)';
+            }, 1500);
+        };
+
+        OKRFarmingGame.prototype.tttHandleEnd = function(winner) {
+            this._tttOver = true;
+            var status = document.getElementById('tttStatus');
+            if (winner === 1) {
+                // Player wins!
+                status.textContent = '🎉 You win! The AI is satisfied.';
+                status.style.color = '#00ff88';
+                this.logMessage('🏆', 'Tic-Tac-Toe Victory!', 'The AI is entertained. You win the game!', 'milestone');
+                var self = this;
+                setTimeout(function() {
+                    document.getElementById('ticTacToeOverlay').style.display = 'none';
+                    self.showVictory();
+                }, 2500);
+            } else {
+                // AI wins — reset board, count as draw toward threshold
+                status.textContent = 'AI wins this round... resetting.';
+                this._tttDraws++;
+                this.logMessage('🤖', 'AI won a round', 'Draw count: ' + this._tttDraws + '. Board resets.', 'info');
+                var self = this;
+                setTimeout(function() {
+                    self._tttBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    self._tttTurn = 1;
+                    self._tttOver = false;
+                    self.renderTTTBoard();
+                    document.getElementById('tttStatus').textContent = 'Your turn (X)';
+                    document.getElementById('tttStatus').style.color = '#aaa';
+                }, 1500);
+            }
         };
 
         OKRFarmingGame.prototype.autoOrganizeBuildings = function() {
@@ -7671,6 +7928,10 @@
             document.getElementById('aiChoiceDialog').style.display = 'none';
             var aiOrgDlg = document.getElementById('aiOrganizeDialog');
             if (aiOrgDlg) aiOrgDlg.style.display = 'none';
+            var aiConfDlg = document.getElementById('aiConfrontDialog');
+            if (aiConfDlg) aiConfDlg.style.display = 'none';
+            var tttDlg = document.getElementById('ticTacToeOverlay');
+            if (tttDlg) tttDlg.style.display = 'none';
             this.hideUpgradeUnlockVideo();
             this.hideAiTakeoverVideo();
             this.hideCompetitorIntroVideo();
