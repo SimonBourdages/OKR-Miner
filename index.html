@@ -4081,6 +4081,16 @@
                     this.showMilestoneBanner(m);
                     if (m.enableUpgrades) this.playUpgradeUnlockVideo();
 
+                    // Funding tutorial: extra prominent warning when $ system activates
+                    if (m.enableElectricity) {
+                        var self2 = this;
+                        setTimeout(function() {
+                            self2.showBanner({ icon: '⚠️', text: 'FUNDING REQUIRED!', desc: 'All buildings now cost $ per second to operate. Build Finances buildings to generate $. If $ hits 0, production drops 50%!', color: '#ff9800', type: 'negative', timer: 16 });
+                            self2.logMessage('💲', 'FUNDING SYSTEM ACTIVE', 'Every building now drains $ per second. Build Finances (orange) to generate $. Watch your $/s rate — if it goes negative you\'ll run out!', 'warning');
+                            self2.addFloatingText(self2.canvas.width / 2, self2.canvas.height / 2, '⚠️ BUILD FINANCES TO GENERATE $!', '#ff9800', 18);
+                        }, 3000);
+                    }
+
                     // Particles + shake
                     var cx = this.canvas.width / 2;
                     this.triggerShake(10);
