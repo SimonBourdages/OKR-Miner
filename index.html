@@ -994,6 +994,15 @@
                 <select id="debugStartLevelSelect" onchange="game.updateDebugStartSummary()" style="background:#111;color:#00ff88;border:1px solid #00ff88;border-radius:6px;padding:7px 10px;font-family:inherit;font-size:13px;min-width:300px;"></select>
             </div>
             <div id="debugStartSummary" style="text-align:left;background:rgba(0,0,0,0.45);border:1px solid #234;border-radius:8px;padding:10px 12px;color:#9fe;font-size:12px;line-height:1.5;min-height:86px;"></div>
+            <div style="margin-top:14px;background:rgba(0,0,0,0.45);border:1px solid #ff980044;border-radius:8px;padding:12px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                    <label style="color:#ff9800;font-size:13px;font-weight:bold;cursor:pointer;display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="debugSvgAssets" onchange="game.toggleSvgAssets(this.checked)" style="width:18px;height:18px;accent-color:#ff9800;cursor:pointer;">
+                        🎨 Try New SVG Asset Styles
+                    </label>
+                </div>
+                <p style="color:#888;font-size:11px;margin:0;">Renders buildings using selected SVG assets from the gallery instead of procedural canvas art. Toggle live — no restart needed.</p>
+            </div>
             <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
                 <button onclick="game.startDebugModeFromMenu()" style="background:#00ff88;color:#000;border:none;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:bold;cursor:pointer;border-radius:6px;">▶ Start Debug Run</button>
                 <button onclick="game.hideDebugStartDialog()" style="background:#333;color:#fff;border:1px solid #666;padding:10px 20px;font-family:inherit;font-size:13px;cursor:pointer;border-radius:6px;">Cancel</button>
@@ -1702,6 +1711,28 @@
             this.galaxyImg.onload = function() { self2.galaxyLoaded[0] = true; };
             this.galaxyImg.src = './phase3-galaxy.jpg';
 
+            // SVG Asset Override System — preload selected building SVGs
+            this.useSvgAssets = false;
+            this.svgAssetImages = {};
+            var SVG_ASSET_MAP = {
+                collector:   'assets/buildings/collector-v1.svg',
+                processor:   'assets/buildings/processor-v3.svg',
+                multiplier:  'assets/buildings/multiplier-v3.svg',
+                synthesizer: 'assets/buildings/synthesizer-v3.svg',
+                generator:   'assets/buildings/generator-v3.svg',
+                bank:        'assets/buildings/bank-v3.svg',
+                gpu:         'assets/buildings/gpu-v3.svg'
+            };
+            this._svgAssetMap = SVG_ASSET_MAP;
+            for (var svgType in SVG_ASSET_MAP) {
+                (function(type, src, game) {
+                    var img = new Image();
+                    img.onload = function() { game.svgAssetImages[type] = img; };
+                    img.onerror = function() { console.warn('SVG asset failed:', src); };
+                    img.src = src;
+                })(svgType, SVG_ASSET_MAP[svgType], this);
+            }
+
             // Parallax star layers
             this.starLayers = STAR_LAYERS.map(function(cfg) {
                 var stars = [];
@@ -2332,6 +2363,17 @@
         OKRFarmingGame.prototype.hideDebugStartDialog = function() {
             var modal = document.getElementById('debugStartModal');
             if (modal) modal.style.display = 'none';
+        };
+
+        OKRFarmingGame.prototype.toggleSvgAssets = function(enabled) {
+            this.useSvgAssets = !!enabled;
+            var checkbox = document.getElementById('debugSvgAssets');
+            if (checkbox) checkbox.checked = this.useSvgAssets;
+            if (enabled) {
+                this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2, '🎨 SVG Assets ON', '#ff9800', 18);
+            } else {
+                this.addFloatingText(this.canvas.width / 2, this.canvas.height / 2, 'SVG Assets OFF', '#888', 14);
+            }
         };
 
         OKRFarmingGame.prototype.startDebugModeFromMenu = function() {
@@ -5871,6 +5913,38 @@
 
             try {
 
+            // SVG Asset Override — draw preloaded SVG image instead of procedural canvas
+            var _svgRendered = false;
+            if (this.useSvgAssets && this.svgAssetImages[node.type]) {
+                var svgImg = this.svgAssetImages[node.type];
+                if (svgImg.complete && svgImg.naturalWidth > 0) {
+                    var drawSize = (8 + (lvl - 1) * 3) * s;
+                    ctx.save();
+                    ctx.globalAlpha = pulse * 0.95;
+                    // Neon glow behind
+                    var bColor = BUILDINGS[node.type] ? BUILDINGS[node.type].color : '#00ff88';
+                    ctx.shadowColor = bColor;
+                    ctx.shadowBlur = 8 + lvl * 4;
+                    ctx.drawImage(svgImg, x - drawSize / 2, y - drawSize / 2, drawSize, drawSize);
+                    // Second pass without shadow for sharpness
+                    ctx.shadowBlur = 0;
+                    ctx.globalAlpha = 1;
+                    ctx.drawImage(svgImg, x - drawSize / 2, y - drawSize / 2, drawSize, drawSize);
+                    // Level indicator ring
+                    if (lvl >= 2) {
+                        ctx.strokeStyle = lvl === 4 ? '#ffd700' : (lvl === 3 ? '#ff00ff' : bColor);
+                        ctx.lineWidth = lvl === 4 ? 2.5 : 1.5;
+                        ctx.globalAlpha = 0.5 + Math.sin(age * 3) * 0.2;
+                        ctx.beginPath();
+                        ctx.arc(x, y, drawSize / 2 + 3, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                    _svgRendered = true;
+                }
+            }
+
+            if (!_svgRendered)
             switch (node.type) {
                 case 'collector':
                     if (lvl === 1) {
@@ -6917,8 +6991,8 @@
 
             // === Common upgrade indicators (after building switch) ===
 
-            // Upgrade glow ring
-            if (lvl >= 2) {
+            // Upgrade glow ring (skip if SVG assets drew their own)
+            if (lvl >= 2 && !_svgRendered) {
                 ctx.save();
                 if (lvl === 4) {
                     // Legendary golden pulsing double ring
