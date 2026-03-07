@@ -255,13 +255,33 @@
 
         .building-btn.selected {
             border-color: #ff0;
-            box-shadow: 0 0 10px rgba(255, 255, 0, 0.3), 0 0 20px rgba(255, 255, 0, 0.15);
-            background: rgba(255, 255, 0, 0.15) !important;
-            animation: selectedPulse 1.2s ease-in-out infinite;
+            border-width: 3px;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.5), 0 0 30px rgba(255, 255, 0, 0.25), inset 0 0 10px rgba(255, 255, 0, 0.1);
+            background: rgba(255, 255, 0, 0.2) !important;
+            animation: selectedPulse 1s ease-in-out infinite;
+            transform: scale(1.08);
+            position: relative;
+        }
+        .building-btn.selected::after {
+            content: '⬅ PLACING';
+            position: absolute;
+            left: -70px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ff0;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            animation: placeArrow 0.8s ease-in-out infinite;
+            white-space: nowrap;
         }
         @keyframes selectedPulse {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 0, 0.3); }
-            50% { box-shadow: 0 0 20px rgba(255, 255, 0, 0.6), 0 0 30px rgba(255, 255, 0, 0.2); }
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 0, 0.5), 0 0 30px rgba(255, 255, 0, 0.25); }
+            50% { box-shadow: 0 0 25px rgba(255, 255, 0, 0.8), 0 0 50px rgba(255, 255, 0, 0.4), inset 0 0 15px rgba(255, 255, 0, 0.15); }
+        }
+        @keyframes placeArrow {
+            0%, 100% { left: -70px; opacity: 1; }
+            50% { left: -60px; opacity: 0.6; }
         }
 
         #firstPlaceBanner {
