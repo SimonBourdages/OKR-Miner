@@ -255,7 +255,43 @@
 
         .building-btn.selected {
             border-color: #ff0;
-            box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.3), 0 0 20px rgba(255, 255, 0, 0.15);
+            background: rgba(255, 255, 0, 0.15) !important;
+            animation: selectedPulse 1.2s ease-in-out infinite;
+        }
+        @keyframes selectedPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 255, 0, 0.6), 0 0 30px rgba(255, 255, 0, 0.2); }
+        }
+
+        #firstPlaceBanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 15;
+            background: linear-gradient(90deg, rgba(0,255,136,0.15), rgba(255,255,0,0.15), rgba(0,255,136,0.15));
+            border-bottom: 2px solid #ff0;
+            padding: 12px 20px;
+            text-align: center;
+            color: #ff0;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            animation: bannerPulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes bannerPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        #firstPlaceBanner .arrow {
+            display: inline-block;
+            animation: bounceArrow 1s ease-in-out infinite;
+        }
+        @keyframes bounceArrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
 
         .building-btn.disabled {
@@ -844,6 +880,10 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="floatingTextOverlay"></div>
+
+    <div id="firstPlaceBanner" style="display:none;">
+        <span class="arrow">👆</span> Click inside the circle to place your first <strong>Recruiter</strong>! <span class="arrow">👆</span>
+    </div>
 
     <div id="ui" style="display:none;">
         <div class="stat-row">
@@ -2803,6 +2843,10 @@
             this.updateUI();
             this.startMusic(1);
 
+            // Show first placement banner if no buildings yet
+            var fpBanner = document.getElementById('firstPlaceBanner');
+            if (fpBanner) fpBanner.style.display = this.nodes.length === 0 ? 'block' : 'none';
+
             // Theme selector
             var self = this;
             var themeBtn = document.getElementById('themeToggleBtn');
@@ -3033,6 +3077,9 @@
 
             // Achievement checks
             this.unlock('build-first');
+            // Hide first placement tutorial banner
+            var fpb = document.getElementById('firstPlaceBanner');
+            if (fpb) fpb.style.display = 'none';
             if (type === 'multiplier') { this.unlock('multiplier'); this.unlock('vpn'); }
 
             // Auto-organize if enabled and AI/GPU placed
@@ -8053,6 +8100,8 @@
             if (tttDlg) tttDlg.style.display = 'none';
             var recruitDlg = document.getElementById('recruitSiteDialog');
             if (recruitDlg) recruitDlg.style.display = 'none';
+            var fpBannerMenu = document.getElementById('firstPlaceBanner');
+            if (fpBannerMenu) fpBannerMenu.style.display = 'none';
             this.hideUpgradeUnlockVideo();
             this.hideAiTakeoverVideo();
             this.hideCompetitorIntroVideo();
