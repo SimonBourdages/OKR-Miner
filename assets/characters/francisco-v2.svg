@@ -1,0 +1,113 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Filter for the primary red neon glow (Francisco's signature color) -->
+    <filter id="neonGlowRed" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#e74c3c" flood-opacity="1" result="floodColor"/>
+      <feComposite in="floodColor" in2="blur" operator="atop" result="coloredGlow"/>
+      <feMerge>
+        <feMergeNode in="coloredGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Filter for general white schematic glow -->
+    <filter id="neonGlowWhite" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feFlood flood-color="#ffffff" flood-opacity="1" result="floodColor"/>
+      <feComposite in="floodColor" in2="blur" operator="atop" result="coloredGlow"/>
+      <feMerge>
+        <feMergeNode in="coloredGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+     <!-- Filter for accent cyan neon glow -->
+    <filter id="neonGlowCyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feFlood flood-color="#00bcd4" flood-opacity="1" result="floodColor"/>
+      <feComposite in="floodColor" in2="blur" operator="atop" result="coloredGlow"/>
+      <feMerge>
+        <feMergeNode in="coloredGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Dark Background -->
+  <rect x="0" y="0" width="200" height="200" fill="#0a0a14"/>
+
+  <!-- Character: Francisco (Blueprint Style) -->
+  <g transform="translate(100, 100) scale(0.9)" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Base structure outlines (subtle dark lines) -->
+    <!-- Head/Helmet Base -->
+    <path d="M-30 -70 Q-45 -75 -50 -55 L-50 -35 Q-45 -15 -30 -20 H30 Q45 -15 50 -35 L50 -55 Q45 -75 30 -70 Z" fill="none" stroke="#222" stroke-width="2"/>
+    <!-- Torso Base -->
+    <path d="M-45 -20 L-60 30 L-60 80 L60 80 L60 30 L45 -20 Z" fill="none" stroke="#222" stroke-width="2"/>
+
+    <!-- Head and Face Schematics (White Glow) -->
+    <g filter="url(#neonGlowWhite)">
+        <!-- Helmet primary outline and panels -->
+        <path d="M-28 -68 C-32 -65 -32 -55 -28 -50 L-28 -40 H28 L28 -50 C32 -55 32 -65 28 -68 Z" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <path d="M-15 -72 A15 15 0 0 1 15 -72 L15 -60 H-15 Z" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 2"/>
+        <!-- Visor / Eyes -->
+        <rect x="-18" y="-55" width="36" height="8" fill="none" stroke="#fff" stroke-width="2"/>
+        <line x1="-15" y1="-51" x2="15" y2="-51" stroke="#fff" stroke-width="1.5"/>
+        <path d="M-18 -55 L-22 -58 L-22 -47 L-18 -50 Z M18 -55 L22 -58 L22 -47 L18 -50 Z" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <!-- Cheek/Jaw details -->
+        <line x1="-25" y1="-35" x2="-35" y2="-45" stroke="#fff" stroke-width="1"/>
+        <line x1="25" y1="-35" x2="35" y2="-45" stroke="#fff" stroke-width="1"/>
+        <circle cx="-30" cy="-30" r="2" fill="none" stroke="#fff" stroke-width="1"/>
+        <circle cx="30" cy="-30" r="2" fill="none" stroke="#fff" stroke-width="1"/>
+    </g>
+
+    <!-- Armor Schematics (Red Glow - Francisco's signature color) -->
+    <g filter="url(#neonGlowRed)">
+      <!-- Neck guard / Collar -->
+      <path d="M-25 -20 L-35 -10 L-35 5 L35 5 L35 -10 L25 -20 Z" fill="none" stroke="#e74c3c" stroke-width="2"/>
+      <!-- Shoulder Plates -->
+      <path d="M-55 -10 L-65 15 L-55 35 L-40 35 L-30 15 L-40 -10 Z" fill="none" stroke="#e74c3c" stroke-width="2"/>
+      <path d="M55 -10 L65 15 L55 35 L40 35 L30 15 L40 -10 Z" fill="none" stroke="#e74c3c" stroke-width="2"/>
+      <!-- Chest Plate -->
+      <path d="M-35 5 L-45 30 L-45 70 L-30 75 L30 75 L45 70 L45 30 L35 5 Z" fill="none" stroke="#e74c3c" stroke-width="2"/>
+
+      <!-- Inner chest details / Power Core Indicator -->
+      <rect x="-20" y="20" width="40" height="30" fill="none" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="6 3"/>
+      <path d="M0 20 L0 50 M-10 35 L10 35" stroke="#e74c3c" stroke-width="1.5"/>
+      <circle cx="0" cy="35" r="5" fill="none" stroke="#e74c3c" stroke-width="2"/>
+
+      <!-- Shoulder conduits / energy flow lines -->
+      <line x1="-38" y1="10" x2="-48" y2="10" stroke="#e74c3c" stroke-width="2"/>
+      <line x1="-48" y1="10" x2="-48" y2="20" stroke="#e74c3c" stroke-width="2"/>
+      <line x1="-38" y1="10" x2="-38" y2="20" stroke="#e74c3c" stroke-width="2"/>
+
+      <line x1="38" y1="10" x2="48" y2="10" stroke="#e74c3c" stroke-width="2"/>
+      <line x1="48" y1="10" x2="48" y2="20" stroke="#e74c3c" stroke-width="2"/>
+      <line x1="38" y1="10" x2="38" y2="20" stroke="#e74c3c" stroke-width="2"/>
+
+      <!-- Waist line / lower armor details -->
+      <line x1="-30" y1="70" x2="30" y2="70" stroke="#e74c3c" stroke-width="2"/>
+      <rect x="-10" y="65" width="20" height="10" fill="none" stroke="#e74c3c" stroke-width="1" stroke-dasharray="4 2"/>
+    </g>
+
+    <!-- Energy Crackling (Red Glow) - implied around hands/forearms -->
+    <g filter="url(#neonGlowRed)">
+        <!-- Left implied hand energy -->
+        <path d="M-55 40 L-65 35 L-75 45 L-70 55 L-60 50 L-50 60 L-40 50 Z" fill="none" stroke="#e74c3c" stroke-width="2"/>
+        <line x1="-60" y1="45" x2="-65" y2="40" stroke="#e74c3c" stroke-width="1"/>
+        <line x1="-68" y1="50" x2="-63" y2="55" stroke="#e74c3c" stroke-width="1"/>
+
+        <!-- Right implied hand energy -->
+        <path d="M55 40 L65 35 L75 45 L70 55 L60 50 L50 60 L40 50 Z" fill="none" stroke="#e74c3c" stroke-width="2"/>
+        <line x1="60" y1="45" x2="65" y2="40" stroke="#e74c3c" stroke-width="1"/>
+        <line x1="68" y1="50" x2="63" y2="55" stroke="#e74c3c" stroke-width="1"/>
+    </g>
+
+    <!-- Minor accent details (Cyan Glow) -->
+    <g filter="url(#neonGlowCyan)">
+        <circle cx="-40" cy="25" r="1.5" fill="#00bcd4"/>
+        <circle cx="40" cy="25" r="1.5" fill="#00bcd4"/>
+        <rect x="-15" y="55" width="30" height="2" fill="#00bcd4"/>
+        <line x1="-20" y1="-25" x2="-10" y2="-25" stroke="#00bcd4" stroke-width="1"/>
+        <line x1="20" y1="-25" x2="10" y2="-25" stroke="#00bcd4" stroke-width="1"/>
+    </g>
+  </g>
+</svg>

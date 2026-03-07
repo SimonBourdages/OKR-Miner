@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/><feFlood flood-color="#2980b9" flood-opacity="0.6" result="color"/><feComposite in="color" in2="blur" operator="in" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect width="200" height="200" fill="#080810"/>
+<g filter="url(#glow)">
+  <rect x="80" y="40" width="40" height="40" fill="#2980b9" opacity="0.3"/>
+  <rect x="80" y="40" width="40" height="40" fill="none" stroke="#2980b9" stroke-width="3"/>
+  <rect x="85" y="50" width="10" height="10" fill="#2980b9"/>
+  <rect x="105" y="50" width="10" height="10" fill="#2980b9"/>
+  <rect x="90" y="65" width="20" height="5" fill="#2980b9" opacity="0.5"/>
+  <rect x="75" y="80" width="50" height="60" fill="#2980b9" opacity="0.15"/>
+  <rect x="75" y="80" width="50" height="60" fill="none" stroke="#2980b9" stroke-width="3"/>
+  <rect x="55" y="90" width="20" height="10" fill="#2980b9" opacity="0.4"/>
+  <rect x="125" y="90" width="20" height="10" fill="#2980b9" opacity="0.4"/>
+  <circle cx="100" cy="110" r="10" fill="#2980b9" opacity="0.3"/>
+  <circle cx="100" cy="110" r="4" fill="#fff" opacity="0.6"/>
+</g>
+<text x="100" y="170" text-anchor="middle" fill="#2980b9" font-size="14" font-family="monospace" filter="url(#glow)">KATY</text>
+</svg>

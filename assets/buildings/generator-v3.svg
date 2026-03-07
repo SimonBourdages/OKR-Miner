@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+    <feFlood flood-color="#ff9800" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter><radialGradient id="fr" cx="50%" cy="50%"><stop offset="0%" stop-color="#ff9800" stop-opacity="0.2"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+  <rect width="200" height="200" fill="#0a0a14"/><circle cx="100" cy="100" r="80" fill="url(#fr)"/>
+  <path d="M35 80 L35 150 Q35 160 45 160 L155 160 Q165 160 165 150 L165 80 Q165 70 155 70 L45 70 Q35 70 35 80 Z" fill="#1a1005" stroke="#ff9800" stroke-width="3" filter="url(#glow)"/>
+  <rect x="40" y="60" width="120" height="15" rx="4" fill="#ff9800" opacity="0.4" filter="url(#glow)"/>
+  <circle cx="100" cy="115" r="25" fill="#ff9800" opacity="0.3" filter="url(#glow)">
+    <animate attributeName="r" values="25;30;25" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <text x="100" y="123" text-anchor="middle" fill="#fff" font-size="28" font-family="serif" font-weight="bold" filter="url(#glow)">$</text>
+  <g opacity="0.6">
+    <circle cx="55" cy="45" r="10" fill="#ff9800"><animate attributeName="cy" values="45;30;45" dur="2s" repeatCount="indefinite"/></circle>
+    <text x="55" y="49" text-anchor="middle" fill="#1a1005" font-size="12" font-family="serif">$</text>
+    <circle cx="145" cy="40" r="8" fill="#ff9800" opacity="0.8"><animate attributeName="cy" values="40;25;40" dur="2.8s" repeatCount="indefinite"/></circle>
+    <circle cx="100" cy="35" r="9" fill="#ff9800" opacity="0.7"><animate attributeName="cy" values="35;20;35" dur="2.3s" repeatCount="indefinite"/></circle>
+  </g>
+</svg>

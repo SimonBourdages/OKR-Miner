@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+    <feFlood flood-color="#76ff03" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter><radialGradient id="gr1" cx="50%" cy="50%"><stop offset="0%" stop-color="#76ff03" stop-opacity="0.2"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+  <rect width="200" height="200" fill="#0a0a14"/><circle cx="100" cy="95" r="80" fill="url(#gr1)"/>
+  <rect x="25" y="45" width="150" height="90" rx="8" fill="#0a1a0a" stroke="#76ff03" stroke-width="3" filter="url(#glow)"/>
+  <circle cx="60" cy="90" r="22" fill="none" stroke="#76ff03" stroke-width="2.5" filter="url(#glow)"/>
+  <circle cx="60" cy="90" r="14" fill="none" stroke="#76ff03" stroke-width="1.5" opacity="0.5"/>
+  <circle cx="60" cy="90" r="4" fill="#76ff03"/>
+  <g><animateTransform attributeName="transform" type="rotate" values="0 60 90;360 60 90" dur="3s" repeatCount="indefinite"/>
+    <line x1="60" y1="68" x2="60" y2="74" stroke="#76ff03" stroke-width="1.5"/>
+    <line x1="60" y1="106" x2="60" y2="112" stroke="#76ff03" stroke-width="1.5"/>
+    <line x1="38" y1="90" x2="44" y2="90" stroke="#76ff03" stroke-width="1.5"/>
+    <line x1="76" y1="90" x2="82" y2="90" stroke="#76ff03" stroke-width="1.5"/>
+  </g>
+  <circle cx="140" cy="90" r="22" fill="none" stroke="#76ff03" stroke-width="2.5" filter="url(#glow)"/>
+  <circle cx="140" cy="90" r="14" fill="none" stroke="#76ff03" stroke-width="1.5" opacity="0.5"/>
+  <circle cx="140" cy="90" r="4" fill="#76ff03"/>
+  <rect x="88" y="58" width="24" height="16" rx="3" fill="#76ff03" opacity="0.3" stroke="#76ff03" stroke-width="1.5"/>
+  <text x="100" y="70" text-anchor="middle" fill="#fff" font-size="8" font-family="monospace" font-weight="bold">GPU</text>
+  <g fill="#76ff03" opacity="0.6" filter="url(#glow)">
+    <rect x="30" y="140" width="10" height="18" rx="1"/><rect x="45" y="140" width="10" height="18" rx="1"/><rect x="60" y="140" width="10" height="18" rx="1"/>
+    <rect x="80" y="140" width="10" height="18" rx="1"/><rect x="95" y="140" width="10" height="18" rx="1"/><rect x="110" y="140" width="10" height="18" rx="1"/>
+    <rect x="130" y="140" width="10" height="18" rx="1"/><rect x="145" y="140" width="10" height="18" rx="1"/><rect x="160" y="140" width="10" height="18" rx="1"/>
+  </g>
+  <text x="100" y="180" text-anchor="middle" fill="#76ff03" font-size="10" font-family="monospace" filter="url(#glow)">5 TFLOPS ⚡</text>
+</svg>

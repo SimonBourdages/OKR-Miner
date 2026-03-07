@@ -1,0 +1,149 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Filter for neon line glow - Magenta -->
+    <filter id="lineGlowPink" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 1   0 0 0 0 0   0 0 0 0 1   0 0 0 1 0"/> <!-- Magenta glow (R, B max) -->
+      <feMerge>
+        <feMergeNode/> <!-- the blurred, colored glow -->
+        <feMergeNode in="SourceGraphic"/> <!-- the original, sharper line -->
+      </feMerge>
+    </filter>
+
+    <!-- Filter for neon line glow - Cyan -->
+    <filter id="lineGlowCyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0   0 0 0 0 1   0 0 0 0 1   0 0 0 1 0"/> <!-- Cyan glow (G, B max) -->
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Filter for a general, more diffuse aura glow for shapes -->
+    <filter id="auraBlobGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Linear gradients for character elements -->
+    <linearGradient id="suitGradient" x1="100" y1="0" x2="100" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e91e63"/>
+      <stop offset="1" stop-color="#a9003c"/>
+    </linearGradient>
+    <linearGradient id="skinGradient" x1="100" y1="0" x2="100" y2="200" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#FFDDCA"/>
+        <stop offset="1" stop-color="#E0A08A"/>
+    </linearGradient>
+    <linearGradient id="hairGradient" x1="0" y1="0" x2="200" y2="0" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#ff00ff"/>
+        <stop offset="1" stop-color="#a000a0"/>
+    </linearGradient>
+    <linearGradient id="circuitGlowGradient" x1="0" y1="0" x2="200" y2="0" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#00BCD4"/>
+        <stop offset="1" stop-color="#00FF88"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Dark Background -->
+  <rect width="200" height="200" fill="#0a0a14"/>
+
+  <!-- Character Elements -->
+  <g transform="translate(0, -15)">
+
+    <!-- Digital Aura / Energy (behind character) -->
+    <g filter="url(#auraBlobGlow)">
+      <path d="M100 0 C150 20 180 80 160 120 C140 160 100 180 40 140 C20 100 50 40 100 0 Z" fill="#ff00ff" opacity="0.1"/>
+      <path d="M100 50 C120 60 130 90 120 110 C110 130 90 140 70 120 C60 100 70 70 100 50 Z" fill="#00bcd4" opacity="0.08"/>
+      <path d="M70 100 L90 150 L110 150 L130 100 L100 80 Z" fill="#00ff88" opacity="0.05"/>
+    </g>
+    <g filter="url(#lineGlowCyan)">
+      <path d="M160 140 L180 120 L170 100" stroke="#00bcd4" stroke-width="1"/>
+      <path d="M40 140 L20 120 L30 100" stroke="#00bcd4" stroke-width="1"/>
+    </g>
+    <g filter="url(#lineGlowPink)">
+      <path d="M100 20 L120 40 L80 40 L100 20 Z" stroke="#ff00ff" stroke-width="1"/>
+    </g>
+
+    <!-- Neck -->
+    <rect x="90" y="105" width="20" height="15" fill="url(#skinGradient)"/>
+
+    <!-- Head shape -->
+    <path d="M100 40 C120 30 140 50 140 70 C140 100 120 115 100 115 C80 115 60 100 60 70 C60 50 80 30 100 40 Z" fill="url(#skinGradient)"/>
+
+    <!-- Hair (dynamic, manga style) -->
+    <path d="M100 30 C110 10 130 15 140 40 L130 70 C120 75 100 80 100 75 C100 80 80 75 70 70 L60 40 C70 15 90 10 100 30 Z" fill="url(#hairGradient)"/>
+    <path d="M140 40 L155 35 C160 50 150 70 130 70 Z" fill="url(#hairGradient)" opacity="0.8"/>
+    <path d="M60 40 L45 35 C40 50 50 70 70 70 Z" fill="url(#hairGradient)" opacity="0.8"/>
+    <path d="M100 35 C105 30 110 35 105 40 C100 45 95 40 100 35 Z" fill="white" opacity="0.4"/>
+    <path d="M80 45 C82 42 85 45 83 48 C80 50 77 47 80 45 Z" fill="white" opacity="0.3"/>
+    <path d="M120 45 C122 42 125 45 123 48 C120 50 117 47 120 45 Z" fill="white" opacity="0.3"/>
+
+    <!-- Eyes (large, expressive, glowing) -->
+    <ellipse cx="85" cy="70" rx="8" ry="12" fill="white"/>
+    <ellipse cx="115" cy="70" rx="8" ry="12" fill="white"/>
+    <ellipse cx="85" cy="73" rx="5" ry="8" fill="#e91e63" filter="url(#auraBlobGlow)" opacity="0.6"/>
+    <ellipse cx="115" cy="73" rx="5" ry="8" fill="#e91e63" filter="url(#auraBlobGlow)" opacity="0.6"/>
+    <circle cx="85" cy="75" r="2.5" fill="#333333"/>
+    <circle cx="115" cy="75" r="2.5" fill="#333333"/>
+    <circle cx="83" cy="68" r="2" fill="white" opacity="0.7"/>
+    <circle cx="113" cy="68" r="2" fill="white" opacity="0.7"/>
+    <circle cx="90" cy="70" r="1" fill="white" opacity="0.5"/>
+    <circle cx="120" cy="70" r="1" fill="white" opacity="0.5"/>
+
+    <!-- Mouth -->
+    <path d="M95 90 C98 92 102 92 105 90" stroke="#0a0a14" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Nose -->
+    <path d="M100 85 L98 88 L100 88" stroke="#0a0a14" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+    <!-- Ear pieces / cybernetics -->
+    <path d="M140 70 L145 60 C148 65 148 75 145 80 L140 70 Z" fill="#e91e63" stroke="#ff00ff" stroke-width="1" filter="url(#lineGlowPink)"/>
+    <path d="M60 70 L55 60 C52 65 52 75 55 80 L60 70 Z" fill="#e91e63" stroke="#ff00ff" stroke-width="1" filter="url(#lineGlowPink)"/>
+
+    <!-- Suit (upper body) -->
+    <path d="M60 115 H140 L155 160 H45 L60 115 Z" fill="url(#suitGradient)"/>
+    <path d="M45 160 C30 170 30 190 45 200 H155 C170 190 170 170 155 160 Z" fill="url(#suitGradient)"/>
+
+    <!-- Suit collar / armored plates -->
+    <path d="M70 110 C80 100 120 100 130 110 L125 120 C115 115 85 115 75 120 Z" fill="#500020"/>
+    <path d="M70 110 C80 100 120 100 130 110" stroke="#ff00ff" stroke-width="2" fill="none" filter="url(#lineGlowPink)"/>
+
+    <!-- Circuit patterns on suit -->
+    <g filter="url(#lineGlowCyan)">
+      <path d="M70 135 L80 145 L75 155 L65 145 Z" fill="#00bcd4" opacity="0.7" stroke="#00bcd4" stroke-width="0.5"/>
+      <path d="M130 135 L120 145 L125 155 L135 145 Z" fill="#00bcd4" opacity="0.7" stroke="#00bcd4" stroke-width="0.5"/>
+      <path d="M85 150 H115 V160 H85 Z" fill="#00ff88" opacity="0.7" stroke="#00ff88" stroke-width="0.5"/>
+      <path d="M90 170 C95 165 105 165 110 170" stroke="url(#circuitGlowGradient)" stroke-width="2" fill="none"/>
+      <path d="M90 175 C95 170 105 170 110 175" stroke="url(#circuitGlowGradient)" stroke-width="2" fill="none"/>
+    </g>
+
+    <!-- Chest plate lines (dynamic) -->
+    <path d="M100 120 L100 160" stroke="#e91e63" stroke-width="2" filter="url(#lineGlowPink)"/>
+    <path d="M90 125 C80 135 80 150 90 160" stroke="#e91e63" stroke-width="1.5" filter="url(#lineGlowPink)"/>
+    <path d="M110 125 C120 135 120 150 110 160" stroke="#e91e63" stroke-width="1.5" filter="url(#lineGlowPink)"/>
+
+    <!-- Shoulder armor (sharp angles) -->
+    <path d="M45 160 L30 150 L40 130 L60 115 L45 160 Z" fill="#500020"/>
+    <path d="M30 150 L40 130" stroke="#ff00ff" stroke-width="2" filter="url(#lineGlowPink)"/>
+
+    <path d="M155 160 L170 150 L160 130 L140 115 L155 160 Z" fill="#500020"/>
+    <path d="M170 150 L160 130" stroke="#ff00ff" stroke-width="2" filter="url(#lineGlowPink)"/>
+
+    <!-- Digital Energy effect from hands/shoulders for "action pose" -->
+    <g filter="url(#lineGlowCyan)">
+      <path d="M140 130 L160 140 L170 160 L150 150 Z" fill="#00bcd4" opacity="0.3"/>
+      <path d="M60 130 L40 140 L30 160 L50 150 Z" fill="#00bcd4" opacity="0.3"/>
+      <path d="M100 170 C110 180 120 175 110 190 L90 190 C80 175 90 180 100 170 Z" fill="#00ff88" opacity="0.2"/>
+    </g>
+    <g filter="url(#lineGlowPink)">
+      <path d="M145 125 L165 135 L175 155" stroke="#ff00ff" stroke-width="1.5" fill="none"/>
+      <path d="M55 125 L35 135 L25 155" stroke="#ff00ff" stroke-width="1.5" fill="none"/>
+      <path d="M100 180 L105 185 L95 185 Z" fill="#ff00ff" opacity="0.5"/>
+    </g>
+
+  </g>
+</svg>

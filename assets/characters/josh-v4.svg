@@ -1,0 +1,64 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Neon Glow Filter -->
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+      <feComponentTransfer in="blur" result="glowEffect">
+        <feFuncA type="linear" slope="1.5" intercept="0"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="glowEffect"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Subtle gradient for body/uniform elements -->
+    <linearGradient id="uniformGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#008fa0" />
+      <stop offset="100%" stop-color="#00bcd4" />
+    </linearGradient>
+  </defs>
+
+  <!-- Dark Background -->
+  <rect width="200" height="200" fill="#0a0a14"/>
+
+  <!-- Character Elements: Josh -->
+
+  <!-- Shoulders / Upper Body -->
+  <path d="M 0 160 C 25 120 70 105 100 105 C 130 105 175 120 200 160 L 200 200 L 0 200 Z"
+        fill="url(#uniformGradient)" />
+
+  <!-- Inner Neck & Head Core (darker, underneath other elements) -->
+  <path d="M 70 110 C 70 90 80 70 100 70 C 120 70 130 90 130 110 L 130 120 C 125 125 75 125 70 120 Z"
+        fill="#1a1a24"/>
+
+  <!-- High Collar / Neck armor -->
+  <path d="M 65 120 L 75 110 L 125 110 L 135 120 L 135 130 L 125 135 L 75 135 L 65 130 Z"
+        fill="#00bcd4" opacity="0.7"/>
+  <!-- Collar frame with glow -->
+  <path d="M 65 120 L 75 110 L 125 110 L 135 120 L 135 130 L 125 135 L 75 135 L 65 130 Z"
+        fill="none" stroke="#00bcd4" stroke-width="1.5" filter="url(#neonGlow)" opacity="0.9"/>
+
+  <!-- Visor -->
+  <!-- Main visor glass shape - semi-transparent -->
+  <path d="M 55 75 C 55 60 70 50 100 50 C 130 50 145 60 145 75 L 145 95 C 145 105 130 110 100 110 C 70 110 55 105 55 95 Z"
+        fill="#00bcd4" opacity="0.35"/>
+
+  <!-- Visor frame (with glow) -->
+  <path d="M 55 75 C 55 60 70 50 100 50 C 130 50 145 60 145 75 L 145 95 C 145 105 130 110 100 110 C 70 110 55 105 55 95 Z"
+        fill="none" stroke="#00bcd4" stroke-width="3" filter="url(#neonGlow)"/>
+
+  <!-- Scan lines on visor -->
+  <g opacity="0.2">
+    <line x1="57" y1="78" x2="143" y2="78" stroke="#00bcd4" stroke-width="1"/>
+    <line x1="57" y1="83" x2="143" y2="83" stroke="#00bcd4" stroke-width="1"/>
+    <line x1="57" y1="88" x2="143" y2="88" stroke="#00bcd4" stroke-width="1"/>
+    <line x1="57" y1="93" x2="143" y2="93" stroke="#00bcd4" stroke-width="1"/>
+    <line x1="57" y1="98" x2="143" y2="98" stroke="#00bcd4" stroke-width="1"/>
+    <line x1="57" y1="103" x2="143" y2="103" stroke="#00bcd4" stroke-width="1"/>
+  </g>
+
+  <!-- Subtle internal lines on the uniform for texture/definition -->
+  <line x1="100" y1="110" x2="100" y2="130" stroke="#00bcd4" stroke-width="1" opacity="0.5"/>
+  <path d="M 70 130 Q 80 135 100 135 Q 120 135 130 130" stroke="#00bcd4" stroke-width="1" opacity="0.5"/>
+</svg>

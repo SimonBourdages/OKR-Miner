@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+    <feFlood flood-color="#9933ff" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+    <pattern id="ng" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none" stroke="#9933ff" stroke-width="0.15" opacity="0.12"/></pattern>
+  </defs>
+  <rect width="200" height="200" fill="#060614"/><rect width="200" height="200" fill="url(#ng)"/>
+  <circle cx="100" cy="100" r="25" fill="none" stroke="#9933ff" stroke-width="1.2" stroke-dasharray="6,3"/>
+  <circle cx="100" cy="100" r="12" fill="none" stroke="#9933ff" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <text x="100" y="104" text-anchor="middle" fill="#9933ff" font-size="7" font-family="monospace">×1.5</text>
+  <g stroke="#9933ff" stroke-width="0.8" stroke-dasharray="4,2" opacity="0.5">
+    <line x1="125" y1="100" x2="170" y2="60"/><line x1="125" y1="100" x2="170" y2="140"/>
+    <line x1="75" y1="100" x2="30" y2="60"/><line x1="75" y1="100" x2="30" y2="140"/>
+    <line x1="100" y1="75" x2="100" y2="30"/><line x1="100" y1="125" x2="100" y2="170"/>
+    <line x1="118" y1="82" x2="155" y2="40"/><line x1="82" y1="118" x2="45" y2="160"/>
+  </g>
+  <g fill="none" stroke="#9933ff" stroke-width="0.8">
+    <circle cx="170" cy="60" r="8"/><circle cx="170" cy="140" r="8"/><circle cx="30" cy="60" r="8"/>
+    <circle cx="30" cy="140" r="8"/><circle cx="100" cy="30" r="8"/><circle cx="100" cy="170" r="8"/>
+    <circle cx="155" cy="40" r="6" opacity="0.6"/><circle cx="45" cy="160" r="6" opacity="0.6"/>
+  </g>
+  <text x="15" y="15" fill="#9933ff" font-size="7" font-family="monospace" opacity="0.4">NET-SCHEMA</text>
+  <rect x="5" y="5" width="190" height="190" fill="none" stroke="#9933ff" stroke-width="0.5" opacity="0.3"/>
+</svg>

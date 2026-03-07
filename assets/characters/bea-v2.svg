@@ -1,0 +1,91 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Neon Glow Filter -->
+    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#4a90e2" result="glowColor"/>
+      <feComposite in="glowColor" in2="blur" operator="in" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/> <!-- Duplicate for stronger glow effect -->
+        <feMergeNode in="SourceGraphic"/> <!-- Original graphic on top -->
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Dark Background -->
+  <rect x="0" y="0" width="200" height="200" fill="#0a0a14"/>
+
+  <!-- Bea's underlying silhouette (subtle dark blue fill) -->
+  <path d="M100 35 C75 35 60 55 60 75 C60 90 70 100 80 100 H120 C130 100 140 90 140 75 C140 55 125 35 100 35 Z
+           M80 100 V115 C55 120 45 140 45 160 H155 C155 140 145 120 130 115 V100 Z"
+        fill="rgba(20, 20, 40, 0.7)"/>
+
+  <!-- Bea's main blueprint outlines (Signature Color: #4a90e2) -->
+  <!-- Head outline -->
+  <path d="M100 35 C75 35 60 55 60 75 C60 90 70 100 80 100 H120 C130 100 140 90 140 75 C140 55 125 35 100 35 Z"
+        fill="none" stroke="#4a90e2" stroke-width="1.5" filter="url(#neon-glow)"/>
+  
+  <!-- Hair outline (stylized) -->
+  <path d="M60 75 Q55 65 60 55 L70 45 Q75 40 80 40 H120 Q125 40 130 45 L140 55 Q145 65 140 75 Z"
+        fill="none" stroke="#4a90e2" stroke-width="1.5" filter="url(#neon-glow)"/>
+
+  <!-- Neck and Shoulders outline -->
+  <path d="M80 100 V115 C55 120 45 140 45 160 H155 C155 140 145 120 130 115 V100 Z"
+        fill="none" stroke="#4a90e2" stroke-width="1.5" filter="url(#neon-glow)"/>
+  
+  <!-- Internal Face Details (blueprint style) -->
+  <!-- Eyes -->
+  <rect x="85" y="65" width="4" height="4" fill="#4a90e2" filter="url(#neon-glow)"/>
+  <rect x="111" y="65" width="4" height="4" fill="#4a90e2" filter="url(#neon-glow)"/>
+  
+  <!-- Mouth line -->
+  <path d="M90 85 Q100 88 110 85" fill="none" stroke="#4a90e2" stroke-width="0.7" filter="url(#neon-glow)"/>
+
+  <!-- Nose bridge detail -->
+  <line x1="100" y1="70" x2="100" y2="78" stroke="#4a90e2" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+  
+  <!-- Hair top tech detail -->
+  <path d="M100 40 V50 M95 45 H105" stroke="#4a90e2" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+
+  <!-- Chest/Collar details -->
+  <rect x="70" y="125" width="60" height="10" fill="none" stroke="#4a90e2" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+  <path d="M70 135 H130" stroke="#4a90e2" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+  <circle cx="100" cy="130" r="3" fill="#4a90e2" filter="url(#neon-glow)"/>
+  <line x1="100" y1="133" x2="100" y2="150" stroke="#4a90e2" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+  <line x1="90" y1="145" x2="110" y2="145" stroke="#4a90e2" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+  
+  <!-- Holographic Tools (using primary palette colors for distinction) -->
+  
+  <!-- Gear (cyan) -->
+  <g transform="translate(30, 80) scale(0.6)">
+    <circle cx="50" cy="70" r="5" fill="none" stroke="#00bcd4" stroke-width="1.2" filter="url(#neon-glow)"/>
+    <circle cx="50" cy="70" r="2.5" fill="none" stroke="#00bcd4" stroke-width="0.7" filter="url(#neon-glow)"/>
+    <path d="M50 65 L52 65 L52 62 L48 62 L48 65 Z M50 75 L52 75 L52 78 L48 78 L48 75 Z M55 70 L55 72 L58 72 L58 68 L55 68 Z M45 70 L45 72 L42 72 L42 68 L45 68 Z"
+          fill="none" stroke="#00bcd4" stroke-width="0.7" filter="url(#neon-glow)"/>
+  </g>
+
+  <!-- Wrench (magenta) -->
+  <g transform="translate(130, 85) scale(0.6)">
+    <path d="M150 80 L155 75 L160 80 L155 85 L150 80 Z M150 80 L145 75 L140 80 L145 85 L150 80 Z M155 85 L160 90 L165 85 L160 80 L155 85 Z M145 85 L150 90 L155 85 L150 80 L145 85 Z"
+          fill="none" stroke="#ff00ff" stroke-width="1.2" filter="url(#neon-glow)"/>
+  </g>
+
+  <!-- Circuit board fragment (gold) -->
+  <g transform="translate(125, 40) scale(0.6)">
+    <rect x="140" y="50" width="25" height="20" rx="3" ry="3" fill="none" stroke="#ffd700" stroke-width="1.2" filter="url(#neon-glow)"/>
+    <line x1="145" y1="55" x2="160" y2="55" stroke="#ffd700" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+    <line x1="145" y1="60" x2="160" y2="60" stroke="#ffd700" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+    <line x1="145" y1="65" x2="160" y2="65" stroke="#ffd700" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+    <rect x="142" y="52" width="3" height="3" fill="#ffd700" filter="url(#neon-glow)"/>
+    <rect x="157" y="67" width="3" height="3" fill="#ffd700" filter="url(#neon-glow)"/>
+  </g>
+
+  <!-- Floating screen/hologram (neon green) -->
+  <g transform="translate(10, 100) scale(0.7)">
+    <rect x="25" y="100" width="30" height="25" rx="4" ry="4" fill="none" stroke="#00ff88" stroke-width="1.2" filter="url(#neon-glow)"/>
+    <circle cx="40" cy="108" r="3" fill="#00ff88" filter="url(#neon-glow)"/>
+    <line x1="30" y1="115" x2="50" y2="115" stroke="#00ff88" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+    <line x1="30" y1="119" x2="50" y2="119" stroke="#00ff88" stroke-width="0.7" stroke-dasharray="2 2" filter="url(#neon-glow)"/>
+  </g>
+</svg>

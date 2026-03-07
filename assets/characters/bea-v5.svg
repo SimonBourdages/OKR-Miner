@@ -1,0 +1,115 @@
+<svg viewBox="0 0 200 200" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- CRT Glow Filter - designed for chunky pixels -->
+        <filter id="crt-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blurred"/>
+            <feComponentTransfer in="blurred" result="boosted">
+                <feFuncA type="linear" slope="2" intercept="0"/>
+                <feFuncR type="linear" slope="1.5" intercept="0.1"/>
+                <feFuncG type="linear" slope="1.5" intercept="0.1"/>
+                <feFuncB type="linear" slope="1.5" intercept="0.1"/>
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode in="boosted"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <!-- Dark Background -->
+    <rect x="0" y="0" width="200" height="200" fill="#0a0a14"/>
+
+    <!-- Bea - Pixel Art Construction (using 4x4 unit pixels for a 50x50 logical grid) -->
+    <g>
+        <!-- Hair Base (dark blue/black) -->
+        <rect x="64" y="28" width="68" height="8" fill="#1a1a2e"/>
+        <rect x="60" y="32" width="4" height="24" fill="#1a1a2e"/>
+        <rect x="132" y="32" width="4" height="24" fill="#1a1a2e"/>
+        <rect x="56" y="52" width="4" height="24" fill="#1a1a2e"/>
+        <rect x="136" y="52" width="4" height="24" fill="#1a1a2e"/>
+        <rect x="52" y="68" width="4" height="24" fill="#1a1a2e"/>
+        <rect x="140" y="68" width="4" height="24" fill="#1a1a2e"/>
+        <rect x="56" y="92" width="8" height="4" fill="#1a1a2e"/>
+        <rect x="132" y="92" width="8" height="4" fill="#1a1a2e"/>
+
+        <!-- Hair Highlights (Bea's signature blue, with glow) -->
+        <rect x="64" y="32" width="12" height="4" fill="#4a90e2" filter="url(#crt-glow)"/>
+        <rect x="120" y="32" width="12" height="4" fill="#4a90e2" filter="url(#crt-glow)"/>
+        <rect x="56" y="72" width="4" height="12" fill="#4a90e2" filter="url(#crt-glow)"/>
+        <rect x="136" y="72" width="4" height="12" fill="#4a90e2" filter="url(#crt-glow)"/>
+        <rect x="80" y="28" width="4" height="4" fill="#4a90e2" filter="url(#crt-glow)"/>
+        <rect x="116" y="28" width="4" height="4" fill="#4a90e2" filter="url(#crt-glow)"/>
+        <rect x="72" y="92" width="4" height="4" fill="#4a90e2" filter="url(#crt-glow)"/>
+
+        <!-- Face (skin tone) -->
+        <rect x="64" y="36" width="68" height="60" fill="#fdd8c7"/>
+        <rect x="60" y="56" width="4" height="40" fill="#fdd8c7"/>
+        <rect x="132" y="56" width="4" height="40" fill="#fdd8c7"/>
+        <rect x="68" y="96" width="60" height="4" fill="#fdd8c7"/>
+
+        <!-- Eyes (dark base with cyan glow) -->
+        <rect x="76" y="52" width="12" height="4" fill="#0a0a14"/> 
+        <rect x="80" y="56" width="8" height="4" fill="#00bcd4" filter="url(#crt-glow)"/> 
+        <rect x="108" y="52" width="12" height="4" fill="#0a0a14"/> 
+        <rect x="112" y="56" width="8" height="4" fill="#00bcd4" filter="url(#crt-glow)"/> 
+
+        <!-- Eyebrows (dark) -->
+        <rect x="72" y="44" width="20" height="4" fill="#1a1a2e"/>
+        <rect x="104" y="44" width="20" height="4" fill="#1a1a2e"/>
+
+        <!-- Nose (dark) -->
+        <rect x="96" y="64" width="4" height="8" fill="#1a1a2e"/>
+
+        <!-- Mouth (dark with subtle magenta glow for smile) -->
+        <rect x="88" y="76" width="24" height="4" fill="#1a1a2e"/>
+        <rect x="92" y="80" width="16" height="4" fill="#ff00ff" filter="url(#crt-glow)"/>
+
+        <!-- Neck (skin tone) -->
+        <rect x="84" y="100" width="32" height="8" fill="#fdd8c7"/>
+
+        <!-- Outfit Base (darker blue) -->
+        <rect x="64" y="108" width="68" height="24" fill="#3a70b2"/>
+        <rect x="56" y="132" width="84" height="24" fill="#3a70b2"/>
+        <rect x="48" y="156" width="104" height="24" fill="#3a70b2"/>
+
+        <!-- Outfit Details/Glow (signature blue and lighter blue, with glow) -->
+        <rect x="68" y="112" width="60" height="4" fill="#4a90e2" filter="url(#crt-glow)"/>
+        <rect x="60" y="136" width="76" height="4" fill="#4a90e2" filter="url(#crt-glow)"/>
+        <rect x="52" y="160" width="96" height="4" fill="#6ad0ff" filter="url(#crt-glow)"/>
+        <rect x="80" y="120" width="40" height="4" fill="#6ad0ff" filter="url(#crt-glow)"/>
+    </g>
+
+    <!-- Holographic Tools (various primary palette colors, with glow) -->
+    <g filter="url(#crt-glow)">
+        <!-- Wrench (cyan) -->
+        <rect x="28" y="108" width="8" height="32" fill="#00bcd4"/>
+        <rect x="24" y="112" width="4" height="8" fill="#00bcd4"/>
+        <rect x="36" y="112" width="4" height="8" fill="#00bcd4"/>
+        <rect x="28" y="104" width="8" height="4" fill="#00bcd4"/>
+        <rect x="28" y="140" width="8" height="4" fill="#00bcd4"/>
+
+        <!-- Gear (neon green) -->
+        <rect x="156" y="100" width="16" height="16" fill="#00ff88"/>
+        <rect x="152" y="104" width="4" height="8" fill="#00ff88"/>
+        <rect x="172" y="104" width="4" height="8" fill="#00ff88"/>
+        <rect x="160" y="96" width="8" height="4" fill="#00ff88"/>
+        <rect x="160" y="116" width="8" height="4" fill="#00ff88"/>
+        <rect x="160" y="104" width="8" height="8" fill="#0a0a14"/> <!-- inner hole -->
+
+        <!-- Circuit Board Fragment (magenta) -->
+        <rect x="20" y="60" width="28" height="28" fill="#ff00ff"/>
+        <rect x="24" y="64" width="4" height="4" fill="#ffd700"/>
+        <rect x="36" y="64" width="4" height="4" fill="#ffd700"/>
+        <rect x="28" y="72" width="4" height="4" fill="#ffd700"/>
+        <rect x="40" y="76" width="4" height="4" fill="#ffd700"/>
+        <rect x="24" y="80" width="4" height="4" fill="#ffd700"/>
+
+        <!-- Floating Diagram/Screen (gold) -->
+        <rect x="152" y="44" width="28" height="28" fill="#ffd700"/>
+        <rect x="156" y="48" width="20" height="4" fill="#0a0a14"/>
+        <rect x="156" y="56" width="20" height="4" fill="#0a0a14"/>
+        <rect x="156" y="64" width="20" height="4" fill="#0a0a14"/>
+        <rect x="164" y="52" width="4" height="4" fill="#0a0a14"/>
+        <rect x="164" y="60" width="4" height="4" fill="#0a0a14"/>
+    </g>
+</svg>

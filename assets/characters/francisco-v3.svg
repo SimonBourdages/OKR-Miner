@@ -1,0 +1,95 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Filter for red neon glow -->
+    <filter id="red-neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur"/>
+      <feFlood flood-color="#ff4500" flood-opacity="1" result="flood"/>
+      <feComposite in="flood" in2="blur" operator="in" result="glow-alpha"/>
+      <feMerge>
+        <feMergeNode in="glow-alpha"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Filter for brighter red highlights (optional, subtle) -->
+    <filter id="red-light" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur"/>
+        <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+    </filter>
+    <!-- Subtle gradient for armor depth -->
+    <linearGradient id="armor-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff6347"/>
+      <stop offset="100%" stop-color="#e74c3c"/>
+    </linearGradient>
+     <linearGradient id="dark-armor-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3a1111"/>
+      <stop offset="100%" stop-color="#1a0000"/>
+    </linearGradient>
+    <linearGradient id="metal-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#999"/>
+      <stop offset="100%" stop-color="#444"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Dark Background -->
+  <rect x="0" y="0" width="200" height="200" fill="#0a0a14"/>
+
+  <!-- Character: Francisco -->
+  <g transform="translate(0, 10)">
+    <!-- Body Base (dark shadow behind armor) -->
+    <path d="M50 170 C40 140 40 100 70 80 L130 80 C160 100 160 140 150 170 Z" fill="#1a0a0a"/>
+
+    <!-- Left Shoulder Armor -->
+    <path d="M48 100 L35 115 L30 135 L45 145 L65 130 L60 110 Z" fill="url(#armor-gradient)"/>
+    <path d="M48 100 L38 112 L45 120 L55 110 Z" fill="#ff4500" filter="url(#red-light)"/>
+    
+    <!-- Right Shoulder Armor -->
+    <path d="M152 100 L165 115 L170 135 L155 145 L135 130 L140 110 Z" fill="url(#armor-gradient)"/>
+    <path d="M152 100 L162 112 L155 120 L145 110 Z" fill="#ff4500" filter="url(#red-light)"/>
+
+    <!-- Chest Armor -->
+    <path d="M70 80 L60 95 L55 120 L80 140 L120 140 L145 120 L140 95 L130 80 Z" fill="url(#armor-gradient)"/>
+    <path d="M80 140 L90 150 L110 150 L120 140 L110 130 L90 130 Z" fill="url(#dark-armor-gradient)"/>
+    <rect x="90" y="110" width="20" height="10" fill="#ff4500" filter="url(#red-neon-glow)"/>
+    
+    <!-- Neck -->
+    <path d="M85 80 L80 90 L120 90 L115 80 Z" fill="#555"/>
+
+    <!-- Head -->
+    <path d="M80 30 C70 40 70 60 80 70 L120 70 C130 60 130 40 120 30 Z" fill="#555"/>
+    <path d="M85 35 C78 40 78 55 85 60 L115 60 C122 55 122 40 115 35 Z" fill="#333"/>
+
+    <!-- Hair (spiky cyberpunk style) -->
+    <path d="M80 30 L75 15 L85 20 L90 10 L100 20 L110 10 L115 20 L125 15 L120 30 Z" fill="#222"/>
+    <path d="M90 10 L95 5 L100 10 Z" fill="#ff00ff" filter="url(#red-neon-glow)"/>
+
+    <!-- Face Details -->
+    <g fill="#000">
+        <!-- Eyes -->
+        <circle cx="90" cy="48" r="3" fill="#00bcd4" filter="url(#red-neon-glow)"/>
+        <circle cx="110" cy="48" r="3" fill="#00bcd4" filter="url(#red-neon-glow)"/>
+        <!-- Jawline shadow -->
+        <path d="M85 60 C80 65 90 68 100 68 C110 68 120 65 115 60 L110 60 L100 62 L90 62 L85 60 Z" fill="#00000033"/>
+    </g>
+
+    <!-- Arms/Hands -->
+    <!-- Left Arm -->
+    <path d="M60 110 C50 120 50 140 60 150 L70 145 L75 125 Z" fill="#444"/>
+    <!-- Left Hand -->
+    <path d="M60 150 C55 155 55 165 65 170 C75 165 70 155 70 150 Z" fill="#666"/>
+    <!-- Energy around left hand -->
+    <path d="M65 170 L60 160 L50 170 L60 180 L70 175 L75 165 L65 170 Z" fill="#e74c3c" filter="url(#red-neon-glow)"/>
+    <path d="M68 165 L65 155 L58 165 L60 175 L70 170 Z" fill="#ff4500" filter="url(#red-neon-glow)"/>
+
+    <!-- Right Arm -->
+    <path d="M140 110 C150 120 150 140 140 150 L130 145 L125 125 Z" fill="#444"/>
+    <!-- Right Hand -->
+    <path d="M140 150 C145 155 145 165 135 170 C125 165 130 155 130 150 Z" fill="#666"/>
+    <!-- Energy around right hand -->
+    <path d="M135 170 L140 160 L150 170 L140 180 L130 175 L125 165 L135 170 Z" fill="#e74c3c" filter="url(#red-neon-glow)"/>
+    <path d="M132 165 L135 155 L142 165 L140 175 L130 170 Z" fill="#ff4500" filter="url(#red-neon-glow)"/>
+
+  </g>
+</svg>

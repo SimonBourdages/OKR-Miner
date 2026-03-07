@@ -1,0 +1,108 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Gold Neon Glow Filter for Jrod's signature elements -->
+        <filter id="neonGoldGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <!-- Wide, soft glow -->
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur_wide"/>
+            <feFlood flood-color="#ffd700" flood-opacity="1" result="color_wide"/>
+            <feComposite in="color_wide" in2="blur_wide" operator="in" result="glow_wide"/>
+
+            <!-- Sharper, brighter glow for core intensity -->
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur_sharp"/>
+            <feFlood flood-color="#ffffaa" flood-opacity="1" result="color_sharp"/>
+            <feComposite in="color_sharp" in2="blur_sharp" operator="in" result="glow_sharp"/>
+
+            <!-- Merge glows and the original graphic -->
+            <feMerge>
+                <feMergeNode in="glow_wide"/>
+                <feMergeNode in="glow_sharp"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- Magenta Neon Glow Filter for accent elements (e.g., visor) -->
+        <filter id="neonMagentaGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur_wide_m"/>
+            <feFlood flood-color="#ff00ff" flood-opacity="1" result="color_wide_m"/>
+            <feComposite in="color_wide_m" in2="blur_wide_m" operator="in" result="glow_wide_m"/>
+
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur_sharp_m"/>
+            <feFlood flood-color="#ff99ff" flood-opacity="1" result="color_sharp_m"/>
+            <feComposite in="color_sharp_m" in2="blur_sharp_m" operator="in" result="glow_sharp_m"/>
+
+            <feMerge>
+                <feMergeNode in="glow_wide_m"/>
+                <feMergeNode in="glow_sharp_m"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- Linear Gradients for Gold Armor depth and dramatic lighting -->
+        <linearGradient id="goldPlate1" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffd700"/>
+            <stop offset="100%" stop-color="#cc8800"/>
+        </linearGradient>
+        <linearGradient id="goldPlate2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffaa"/>
+            <stop offset="50%" stop-color="#ffd700"/>
+            <stop offset="100%" stop-color="#8a5a00"/>
+        </linearGradient>
+        <linearGradient id="goldPlateSide" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffd700"/>
+            <stop offset="100%" stop-color="#a06000"/>
+        </linearGradient>
+        <linearGradient id="goldHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="50%" stop-color="#ffd700"/>
+            <stop offset="100%" stop-color="#cc8800"/>
+        </linearGradient>
+
+        <!-- Radial gradient for the core of the halo effect -->
+        <radialGradient id="haloRadial" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+            <stop offset="30%" stop-color="#ffffaa" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#ffd700" stop-opacity="0"/>
+        </radialGradient>
+    </defs>
+
+    <!-- Dark Background -->
+    <rect x="0" y="0" width="200" height="200" fill="#0a0a14"/>
+
+    <!-- Jrod Character Elements -->
+
+    <!-- Halo of Light (main radiant element behind the head, using radial gradient and gold glow filter) -->
+    <circle cx="100" cy="65" r="60" fill="url(#haloRadial)" filter="url(#neonGoldGlow)"/>
+
+    <!-- Shoulder Pads (Exaggerated and angular for an imposing silhouette) -->
+    <path d="M50 140 L20 120 L30 150 L60 170 Z" fill="url(#goldPlateSide)" stroke="#ffd700" stroke-width="1"/>
+    <path d="M150 140 L180 120 L170 150 L140 170 Z" fill="url(#goldPlateSide)" stroke="#ffd700" stroke-width="1"/>
+
+    <!-- Main Chest Plate (layered for depth) -->
+    <path d="M100 110 L40 160 H160 L100 110 Z" fill="url(#goldPlate2)" stroke="#ffd700" stroke-width="1"/>
+    <!-- Central Chest Panel -->
+    <path d="M100 110 L70 145 H130 L100 110 Z" fill="url(#goldPlate1)" stroke="#ffd700" stroke-width="1"/>
+
+    <!-- Neck Connector (darker to create separation) -->
+    <path d="M90 95 L85 110 H115 L110 95 Z" fill="#664400" stroke="#ffd700" stroke-width="1"/>
+
+    <!-- Helmet Base Shape (Angular and imposing, with dynamic lighting from gradients) -->
+    <path d="M100 30 L130 60 V90 L120 95 H80 L70 90 V60 L100 30 Z" fill="url(#goldPlate1)" stroke="#ffd700" stroke-width="1"/>
+    <!-- Helmet jawline/side pieces for defined structure -->
+    <path d="M70 60 L60 75 L70 90 L80 90 Z" fill="url(#goldPlateSide)" stroke="#ffd700" stroke-width="1"/>
+    <path d="M130 60 L140 75 L130 90 L120 90 Z" fill="url(#goldPlateSide)" stroke="#ffd700" stroke-width="1"/>
+
+    <!-- Helmet top detail / Crown elements (emphasizing "supreme leader" and "crown of light") -->
+    <path d="M100 25 L105 35 L95 35 L100 25 Z" fill="#ffd700" filter="url(#neonGoldGlow)"/>
+    <path d="M95 35 L90 45 H110 L105 35 L95 35 Z" fill="#ffd700" filter="url(#neonGoldGlow)"/>
+    <rect x="98" y="20" width="4" height="10" fill="#ffd700" filter="url(#neonGoldGlow)"/> <!-- Central spiky part of crown -->
+
+    <!-- Visor (Glowing Magenta for cyberpunk contrast) -->
+    <rect x="80" y="68" width="40" height="8" fill="#ff00ff" filter="url(#neonMagentaGlow)"/>
+    <!-- Visor highlight for depth and intensity -->
+    <rect x="82" y="70" width="36" height="4" fill="#ff99ff"/>
+
+    <!-- Additional armor highlights for dramatic lighting and comic/manga styling -->
+    <path d="M100 110 L95 120 L105 120 L100 110 Z" fill="url(#goldHighlight)"/>
+    <path d="M100 30 L95 40 L105 40 L100 30 Z" fill="url(#goldHighlight)"/>
+
+</svg>

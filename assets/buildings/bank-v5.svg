@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+    <feFlood flood-color="#ffcc00" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter></defs>
+  <rect width="200" height="200" fill="#080810"/>
+  <g filter="url(#glow)">
+    <rect x="20" y="30" width="160" height="110" fill="#ffcc00" opacity="0.08"/><rect x="20" y="30" width="160" height="110" fill="none" stroke="#ffcc00" stroke-width="3"/>
+    <rect x="30" y="100" width="20" height="30" fill="#ffcc00" opacity="0.4"/>
+    <rect x="55" y="90" width="20" height="40" fill="#ffcc00" opacity="0.4"/>
+    <rect x="80" y="75" width="20" height="55" fill="#ffcc00" opacity="0.5"/>
+    <rect x="105" y="60" width="20" height="70" fill="#ffcc00" opacity="0.5"/>
+    <rect x="130" y="45" width="20" height="85" fill="#ffcc00" opacity="0.6"/>
+    <rect x="155" y="35" width="20" height="95" fill="#ffcc00" opacity="0.7"/>
+    <polyline points="40,95 65,85 90,70 115,55 140,40 165,32" fill="none" stroke="#fff" stroke-width="2"/>
+    <circle cx="165" cy="32" r="5" fill="#fff"/>
+  </g>
+  <text x="100" y="168" text-anchor="middle" fill="#ffcc00" font-size="14" font-family="monospace" filter="url(#glow)">INVEST</text>
+</svg>

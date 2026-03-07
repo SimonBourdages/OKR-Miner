@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+    <feFlood flood-color="#00e5ff" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter><filter id="glow2" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+    <feFlood flood-color="#ff8800" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter><radialGradient id="pr" cx="50%" cy="50%"><stop offset="0%" stop-color="#00e5ff" stop-opacity="0.15"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+  <rect width="200" height="200" fill="#0a0a14"/><circle cx="100" cy="100" r="80" fill="url(#pr)"/>
+  <ellipse cx="100" cy="80" rx="50" ry="20" fill="#3a2000" stroke="#ff8800" stroke-width="2.5" filter="url(#glow2)"/>
+  <ellipse cx="100" cy="75" rx="48" ry="18" fill="#ff8800" opacity="0.4"/>
+  <circle cx="85" cy="72" r="5" fill="#ff3333" opacity="0.7"/><circle cx="105" cy="76" r="4" fill="#ff3333" opacity="0.6"/>
+  <circle cx="95" cy="68" r="3" fill="#66cc33" opacity="0.6"/><circle cx="115" cy="72" r="3" fill="#66cc33" opacity="0.5"/>
+  <rect x="55" y="110" width="90" height="50" rx="6" fill="#0a1520" stroke="#00e5ff" stroke-width="2.5" filter="url(#glow)"/>
+  <path d="M75 130 L85 140 L100 125" stroke="#00e5ff" stroke-width="2" fill="none" filter="url(#glow)"/>
+  <rect x="110" y="128" width="25" height="4" fill="#00e5ff" opacity="0.5"/><rect x="110" y="136" width="15" height="3" fill="#00e5ff" opacity="0.3"/>
+  <circle cx="50" cy="45" r="8" fill="#ff4466" opacity="0.6"><animate attributeName="cy" values="45;30;45" dur="2s" repeatCount="indefinite"/></circle>
+  <circle cx="150" cy="40" r="7" fill="#44ff88" opacity="0.5"><animate attributeName="cy" values="40;28;40" dur="2.5s" repeatCount="indefinite"/></circle>
+  <text x="65" y="43" text-anchor="middle" fill="#fff" font-size="10">🎈</text>
+  <text x="140" y="38" text-anchor="middle" fill="#fff" font-size="10">🎉</text>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+    <feFlood flood-color="#4488ff" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter></defs>
+  <rect width="200" height="200" fill="#0a0a14"/>
+  <rect x="55" y="60" width="90" height="60" rx="4" fill="#0d1a2a" stroke="#4488ff" stroke-width="2" filter="url(#glow)"/>
+  <rect x="60" y="65" width="80" height="50" rx="2" fill="#0a1020"/>
+  <rect x="65" y="70" width="30" height="8" fill="#4488ff" opacity="0.5"/><rect x="65" y="82" width="50" height="4" fill="#4488ff" opacity="0.3"/>
+  <rect x="65" y="90" width="40" height="4" fill="#4488ff" opacity="0.2"/><rect x="65" y="98" width="60" height="4" fill="#4488ff" opacity="0.15"/>
+  <circle cx="120" cy="85" r="12" fill="none" stroke="#4488ff" stroke-width="1" opacity="0.4"/>
+  <path d="M115 85 L118 90 L126 80" stroke="#4488ff" stroke-width="1.5" fill="none"/>
+  <rect x="80" y="120" width="40" height="6" rx="2" fill="rgb(27,54,102)" stroke="#4488ff" stroke-width="1"/>
+  <rect x="70" y="126" width="60" height="30" rx="3" fill="#0d1a2a" stroke="#4488ff" stroke-width="1" opacity="0.6"/>
+  <g fill="#4488ff" opacity="0.3">
+    <rect x="76" y="132" width="8" height="6" rx="1"/><rect x="86" y="132" width="8" height="6" rx="1"/>
+    <rect x="96" y="132" width="8" height="6" rx="1"/><rect x="106" y="132" width="8" height="6" rx="1"/>
+    <rect x="76" y="140" width="8" height="6" rx="1"/><rect x="86" y="140" width="8" height="6" rx="1"/>
+    <rect x="96" y="140" width="8" height="6" rx="1"/><rect x="106" y="140" width="8" height="6" rx="1"/>
+    <rect x="76" y="148" width="38" height="6" rx="1"/>
+  </g>
+  <circle cx="50" cy="50" r="15" fill="#0d1a2a" stroke="#4488ff" stroke-width="1.5"/>
+  <circle cx="50" cy="47" r="5" fill="#4488ff" opacity="0.4"/>
+  <rect x="43" y="55" width="14" height="6" rx="3" fill="#4488ff" opacity="0.3"/>
+  <text x="100" y="192" text-anchor="middle" fill="#4488ff" font-size="10" font-family="monospace" opacity="0.7">EMPLOYEE</text>
+</svg>

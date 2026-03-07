@@ -1,0 +1,78 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Neon Glow Filter -->
+        <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+            <feComponentTransfer in="blur" result="glowIntensified">
+                <feFuncA type="linear" slope="3" intercept="0"/>
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode in="glowIntensified"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- Scanline Pattern (subtle blue lines) -->
+        <pattern id="scanlines" patternUnits="userSpaceOnUse" width="6" height="6">
+            <path d="M 0 0 L 6 0" stroke="#4a90e2" stroke-width="0.7" opacity="0.3"/>
+        </pattern>
+
+        <!-- Tool shapes defined for reuse and clipping -->
+        <path id="wrenchShape" d="M -15 0 L -8 -12 L -5 -10 L 0 -15 L 15 0 L 0 15 L -5 10 L -8 12 Z M -3 -3 L 3 -3 L 3 3 L -3 3 Z" />
+        <path id="gearShape" d="M 0 0 m -10 0 a 10 10 0 1 0 20 0 a 10 10 0 1 0 -20 0 M 0 -10 L 0 -14 L 3 -14 L 3 -10 Z M 5 -8 L 8 -12 L 10 -9 L 7 -5 Z M 8 5 L 12 8 L 9 10 L 5 7 Z M 0 10 L 0 14 L -3 14 L -3 10 Z M -5 8 L -8 12 L -10 9 L -7 5 Z M -8 -5 L -12 -8 L -9 -10 L -5 -7 Z M 0 0 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0 Z"/>
+        <path id="circuitShape" d="M -15 -10 L 15 -10 L 15 10 L -15 10 Z M -10 -5 L -10 5 M 0 -5 L 0 5 M 10 -5 L 10 5 M -12 -7 L -8 -7 L -8 -3 L -12 -3 Z M 8 -7 L 12 -7 L 12 -3 L 8 -3 Z M -2 -7 L 2 -7 L 2 -3 L -2 -3 Z"/>
+
+        <!-- Clip paths for tools using their shapes -->
+        <clipPath id="clipWrench"><use href="#wrenchShape" /></clipPath>
+        <clipPath id="clipGear"><use href="#gearShape" /></clipPath>
+        <clipPath id="clipCircuit"><use href="#circuitShape" /></clipPath>
+    </defs>
+
+    <!-- Dark background -->
+    <rect x="0" y="0" width="200" height="200" fill="#0a0a14"/>
+
+    <!-- Bea's portrait (Head and upper body) -->
+    <g transform="translate(100 110)">
+        <!-- Neck and Shoulders (base form) -->
+        <path d="M -40 0 C -55 20 -50 50 0 50 C 50 50 55 20 40 0 Z" fill="#4a90e2" opacity="0.7" filter="url(#neonGlow)"/>
+
+        <!-- Head Outline (angular, futuristic style) -->
+        <path d="M -35 -40 L -25 -80 L 0 -95 L 25 -80 L 35 -40 Z" fill="#4a90e2" opacity="0.8" filter="url(#neonGlow)"/>
+
+        <!-- Inner Head/Hair detail (slightly darker blue for depth) -->
+        <path d="M -20 -45 L -15 -70 L 0 -80 L 15 -70 L 20 -45 Z" fill="#2a60a2" opacity="0.9" filter="url(#neonGlow)"/>
+
+        <!-- Eyes (cyan glow for tech contrast) -->
+        <rect x="-15" y="-65" width="8" height="3" fill="#00bcd4" filter="url(#neonGlow)"/>
+        <rect x="7" y="-65" width="8" height="3" fill="#00bcd4" filter="url(#neonGlow)"/>
+
+        <!-- Collar/Jacket details (angular and subtle) -->
+        <path d="M -25 -30 L -15 -35 L 15 -35 L 25 -30 L 20 -15 L -20 -15 Z" fill="#2a60a2" opacity="0.9" filter="url(#neonGlow)"/>
+        <path d="M -30 -15 C -40 0 -35 30 0 30 C 35 30 40 0 30 -15 Z" fill="#2a60a2" opacity="0.8" filter="url(#neonGlow)"/>
+    </g>
+
+    <!-- Holographic Tools Floating Around Bea -->
+    <!-- Wrench -->
+    <g transform="translate(50 60) scale(1.2)">
+        <use href="#wrenchShape" fill="#4a90e2" opacity="0.5" filter="url(#neonGlow)"/>
+        <use href="#wrenchShape" stroke="#4a90e2" stroke-width="1.5" fill="none" opacity="0.9" filter="url(#neonGlow)"/>
+        <!-- Scanlines overlay, clipped to tool shape -->
+        <rect x="-20" y="-20" width="40" height="40" fill="url(#scanlines)" clip-path="url(#clipWrench)" opacity="0.8"/>
+    </g>
+
+    <!-- Gear -->
+    <g transform="translate(155 75) scale(1.2)">
+        <use href="#gearShape" fill="#4a90e2" opacity="0.5" filter="url(#neonGlow)"/>
+        <use href="#gearShape" stroke="#4a90e2" stroke-width="1.5" fill="none" opacity="0.9" filter="url(#neonGlow)"/>
+        <!-- Scanlines overlay, clipped to tool shape -->
+        <rect x="-20" y="-20" width="40" height="40" fill="url(#scanlines)" clip-path="url(#clipGear)" opacity="0.8"/>
+    </g>
+
+    <!-- Circuit Board Fragment -->
+    <g transform="translate(100 170) scale(1.2)">
+        <use href="#circuitShape" fill="#4a90e2" opacity="0.5" filter="url(#neonGlow)"/>
+        <use href="#circuitShape" stroke="#4a90e2" stroke-width="1.5" fill="none" opacity="0.9" filter="url(#neonGlow)"/>
+        <!-- Scanlines overlay, clipped to tool shape -->
+        <rect x="-20" y="-20" width="40" height="40" fill="url(#scanlines)" clip-path="url(#clipCircuit)" opacity="0.8"/>
+    </g>
+</svg>

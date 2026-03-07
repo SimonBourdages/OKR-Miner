@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+    <feFlood flood-color="#ff4444" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter></defs>
+  <rect width="200" height="200" fill="#080810"/>
+  <g filter="url(#glow)">
+    <rect x="70" y="20" width="60" height="40" fill="#ff4444" opacity="0.2"/><rect x="70" y="20" width="60" height="40" fill="none" stroke="#ff4444" stroke-width="3"/>
+    <rect x="80" y="30" width="10" height="10" fill="#ff4444"/><rect x="110" y="30" width="10" height="10" fill="#ff4444"/>
+    <rect x="85" y="48" width="30" height="5" fill="#ff4444" opacity="0.5"/>
+    <rect x="75" y="60" width="50" height="55" fill="#ff4444" opacity="0.15"/><rect x="75" y="60" width="50" height="55" fill="none" stroke="#ff4444" stroke-width="3"/>
+    <circle cx="100" cy="85" r="12" fill="#ff4444" opacity="0.4"/><circle cx="100" cy="85" r="5" fill="#fff" opacity="0.8"/>
+    <rect x="50" y="70" width="25" height="10" fill="#ff4444" opacity="0.4"/>
+    <rect x="125" y="70" width="25" height="10" fill="#ff4444" opacity="0.4"/>
+    <rect x="45" y="80" width="10" height="20" fill="#ff4444" opacity="0.6"/>
+    <rect x="145" y="80" width="10" height="20" fill="#ff4444" opacity="0.6"/>
+    <rect x="80" y="115" width="15" height="35" fill="#ff4444" opacity="0.3"/><rect x="80" y="115" width="15" height="35" fill="none" stroke="#ff4444" stroke-width="2"/>
+    <rect x="105" y="115" width="15" height="35" fill="#ff4444" opacity="0.3"/><rect x="105" y="115" width="15" height="35" fill="none" stroke="#ff4444" stroke-width="2"/>
+    <rect x="75" y="150" width="25" height="10" fill="#ff4444" opacity="0.4"/>
+    <rect x="100" y="150" width="25" height="10" fill="#ff4444" opacity="0.4"/>
+  </g>
+  <text x="100" y="185" text-anchor="middle" fill="#ff4444" font-size="14" font-family="monospace" filter="url(#glow)">MECH</text>
+</svg>

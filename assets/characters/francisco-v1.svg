@@ -1,0 +1,61 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Blur the alpha channel of the source graphic -->
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"></feGaussianBlur>
+      <!-- Create a solid color using currentColor (inherited from fill/stroke) -->
+      <feFlood flood-color="currentColor" result="flood"></feFlood>
+      <!-- Composite the flood color with the blurred alpha, effectively coloring the blur -->
+      <feComposite in="flood" in2="blur" operator="in" result="glow-effect"></feComposite>
+      <!-- Merge the original source graphic with the colored glow -->
+      <feMerge>
+        <feMergeNode in="glow-effect"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Dark Background -->
+  <rect x="0" y="0" width="200" height="200" fill="#0a0a14"></rect>
+
+  <!-- Character: Francisco (Power Engineer) -->
+  <g id="francisco">
+    <!-- Helmet Base -->
+    <path d="M70 50 H130 L140 70 L130 80 H70 L60 70 Z" fill="#1c1c24"></path>
+    <!-- Helmet Visor (glowing red) -->
+    <rect x="75" y="60" width="50" height="4" fill="#e74c3c" filter="url(#neon-glow)"></rect>
+
+    <!-- Neck / Collar Base -->
+    <rect x="85" y="80" width="30" height="10" fill="#1c1c24"></rect>
+
+    <!-- Main Torso Armor Base -->
+    <path d="M40 90 L30 150 L170 150 L160 90 Z" fill="#22222a"></path>
+    <!-- Central Chest Plate (darker detail) -->
+    <path d="M60 95 L55 135 L145 135 L140 95 Z" fill="#111118"></path>
+
+    <!-- Shoulder Pads Base -->
+    <path d="M40 90 L20 100 L20 120 L40 130 Z" fill="#22222a"></path>
+    <path d="M160 90 L180 100 L180 120 L160 130 Z" fill="#22222a"></path>
+
+    <!-- Neon Outlines (using signature red color and glow filter) -->
+    <!-- Helmet Outline -->
+    <path d="M70 50 H130 L140 70 L130 80 H70 L60 70 Z" stroke="#e74c3c" stroke-width="2" fill="none" filter="url(#neon-glow)"></path>
+
+    <!-- Torso Armor Outline -->
+    <path d="M40 90 L30 150 L170 150 L160 90 Z" stroke="#e74c3c" stroke-width="2" fill="none" filter="url(#neon-glow)"></path>
+    <!-- Central Chest Plate Outline -->
+    <path d="M60 95 L55 135 L145 135 L140 95 Z" stroke="#e74c3c" stroke-width="2" fill="none" filter="url(#neon-glow)"></path>
+
+    <!-- Shoulder Pad Outlines -->
+    <path d="M40 90 L20 100 L20 120 L40 130 Z" stroke="#e74c3c" stroke-width="2" fill="none" filter="url(#neon-glow)"></path>
+    <path d="M160 90 L180 100 L180 120 L160 130 Z" stroke="#e74c3c" stroke-width="2" fill="none" filter="url(#neon-glow)"></path>
+
+    <!-- Energy Crackle Effects (Power Engineer signature effect, glowing red) -->
+    <!-- Left side energy -->
+    <path d="M30 150 L20 160 L35 170 L25 180 L40 170 L30 160 Z" fill="#e74c3c" filter="url(#neon-glow)"></path>
+    <path d="M40 145 L30 155 L45 165 L35 175 L50 165 L40 155 Z" fill="#e74c3c" filter="url(#neon-glow)"></path>
+    <!-- Right side energy -->
+    <path d="M170 150 L180 160 L165 170 L175 180 L160 170 L170 160 Z" fill="#e74c3c" filter="url(#neon-glow)"></path>
+    <path d="M160 145 L170 155 L155 165 L165 175 L150 165 L160 155 Z" fill="#e74c3c" filter="url(#neon-glow)"></path>
+  </g>
+</svg>

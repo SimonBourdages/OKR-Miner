@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR-Miner Asset Gallery — Character & Building Options</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a14;--card:#12122a;--card-hover:#1a1a3a;--accent:#00ff88;--accent-dim:#00cc6a;
+--text:#e0e0e0;--text-dim:#888;--border:#222240;--selected:#00ff8833;--gold:#ffd700}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;
+background:radial-gradient(ellipse at 20% 50%,#0a1a2f 0%,transparent 50%),
+radial-gradient(ellipse at 80% 20%,#0f1a0f 0%,transparent 50%),
+radial-gradient(ellipse at 50% 80%,#1a0a2a 0%,transparent 50%)}
+.container{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:20px 30px 80px}
+header{text-align:center;padding:40px 0 20px}
+header h1{font-size:2.8em;font-weight:800;
+background:linear-gradient(135deg,var(--accent),#88ffcc,var(--gold));
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+letter-spacing:2px}
+header p{color:var(--text-dim);font-size:1.1em;margin-top:8px;letter-spacing:1px}
+.section-title{font-size:2em;color:var(--accent);text-align:center;margin:50px 0 10px;
+text-shadow:0 0 30px #00ff8844;letter-spacing:3px;font-weight:800}
+.section-subtitle{text-align:center;color:var(--text-dim);margin-bottom:30px}
+nav{position:sticky;top:0;z-index:100;background:#0a0a14ee;backdrop-filter:blur(12px);
+border-bottom:1px solid var(--border);padding:10px 0;margin-bottom:10px}
+nav .links{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:1500px;margin:0 auto;padding:0 20px}
+nav a{color:var(--text-dim);text-decoration:none;font-size:.78em;padding:4px 10px;border-radius:4px;
+border:1px solid transparent;transition:all .2s}
+nav a:hover{color:var(--accent);border-color:var(--accent);background:#00ff8811}
+.entity-section{margin:30px 0;padding:24px;background:var(--card);border:1px solid var(--border);
+border-radius:16px;box-shadow:0 4px 30px #00000066}
+.entity-header{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:12px;
+border-bottom:1px solid var(--border)}
+.entity-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;
+justify-content:center;font-size:.7em;flex-shrink:0;font-weight:700;color:#fff}
+.entity-header h2{font-size:1.4em;font-weight:700}
+.entity-header .role{color:var(--text-dim);font-size:.9em;margin-left:auto;font-weight:400}
+.options-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+@media(max-width:1200px){.options-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.options-grid{grid-template-columns:repeat(2,1fr)}}
+.option-card{background:#0e0e22;border:2px solid var(--border);border-radius:12px;padding:10px;
+cursor:pointer;transition:all .25s ease;display:flex;flex-direction:column;align-items:center;gap:6px}
+.option-card:hover{border-color:var(--accent-dim);background:var(--card-hover);
+transform:translateY(-3px);box-shadow:0 8px 25px #00ff8822}
+.option-card.selected{border-color:var(--accent);background:var(--selected);
+box-shadow:0 0 25px #00ff8833}
+.option-card.selected::before{content:'✓ SELECTED';position:absolute;top:6px;right:8px;
+color:var(--accent);font-size:.65em;font-weight:700;background:#0a0a14cc;padding:2px 8px;border-radius:4px}
+.option-card{position:relative}
+.card-preview{width:180px;height:180px;border-radius:8px;overflow:hidden;background:#080818;
+display:flex;align-items:center;justify-content:center}
+.card-preview object,.card-preview img{width:100%;height:100%;object-fit:contain}
+.card-label{font-weight:700;font-size:.85em;color:#fff}
+.card-style{font-size:.68em;color:var(--text-dim);text-align:center;line-height:1.3}
+.stats{text-align:center;padding:20px;color:var(--text-dim);font-size:.9em;margin-top:20px}
+.stats span{color:var(--accent);font-weight:700}
+footer{text-align:center;padding:40px;color:var(--text-dim);font-size:.8em;border-top:1px solid var(--border);margin-top:40px}
+</style>
+</head>
+<body>
+<nav>
+<div class="links">
+<strong style="color:var(--accent);font-size:.8em;padding:4px 10px">Characters:</strong>
+<a href="#char-josh">Josh</a><a href="#char-jrod">Jrod</a><a href="#char-bea">Bea</a><a href="#char-ada">Ada</a><a href="#char-francisco">Francisco</a><a href="#char-mason">Mason</a><a href="#char-zaki">Zaki</a><a href="#char-katy">Katy</a>
+<span style="color:var(--border);padding:0 6px">|</span>
+<strong style="color:var(--gold);font-size:.8em;padding:4px 10px">Buildings:</strong>
+<a href="#build-collector">📡 Recruiter</a><a href="#build-processor">💻 Employee</a><a href="#build-multiplier">🔮 Network Hub</a><a href="#build-synthesizer">🤖 AI Worker</a><a href="#build-generator">🏦 Finances</a><a href="#build-bank">📈 Investment</a><a href="#build-repairbot">🍕 IT Support</a><a href="#build-gpu">⚡ GPU</a>
+</div>
+</nav>
+<div class="container">
+<header>
+<h1>⛏️ OKR-Miner Asset Gallery</h1>
+<p>Select your preferred style for each character and building — 5 options per entity</p>
+</header>
+
+<h2 class="section-title">👤 CHARACTERS</h2>
+<p class="section-subtitle">Team member portraits — click to select your preferred style</p>
+
+        <div class="entity-section" id="char-josh">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#00bcd422;border:2px solid #00bcd4">#00bcd4</div>
+                <h2 style="color:#00bcd4">Josh</h2>
+                <span class="role">Tech Lead — "Build it!"</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/josh-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Josh v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/josh-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Josh v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/josh-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Josh v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/josh-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Josh v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/josh-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Josh v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="char-jrod">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#ffd70022;border:2px solid #ffd700">#ffd700</div>
+                <h2 style="color:#ffd700">Jrod</h2>
+                <span class="role">The Boss / Final Unlock — "Legendary!"</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/jrod-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Jrod v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/jrod-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Jrod v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/jrod-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Jrod v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/jrod-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Jrod v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/jrod-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Jrod v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="char-bea">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#4a90e222;border:2px solid #4a90e2">#4a90e2</div>
+                <h2 style="color:#4a90e2">Bea</h2>
+                <span class="role">Engineer — "Nice work!"</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/bea-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Bea v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/bea-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Bea v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/bea-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Bea v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/bea-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Bea v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/bea-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Bea v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="char-ada">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#e91e6322;border:2px solid #e91e63">#e91e63</div>
+                <h2 style="color:#e91e63">Ada</h2>
+                <span class="role">AI Specialist — "Amazing!"</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/ada-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Ada v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/ada-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Ada v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/ada-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Ada v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/ada-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Ada v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/ada-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Ada v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="char-francisco">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#e74c3c22;border:2px solid #e74c3c">#e74c3c</div>
+                <h2 style="color:#e74c3c">Francisco</h2>
+                <span class="role">Power Engineer — "More power!"</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/francisco-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Francisco v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/francisco-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Francisco v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/francisco-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Francisco v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/francisco-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Francisco v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/francisco-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Francisco v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="char-mason">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#27ae6022;border:2px solid #27ae60">#27ae60</div>
+                <h2 style="color:#27ae60">Mason</h2>
+                <span class="role">Automation Expert — "Automate!"</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/mason-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Mason v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/mason-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Mason v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/mason-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Mason v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/mason-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Mason v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/mason-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Mason v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="char-zaki">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#16a08522;border:2px solid #16a085">#16a085</div>
+                <h2 style="color:#16a085">Zaki</h2>
+                <span class="role">Optimizer — "Optimize!"</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/zaki-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Zaki v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/zaki-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Zaki v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/zaki-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Zaki v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/zaki-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Zaki v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/zaki-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Zaki v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="char-katy">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#2980b922;border:2px solid #2980b9">#2980b9</div>
+                <h2 style="color:#2980b9">Katy</h2>
+                <span class="role">Strategist — "Almost!"</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/katy-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Katy v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/katy-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Katy v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/katy-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Katy v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/katy-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Katy v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/characters/katy-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Katy v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+
+<h2 class="section-title">🏗️ BUILDINGS</h2>
+<p class="section-subtitle">Structure icons — click to select your preferred style</p>
+
+        <div class="entity-section" id="build-collector">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#00ff8822;border:2px solid #00ff88;font-size:1.5em">📡</div>
+                <h2 style="color:#00ff88">Recruiter</h2>
+                <span class="role">collector</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/collector-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Recruiter v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/collector-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Recruiter v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/collector-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Recruiter v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/collector-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Recruiter v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/collector-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Recruiter v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="build-processor">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#4488ff22;border:2px solid #4488ff;font-size:1.5em">💻</div>
+                <h2 style="color:#4488ff">Employee</h2>
+                <span class="role">processor</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/processor-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Employee v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/processor-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Employee v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/processor-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Employee v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/processor-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Employee v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/processor-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Employee v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="build-multiplier">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#9933ff22;border:2px solid #9933ff;font-size:1.5em">🔮</div>
+                <h2 style="color:#9933ff">Network Hub</h2>
+                <span class="role">multiplier</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/multiplier-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Network Hub v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/multiplier-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Network Hub v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/multiplier-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Network Hub v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/multiplier-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Network Hub v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/multiplier-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Network Hub v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="build-synthesizer">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#ff444422;border:2px solid #ff4444;font-size:1.5em">🤖</div>
+                <h2 style="color:#ff4444">AI Worker</h2>
+                <span class="role">synthesizer</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/synthesizer-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">AI Worker v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/synthesizer-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">AI Worker v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/synthesizer-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">AI Worker v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/synthesizer-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">AI Worker v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/synthesizer-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">AI Worker v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="build-generator">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#cc883322;border:2px solid #cc8833;font-size:1.5em">🏦</div>
+                <h2 style="color:#cc8833">Finances</h2>
+                <span class="role">generator</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/generator-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Finances v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/generator-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Finances v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/generator-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Finances v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/generator-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Finances v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/generator-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Finances v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="build-bank">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#ffcc0022;border:2px solid #ffcc00;font-size:1.5em">📈</div>
+                <h2 style="color:#ffcc00">Investment</h2>
+                <span class="role">bank</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/bank-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Investment v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/bank-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Investment v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/bank-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Investment v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/bank-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Investment v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/bank-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">Investment v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="build-repairbot">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#ff880022;border:2px solid #ff8800;font-size:1.5em">🍕</div>
+                <h2 style="color:#ff8800">IT Support</h2>
+                <span class="role">repairbot</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/repairbot-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">IT Support v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/repairbot-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">IT Support v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/repairbot-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">IT Support v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/repairbot-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">IT Support v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/repairbot-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">IT Support v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+        <div class="entity-section" id="build-gpu">
+            <div class="entity-header">
+                <div class="entity-icon" style="background:#00ff4422;border:2px solid #00ff44;font-size:1.5em">⚡</div>
+                <h2 style="color:#00ff44">GPU</h2>
+                <span class="role">gpu</span>
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/gpu-v1.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">GPU v1</div>
+                    <div class="card-style">Clean minimalist with strong silhouette and bold neon outlines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/gpu-v2.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">GPU v2</div>
+                    <div class="card-style">Detailed technical blueprint style with glowing schematics</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/gpu-v3.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">GPU v3</div>
+                    <div class="card-style">Vibrant comic/manga style with dramatic lighting and action pose</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/gpu-v4.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">GPU v4</div>
+                    <div class="card-style">Sleek futuristic hologram look with transparency effects and scan lines</div>
+                </div>
+                <div class="option-card" onclick="this.classList.toggle('selected')">
+                    <div class="card-preview">
+                        <object data="assets/buildings/gpu-v5.svg" type="image/svg+xml" width="180" height="180"></object>
+                    </div>
+                    <div class="card-label">GPU v5</div>
+                    <div class="card-style">Heavy pixel-art retro style with chunky pixels and CRT glow effects</div>
+                </div>
+            </div>
+        </div>
+
+<div class="stats">
+Generated <span>40</span> character variants + <span>40</span> building variants
+= <span>80</span> total assets
+</div>
+<footer>Generated with Gemini 2.5 Flash &bull; OKR-Miner &copy; 2026</footer>
+</div>
+
+<script>
+// Track selections
+const selections = {};
+document.querySelectorAll('.option-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const section = card.closest('.entity-section');
+        const sectionId = section.id;
+        section.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+        card.classList.toggle('selected');
+        if (card.classList.contains('selected')) {
+            selections[sectionId] = card.querySelector('.card-label').textContent;
+        } else {
+            delete selections[sectionId];
+        }
+        console.log('Selections:', selections);
+    });
+});
+</script>
+</body>
+</html>

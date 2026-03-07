@@ -1,0 +1,51 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <!-- Create a strong blurred glow using the primary magenta from the palette for vibrancy -->
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+            <feFlood flood-color="#ff00ff" flood-opacity="1" result="flood"/>
+            <feComposite in="flood" in2="blur" operator="in" result="coloredBlur"/>
+            <!-- Merge the original graphic on top of the glow -->
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <!-- Dark background -->
+    <rect width="200" height="200" fill="#0a0a14"/>
+
+    <!-- Main character silhouette - very dark purplish-grey to subtly hint at Ada's color and provide depth -->
+    <path fill="#1c1c2e" d="M100 25
+                            C125 25 135 45 135 75
+                            S125 105 100 105
+                            S65 105 65 75
+                            S75 25 100 25 Z
+                            M45 100
+                            C35 120 35 160 35 160
+                            L165 160
+                            C165 160 165 120 155 100
+                            C140 110 120 115 100 115
+                            C80 115 60 110 45 100 Z"/>
+
+    <!-- Neon outlines for the character - Ada's signature color #e91e63, with glow filter -->
+    <!-- Head outline -->
+    <path d="M100 25 C125 25 135 45 135 75 S125 105 100 105 S65 105 65 75 S75 25 100 25 Z"
+          fill="none" stroke="#e91e63" stroke-width="2.5" filter="url(#neon-glow)"/>
+    <!-- High collar/neckline -->
+    <path d="M65 105 C80 115 100 115 135 105" fill="none" stroke="#e91e63" stroke-width="2.5" filter="url(#neon-glow)"/>
+    <!-- Sleek visor for AI specialist -->
+    <path d="M70 70 C75 68 85 68 100 70 C115 72 125 72 130 70" fill="none" stroke="#e91e63" stroke-width="3.5" filter="url(#neon-glow)"/>
+    <!-- Minimalist circuit patterns on shoulders -->
+    <path d="M55 130 L70 115 M145 130 L130 115"
+          fill="none" stroke="#e91e63" stroke-width="1.5" filter="url(#neon-glow)"/>
+    <!-- Additional lines for suit detail -->
+    <path d="M45 140 L155 140" fill="none" stroke="#e91e63" stroke-width="1.5" filter="url(#neon-glow)"/>
+
+    <!-- Digital aura elements (floating particles) -->
+    <circle cx="140" cy="50" r="2" fill="#e91e63" filter="url(#neon-glow)"/>
+    <circle cx="60" cy="60" r="2" fill="#e91e63" filter="url(#neon-glow)"/>
+    <rect x="125" y="30" width="4" height="4" fill="#e91e63" transform="rotate(45 127 32)" filter="url(#neon-glow)"/>
+    <rect x="70" y="40" width="4" height="4" fill="#e91e63" transform="rotate(45 72 42)" filter="url(#neon-glow)"/>
+</svg>

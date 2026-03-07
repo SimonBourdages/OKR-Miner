@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+    <feFlood flood-color="#9933ff" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter><radialGradient id="ng1" cx="50%" cy="50%"><stop offset="0%" stop-color="#9933ff" stop-opacity="0.3"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+  <rect width="200" height="200" fill="#0a0a14"/><circle cx="100" cy="100" r="90" fill="url(#ng1)"/>
+  <polygon points="100,60 130,85 120,120 80,120 70,85" fill="rgb(61,20,102)" stroke="#9933ff" stroke-width="2.5" filter="url(#glow)"/>
+  <circle cx="100" cy="95" r="15" fill="#9933ff" opacity="0.4" filter="url(#glow)">
+    <animate attributeName="r" values="15;20;15" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.4;0.7;0.4" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <text x="100" y="99" text-anchor="middle" fill="#fff" font-size="14" font-family="sans-serif" font-weight="bold">×</text>
+  <g stroke="#9933ff" stroke-width="2.5" filter="url(#glow)">
+    <line x1="100" y1="60" x2="100" y2="25"><animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite"/></line>
+    <line x1="130" y1="85" x2="165" y2="70"><animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite"/></line>
+    <line x1="120" y1="120" x2="155" y2="150"><animate attributeName="opacity" values="0.7;0.3;0.7" dur="1.8s" repeatCount="indefinite"/></line>
+    <line x1="80" y1="120" x2="45" y2="150"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="1.8s" repeatCount="indefinite"/></line>
+    <line x1="70" y1="85" x2="35" y2="70"><animate attributeName="opacity" values="0.6;1;0.6" dur="1.3s" repeatCount="indefinite"/></line>
+  </g>
+  <g fill="#9933ff" filter="url(#glow)">
+    <circle cx="100" cy="25" r="8"/><circle cx="165" cy="70" r="8"/><circle cx="155" cy="150" r="8"/>
+    <circle cx="45" cy="150" r="8"/><circle cx="35" cy="70" r="8"/>
+  </g>
+</svg>

@@ -1,0 +1,110 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Gold Neon Glow Filter for Jrod's signature elements -->
+        <filter id="neonGlowGold" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blurOut"/>
+            <feFlood flood-color="#ffd700" flood-opacity="1" result="floodOut"/>
+            <feComposite in="floodOut" in2="blurOut" operator="in" result="glowOut"/>
+            <feMerge>
+                <feMergeNode in="glowOut"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        <!-- Cyan Neon Glow Filter for secondary blueprint details -->
+        <filter id="neonGlowCyan" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blurOut"/>
+            <feFlood flood-color="#00bcd4" flood-opacity="1" result="floodOut"/>
+            <feComposite in="floodOut" in2="blurOut" operator="in" result="glowOut"/>
+            <feMerge>
+                <feMergeNode in="glowOut"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        <!-- Green Neon Glow Filter for tertiary blueprint details / core energy -->
+        <filter id="neonGlowGreen" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blurOut"/>
+            <feFlood flood-color="#00ff88" flood-opacity="1" result="floodOut"/>
+            <feComposite in="floodOut" in2="blurOut" operator="in" result="glowOut"/>
+            <feMerge>
+                <feMergeNode in="glowOut"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <!-- Dark Background -->
+    <rect x="0" y="0" width="200" height="200" fill="#0a0a14"/>
+
+    <!-- Main Character Group -->
+    <g transform="translate(0, 10)"> <!-- Adjust vertical position for better fit -->
+
+        <!-- Halo of Light (Crown) - Jrod's Signature Gold -->
+        <circle cx="100" cy="50" r="45" fill="none" stroke="#ffd700" stroke-width="4" filter="url(#neonGlowGold)"/>
+        <!-- Inner dashed ring for halo detail -->
+        <circle cx="100" cy="50" r="42" fill="none" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="6 4" filter="url(#neonGlowGold)"/>
+        <!-- Central glow point for halo -->
+        <circle cx="100" cy="50" r="3" fill="#ffd700" filter="url(#neonGlowGold)"/> 
+
+        <!-- Head / Helmet Structure - Signature Gold -->
+        <!-- Main helmet shape, angular and imposing -->
+        <path d="M 100 25 L 125 40 L 120 70 L 100 80 L 80 70 L 75 40 Z" 
+              fill="none" stroke="#ffd700" stroke-width="2.5" filter="url(#neonGlowGold)"/>
+        <!-- Visor / Eye Slits - minimal and angular -->
+        <path d="M 88 52 L 95 50 M 105 50 L 112 52"
+              fill="none" stroke="#ffd700" stroke-width="1.5" filter="url(#neonGlowGold)"/>
+        <!-- Lower faceplate line -->
+        <path d="M 90 60 H 110" fill="none" stroke="#ffd700" stroke-width="1.5" filter="url(#neonGlowGold)"/>
+        
+        <!-- Internal Head Blueprint lines - Cyan (secondary color) -->
+        <path d="M 100 35 V 70" fill="none" stroke="#00bcd4" stroke-width="1" stroke-dasharray="3 2" filter="url(#neonGlowCyan)"/>
+        <path d="M 85 45 H 115 M 85 65 H 115" fill="none" stroke="#00bcd4" stroke-width="1" stroke-dasharray="3 2" filter="url(#neonGlowCyan)"/>
+        <!-- Connection nodes on head blueprint -->
+        <circle cx="90" cy="45" r="1.5" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+        <circle cx="110" cy="45" r="1.5" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+        <circle cx="90" cy="65" r="1.5" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+        <circle cx="110" cy="65" r="1.5" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+
+        <!-- Neck / High Collar - Signature Gold -->
+        <path d="M 85 80 L 80 95 H 120 L 115 80 Z" 
+              fill="none" stroke="#ffd700" stroke-width="2.5" filter="url(#neonGlowGold)"/>
+        <!-- Collar detail line -->
+        <path d="M 90 90 H 110" fill="none" stroke="#ffd700" stroke-width="1.5" filter="url(#neonGlowGold)"/>
+
+        <!-- Shoulders / Chest Armor - Signature Gold outlines -->
+        <!-- Left Shoulder Guard, angular design -->
+        <path d="M 80 95 L 60 110 V 135 L 75 145 H 95 L 90 120 V 105 Z"
+              fill="none" stroke="#ffd700" stroke-width="2.5" filter="url(#neonGlowGold)"/>
+        <!-- Right Shoulder Guard, angular design -->
+        <path d="M 120 95 L 140 110 V 135 L 125 145 H 105 L 110 120 V 105 Z"
+              fill="none" stroke="#ffd700" stroke-width="2.5" filter="url(#neonGlowGold)"/>
+        
+        <!-- Central Chest Plate - Signature Gold outlines -->
+        <path d="M 95 105 L 100 110 L 105 105 L 105 140 L 100 145 L 95 140 Z"
+              fill="none" stroke="#ffd700" stroke-width="2.5" filter="url(#neonGlowGold)"/>
+        <!-- Inner Chest Plate detail, dashed for blueprint effect -->
+        <path d="M 90 100 H 110 V 130 H 90 Z" 
+              fill="none" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="5 3" filter="url(#neonGlowGold)"/>
+
+        <!-- Internal Chest Blueprint Details -->
+        <!-- Central core lines and nodes - Green (tertiary color) -->
+        <path d="M 100 115 V 130" fill="none" stroke="#00ff88" stroke-width="1" stroke-dasharray="3 2" filter="url(#neonGlowGreen)"/>
+        <rect x="98" y="112" width="4" height="4" fill="#00ff88" filter="url(#neonGlowGreen)"/>
+        <rect x="98" y="132" width="4" height="4" fill="#00ff88" filter="url(#neonGlowGreen)"/>
+
+        <!-- Diagonal connection lines to shoulders - Cyan -->
+        <path d="M 75 115 L 95 115 M 125 115 L 105 115" fill="none" stroke="#00bcd4" stroke-width="1" stroke-dasharray="4 2" filter="url(#neonGlowCyan)"/>
+        <!-- Connection nodes on shoulders -->
+        <circle cx="75" cy="115" r="1.5" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+        <circle cx="125" cy="115" r="1.5" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+        
+        <!-- Additional angular lines for chest detailing - Gold (dashed) -->
+        <path d="M 85 130 H 115 M 90 125 H 110" fill="none" stroke="#ffd700" stroke-width="1" stroke-dasharray="2 1" filter="url(#neonGlowGold)"/>
+        
+        <!-- Shoulder internal panels/details - Cyan (dashed) -->
+        <path d="M 65 125 H 75 M 125 125 H 135" fill="none" stroke="#00bcd4" stroke-width="1" stroke-dasharray="2 2" filter="url(#neonGlowCyan)"/>
+        <!-- Small rectangular nodes on shoulders -->
+        <rect x="68" y="122" width="3" height="3" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+        <rect x="129" y="122" width="3" height="3" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+
+    </g>
+</svg>

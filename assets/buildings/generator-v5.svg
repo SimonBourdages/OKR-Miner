@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+    <feFlood flood-color="#ff9800" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter></defs>
+  <rect width="200" height="200" fill="#080810"/>
+  <g filter="url(#glow)">
+    <rect x="30" y="50" width="140" height="90" fill="#ff9800" opacity="0.12"/><rect x="30" y="50" width="140" height="90" fill="none" stroke="#ff9800" stroke-width="3"/>
+    <rect x="35" y="40" width="130" height="15" fill="#ff9800" opacity="0.4"/>
+    <rect x="70" y="70" width="60" height="50" fill="#ff9800" opacity="0.2"/>
+    <rect x="70" y="70" width="60" height="50" fill="none" stroke="#ff9800" stroke-width="2"/>
+    <text x="100" y="103" text-anchor="middle" fill="#ff9800" font-size="30" font-family="serif" font-weight="bold">$</text>
+    <circle cx="55" cy="80" r="5" fill="#ff9800" opacity="0.5"/><circle cx="145" cy="80" r="5" fill="#ff9800" opacity="0.5"/>
+    <circle cx="55" cy="120" r="5" fill="#ff9800" opacity="0.5"/><circle cx="145" cy="120" r="5" fill="#ff9800" opacity="0.5"/>
+    <rect x="40" y="145" width="120" height="10" fill="#ff9800" opacity="0.3"/>
+  </g>
+  <text x="100" y="185" text-anchor="middle" fill="#ff9800" font-size="14" font-family="monospace" filter="url(#glow)">VAULT</text>
+</svg>

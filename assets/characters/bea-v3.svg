@@ -1,0 +1,143 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Neon Glow Filter for Bea's Signature Blue (#4a90e2) -->
+        <filter id="neonGlowBlue" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+            <feComponentTransfer in="blur" result="coloredBlur">
+                <feFuncA type="linear" slope="2" intercept="0"/>
+                <feFuncR type="linear" slope="0" intercept="0.290196"/> <!-- R of #4a90e2 -->
+                <feFuncG type="linear" slope="0" intercept="0.564706"/> <!-- G of #4a90e2 -->
+                <feFuncB type="linear" slope="0" intercept="0.886275"/> <!-- B of #4a90e2 -->
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- Neon Glow Filter for Holographic Cyan (#00bcd4) -->
+        <filter id="neonGlowCyan" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+            <feComponentTransfer in="blur" result="coloredBlur">
+                <feFuncA type="linear" slope="2" intercept="0"/>
+                <feFuncR type="linear" slope="0" intercept="0"/> <!-- R of #00bcd4 -->
+                <feFuncG type="linear" slope="0" intercept="0.737255"/> <!-- G of #00bcd4 -->
+                <feFuncB type="linear" slope="0" intercept="0.831373"/> <!-- B of #00bcd4 -->
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- Gradients for subtle shading and dramatic lighting -->
+        <linearGradient id="skinGradient" x1="100" y1="60" x2="110" y2="120" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#C28F79"/>
+            <stop offset="1" stop-color="#A56E58"/>
+        </linearGradient>
+        <linearGradient id="suitGradient" x1="100" y1="110" x2="100" y2="190" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#2a2a3a"/>
+            <stop offset="1" stop-color="#1a1a24"/>
+        </linearGradient>
+        <linearGradient id="hairGradient" x1="100" y1="30" x2="100" y2="90" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#10101a"/>
+            <stop offset="1" stop-color="#000000"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Dark Background -->
+    <rect width="200" height="200" fill="#0a0a14"/>
+
+    <!-- Subtle energy aura behind Bea (signature color) -->
+    <path d="M100 100 C 50 80 30 140 100 190 C 170 140 150 80 100 100 Z" fill="#4a90e2" opacity="0.1" filter="url(#neonGlowBlue)"/>
+
+    <!-- Bea - Head and Upper Body -->
+
+    <!-- Hair -->
+    <g transform="translate(0, 5)">
+        <path d="M 80 30 C 60 40 65 65 70 75 C 75 85 90 90 100 90 C 110 90 125 85 130 75 C 135 65 140 40 120 30 C 110 25 90 25 80 30 Z" fill="url(#hairGradient)"/>
+        <!-- Defined hair strands -->
+        <path d="M78 33 L85 29 L90 35 L80 40 Z" fill="#20202a"/>
+        <path d="M122 33 L115 29 L110 35 L120 40 Z" fill="#20202a"/>
+        <path d="M100 25 L105 30 L100 35 L95 30 Z" fill="#20202a"/>
+        <!-- Blue highlights with glow -->
+        <path d="M82 35 L87 32 L88 37 L83 40 Z" fill="#4a90e2" filter="url(#neonGlowBlue)" opacity="0.8"/>
+        <path d="M118 35 L113 32 L112 37 L117 40 Z" fill="#4a90e2" filter="url(#neonGlowBlue)" opacity="0.8"/>
+    </g>
+
+    <!-- Face -->
+    <g transform="translate(0, 5)">
+        <path d="M 100 50 C 120 50 125 85 100 95 C 75 85 80 50 100 50 Z" fill="url(#skinGradient)"/>
+        <!-- Jawline -->
+        <path d="M78 87 Q100 100 122 87" stroke="#A56E58" stroke-width="0.5" fill="none"/>
+
+        <!-- Stylized, glowing eyes -->
+        <path d="M85 73 C88 70 92 70 95 73 L92 75 C90 75 87 75 85 73 Z" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+        <path d="M105 73 C108 70 112 70 115 73 L112 75 C110 75 107 75 105 73 Z" fill="#00bcd4" filter="url(#neonGlowCyan)"/>
+        <!-- Eye Pupils -->
+        <circle cx="90" cy="73" r="1.5" fill="#fff"/>
+        <circle cx="110" cy="73" r="1.5" fill="#fff"/>
+        
+        <!-- Mouth (focused expression) -->
+        <path d="M95 85 Q100 87 105 85" stroke="#A56E58" stroke-width="1" fill="none"/>
+    </g>
+
+    <!-- Neck -->
+    <rect x="95" y="103" width="10" height="15" fill="url(#skinGradient)"/>
+
+    <!-- Engineer Suit / Upper Body -->
+    <path d="M 60 115 C 50 120 45 135 45 155 C 45 175 55 190 100 195 C 145 190 155 175 155 155 C 155 135 150 120 140 115 L 100 120 L 60 115 Z" fill="url(#suitGradient)"/>
+
+    <!-- Shoulder armor (signature blue with glow) -->
+    <path d="M 50 120 L 40 135 L 50 150 L 70 145 L 65 125 Z" fill="#4a90e2" filter="url(#neonGlowBlue)"/>
+    <path d="M 150 120 L 160 135 L 150 150 L 130 145 L 135 125 Z" fill="#4a90e2" filter="url(#neonGlowBlue)"/>
+
+    <!-- Chest core/power element (glowing) -->
+    <rect x="90" y="130" width="20" height="20" fill="#0a0a14" stroke="#4a90e2" stroke-width="2" filter="url(#neonGlowBlue)"/>
+    <circle cx="100" cy="140" r="5" fill="#4a90e2" filter="url(#neonGlowBlue)"/>
+
+    <!-- Belt/waistline detail -->
+    <rect x="60" y="165" width="80" height="10" fill="#2a2a3a" stroke="#4a90e2" stroke-width="1" filter="url(#neonGlowBlue)"/>
+    <rect x="95" y="167" width="10" height="6" fill="#0a0a14" stroke="#00bcd4" stroke-width="0.5" filter="url(#neonGlowCyan)"/>
+
+    <!-- Right Arm (Bea's Left Arm) - Extended for interaction with holograms -->
+    <g transform="translate(10, -5) rotate(10 130 105)">
+        <path d="M 130 110 C 140 105 155 115 160 125 C 165 135 155 145 140 140 C 125 135 120 120 130 110 Z" fill="url(#skinGradient)"/>
+        <path d="M 135 115 C 145 110 150 120 150 130 C 150 140 140 135 135 130 C 130 125 130 120 135 115 Z" fill="url(#suitGradient)"/> <!-- Sleeve -->
+        <rect x="150" y="120" width="5" height="10" fill="#4a90e2" filter="url(#neonGlowBlue)" opacity="0.7"/> <!-- Wrist communicator -->
+    </g>
+
+    <!-- Left Arm (Bea's Right Arm) - Relaxed, supporting pose -->
+    <g transform="translate(0, 10)">
+        <path d="M 70 110 C 60 105 45 115 40 125 C 35 135 45 145 60 140 C 75 135 80 120 70 110 Z" fill="url(#skinGradient)"/>
+        <path d="M 65 115 C 55 110 50 120 50 130 C 50 140 60 135 65 130 C 70 125 70 120 65 115 Z" fill="url(#suitGradient)"/> <!-- Sleeve -->
+    </g>
+
+    <!-- Holographic Tools (Cyan with glow) -->
+    <!-- Tool 1: Circuit Board Fragment - near extended hand -->
+    <g transform="translate(160 105) scale(0.8) rotate(25)">
+        <path d="M0 0 L20 0 L20 5 L10 5 L10 10 L30 10 L30 15 L0 15 Z" fill="#00bcd4" opacity="0.6" filter="url(#neonGlowCyan)"/>
+        <circle cx="5" cy="2.5" r="1" fill="#fff" opacity="0.8"/>
+        <circle cx="15" cy="7.5" r="1" fill="#fff" opacity="0.8"/>
+        <rect x="25" y="12.5" width="3" height="1" fill="#fff" opacity="0.8"/>
+    </g>
+
+    <!-- Tool 2: Data Cube - floating above shoulder -->
+    <g transform="translate(130 45) scale(0.9) rotate(-15)">
+        <rect x="0" y="0" width="15" height="15" fill="#00bcd4" opacity="0.6" filter="url(#neonGlowCyan)"/>
+        <path d="M0 0 L5 -5 L20 -5 L15 0 Z" fill="#00bcd4" opacity="0.4" filter="url(#neonGlowCyan)"/>
+        <path d="M15 0 L20 -5 L20 10 L15 15 Z" fill="#00bcd4" opacity="0.4" filter="url(#neonGlowCyan)"/>
+        <line x1="2" y1="2" x2="13" y2="2" stroke="#fff" stroke-width="0.5" opacity="0.8"/>
+        <line x1="2" y1="5" x2="13" y2="5" stroke="#fff" stroke-width="0.5" opacity="0.8"/>
+        <line x1="2" y1="8" x2="13" y2="8" stroke="#fff" stroke-width="0.5" opacity="0.8"/>
+    </g>
+
+    <!-- Tool 3: Stylized Wrench - floating near other hand -->
+    <g transform="translate(30 80) scale(0.7) rotate(-30)">
+        <path d="M10 0 C 15 0 15 5 10 5 C 5 5 5 0 10 0 Z M 10 5 L 10 20 C 10 25 5 25 5 20 L 5 5 Z M 15 10 C 20 10 20 15 15 15 C 10 15 10 10 15 10 Z"
+              fill="#00bcd4" opacity="0.6" filter="url(#neonGlowCyan)"/>
+        <rect x="7" y="5" width="6" height="15" fill="#00bcd4" opacity="0.6" filter="url(#neonGlowCyan)"/>
+        <circle cx="10" cy="12.5" r="2" fill="#fff" opacity="0.8"/>
+    </g>
+
+</svg>

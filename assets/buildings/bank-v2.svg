@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+    <feFlood flood-color="#ffcc00" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter><pattern id="ig" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none" stroke="#ffcc00" stroke-width="0.15" opacity="0.1"/></pattern></defs>
+  <rect width="200" height="200" fill="#060614"/><rect width="200" height="200" fill="url(#ig)"/>
+  <rect x="25" y="35" width="150" height="110" fill="none" stroke="#ffcc00" stroke-width="1" stroke-dasharray="4,2"/>
+  <polyline points="35,125 55,115 75,118 95,80 115,90 135,55 165,50" fill="none" stroke="#ffcc00" stroke-width="1.2" stroke-dasharray="6,3"/>
+  <text x="160" y="48" fill="#ffcc00" font-size="8" font-family="monospace">↑</text>
+  <line x1="35" y1="130" x2="165" y2="130" stroke="#ffcc00" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <text x="100" y="160" text-anchor="middle" fill="#ffcc00" font-size="7" font-family="monospace">COMPOUND.INTEREST</text>
+  <text x="15" y="15" fill="#ffcc00" font-size="7" font-family="monospace" opacity="0.4">INVEST-SPEC</text>
+  <rect x="5" y="5" width="190" height="190" fill="none" stroke="#ffcc00" stroke-width="0.5" opacity="0.3"/>
+</svg>

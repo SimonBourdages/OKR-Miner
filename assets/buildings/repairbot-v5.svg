@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+    <feFlood flood-color="#00e5ff" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter><filter id="glow2" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+    <feFlood flood-color="#ff8800" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter></defs>
+  <rect width="200" height="200" fill="#080810"/>
+  <g filter="url(#glow2)">
+    <polygon points="100,30 150,85 50,85" fill="#ff8800" opacity="0.2"/><polygon points="100,30 150,85 50,85" fill="none" stroke="#ff8800" stroke-width="3"/>
+    <circle cx="85" cy="65" r="5" fill="#ff3333"/><circle cx="105" cy="70" r="4" fill="#ff3333"/>
+    <circle cx="95" cy="58" r="3" fill="#66cc33"/>
+    <rect x="40" y="85" width="120" height="15" fill="#ff8800" opacity="0.3"/>
+    <rect x="40" y="85" width="120" height="15" fill="none" stroke="#ff8800" stroke-width="2"/>
+  </g>
+  <g filter="url(#glow)">
+    <rect x="45" y="110" width="110" height="55" fill="#00e5ff" opacity="0.08"/><rect x="45" y="110" width="110" height="55" fill="none" stroke="#00e5ff" stroke-width="2"/>
+    <path d="M65 135 L80 148 L100 125" stroke="#00e5ff" stroke-width="2.5" fill="none"/>
+    <rect x="110" y="128" width="30" height="5" fill="#00e5ff" opacity="0.4"/><rect x="110" y="138" width="20" height="4" fill="#00e5ff" opacity="0.3"/>
+  </g>
+  <text x="100" y="188" text-anchor="middle" fill="#00e5ff" font-size="12" font-family="monospace" filter="url(#glow)">🍕 HEAL</text>
+</svg>

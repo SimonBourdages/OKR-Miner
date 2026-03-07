@@ -1,0 +1,83 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Neon Glow Filter for Cyan -->
+    <filter id="neon-glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Blur the alpha channel of the source graphic (e.g., a stroke) -->
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3.5" result="blurAlpha"/>
+      <!-- Create a solid color layer with the desired neon cyan -->
+      <feFlood flood-color="#00bcd4" flood-opacity="1" result="floodColor"/>
+      <!-- Combine the neon color with the blurred alpha, creating the glowing effect -->
+      <feComposite in="floodColor" in2="blurAlpha" operator="in" result="glowLayer"/>
+      <!-- Merge the glowing layer with the original source graphic (for crispness) -->
+      <feMerge>
+        <feMergeNode in="glowLayer"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Generic dark fill for main body parts with subtle gradient -->
+    <linearGradient id="darkGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a24"/>
+      <stop offset="100%" stop-color="#05050f"/>
+    </linearGradient>
+
+    <!-- Defines the main head shape -->
+    <path id="head-shape" d="M 70 40 C 70 25, 80 20, 100 20 C 120 20, 130 25, 130 40 C 130 55, 130 65, 120 70 L 80 70 C 70 65, 70 55, 70 40 Z"/>
+    
+    <!-- Defines the main visor frame shape -->
+    <rect id="visor-frame" x="68" y="48" width="64" height="20" rx="5" ry="5"/>
+
+    <!-- Defines the main body/shoulder shape -->
+    <path id="body-shape" d="M 50 160 H 150 V 130 C 150 100, 160 90, 130 90 L 70 90 C 40 90, 50 100, 50 130 Z"/>
+
+    <!-- Defines the neck piece shape -->
+    <rect id="neck-piece" x="85" y="85" width="30" height="20" rx="5" ry="5"/>
+
+  </defs>
+
+  <!-- Background Rectangle -->
+  <rect x="0" y="0" width="200" height="200" fill="#0a0a14"/>
+
+  <!-- Character Elements (layered from back to front) -->
+
+  <!-- Body/Shoulders Silhouette -->
+  <use href="#body-shape" fill="url(#darkGradient)"/>
+  <!-- Bold neon outline for shoulders -->
+  <use href="#body-shape" fill="none" stroke="#00bcd4" stroke-width="2.5" filter="url(#neon-glow-cyan)"/>
+
+  <!-- Neck Piece -->
+  <use href="#neck-piece" fill="url(#darkGradient)"/>
+  <!-- Bold neon outline for neck piece -->
+  <use href="#neck-piece" fill="none" stroke="#00bcd4" stroke-width="1.5" filter="url(#neon-glow-cyan)"/>
+
+  <!-- Head Silhouette -->
+  <use href="#head-shape" fill="url(#darkGradient)"/>
+  <!-- Bold neon outline for head -->
+  <use href="#head-shape" fill="none" stroke="#00bcd4" stroke-width="2.5" filter="url(#neon-glow-cyan)"/>
+
+  <!-- Visor Frame (dark fill and glowing outline) -->
+  <use href="#visor-frame" fill="#0a0a14"/>
+  <!-- Bold neon outline for visor frame -->
+  <use href="#visor-frame" fill="none" stroke="#00bcd4" stroke-width="2" filter="url(#neon-glow-cyan)"/>
+
+  <!-- Visor Glass (inner dark rectangle for screen) -->
+  <rect x="70" y="50" width="60" height="16" rx="4" ry="4" fill="#05050f"/>
+
+  <!-- Visor Details (glowing internal lines) -->
+  <rect x="75" y="54" width="20" height="2" fill="#00bcd4" filter="url(#neon-glow-cyan)"/>
+  <rect x="105" y="54" width="20" height="2" fill="#00bcd4" filter="url(#neon-glow-cyan)"/>
+  <rect x="75" y="59" width="40" height="2" fill="#00bcd4" filter="url(#neon-glow-cyan)"/>
+
+  <!-- Collar Tech Accents (small glowing outlines) -->
+  <path d="M 80 90 L 75 95 L 75 105 L 80 110 L 85 105 L 85 95 Z"
+        fill="none" stroke="#00bcd4" stroke-width="1.5" filter="url(#neon-glow-cyan)"/>
+  <path d="M 120 90 L 125 95 L 125 105 L 120 110 L 115 105 L 115 95 Z"
+        fill="none" stroke="#00bcd4" stroke-width="1.5" filter="url(#neon-glow-cyan)"/>
+
+  <!-- Shoulder pad accents (small glowing lines) -->
+  <rect x="45" y="110" width="10" height="3" fill="none" stroke="#00bcd4" stroke-width="1" filter="url(#neon-glow-cyan)"/>
+  <rect x="145" y="110" width="10" height="3" fill="none" stroke="#00bcd4" stroke-width="1" filter="url(#neon-glow-cyan)"/>
+  <rect x="48" y="120" width="3" height="10" fill="none" stroke="#00bcd4" stroke-width="1" filter="url(#neon-glow-cyan)"/>
+  <rect x="149" y="120" width="3" height="10" fill="none" stroke="#00bcd4" stroke-width="1" filter="url(#neon-glow-cyan)"/>
+
+</svg>

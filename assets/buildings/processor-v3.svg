@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+    <feFlood flood-color="#4488ff" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+    <radialGradient id="eg1" cx="50%" cy="45%"><stop offset="0%" stop-color="#4488ff" stop-opacity="0.25"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+  </defs>
+  <rect width="200" height="200" fill="#0a0a14"/><circle cx="100" cy="90" r="70" fill="url(#eg1)"/>
+  <rect x="30" y="55" width="55" height="40" rx="3" fill="#0a1525" stroke="#4488ff" stroke-width="2" filter="url(#glow)"/>
+  <rect x="72" y="50" width="55" height="45" rx="3" fill="#0a1525" stroke="#4488ff" stroke-width="2.5" filter="url(#glow)"/>
+  <rect x="115" y="55" width="55" height="40" rx="3" fill="#0a1525" stroke="#4488ff" stroke-width="2" filter="url(#glow)"/>
+  <g fill="#4488ff" opacity="0.5"><rect x="35" y="62" width="20" height="3"/><rect x="35" y="68" width="30" height="2"/><rect x="35" y="73" width="25" height="2"/></g>
+  <g fill="#4488ff" opacity="0.6"><rect x="78" y="58" width="22" height="3"/><rect x="78" y="64" width="35" height="2"/><rect x="78" y="69" width="28" height="2"/><rect x="78" y="74" width="38" height="2"/></g>
+  <g fill="#4488ff" opacity="0.5"><rect x="120" y="62" width="18" height="3"/><rect x="120" y="68" width="25" height="2"/><rect x="120" y="73" width="20" height="2"/></g>
+  <path d="M50 95 Q100 110 150 95 L145 130 Q100 140 55 130 Z" fill="#081018" stroke="#4488ff" stroke-width="1.5" filter="url(#glow)"/>
+  <g fill="#4488ff" opacity="0.25">
+    <rect x="70" y="105" width="8" height="6" rx="1"/><rect x="80" y="105" width="8" height="6" rx="1"/><rect x="90" y="105" width="8" height="6" rx="1"/><rect x="100" y="105" width="8" height="6" rx="1"/><rect x="110" y="105" width="8" height="6" rx="1"/>
+    <rect x="75" y="115" width="8" height="6" rx="1"/><rect x="85" y="115" width="8" height="6" rx="1"/><rect x="95" y="115" width="8" height="6" rx="1"/><rect x="105" y="115" width="8" height="6" rx="1"/>
+    <rect x="80" y="125" width="40" height="6" rx="1"/>
+  </g>
+  <circle cx="100" cy="160" r="12" fill="none" stroke="#4488ff" stroke-width="1.5" opacity="0.6"/>
+  <path d="M95 160 L98 164 L106 155" stroke="#4488ff" stroke-width="2" fill="none" filter="url(#glow)"/>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+    <feFlood flood-color="#76ff03" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter></defs>
+  <rect width="200" height="200" fill="#080810"/>
+  <g filter="url(#glow)">
+    <rect x="20" y="40" width="160" height="90" fill="#76ff03" opacity="0.08"/><rect x="20" y="40" width="160" height="90" fill="none" stroke="#76ff03" stroke-width="3"/>
+    <circle cx="60" cy="85" r="22" fill="none" stroke="#76ff03" stroke-width="3"/><circle cx="60" cy="85" r="10" fill="#76ff03" opacity="0.3"/>
+    <circle cx="140" cy="85" r="22" fill="none" stroke="#76ff03" stroke-width="3"/><circle cx="140" cy="85" r="10" fill="#76ff03" opacity="0.3"/>
+    <rect x="85" y="50" width="30" height="18" fill="#76ff03" opacity="0.4"/><rect x="85" y="50" width="30" height="18" fill="none" stroke="#76ff03" stroke-width="2"/>
+    <text x="100" y="63" text-anchor="middle" fill="#080810" font-size="10" font-family="monospace" font-weight="bold">GPU</text>
+    <rect x="25" y="135" width="12" height="20" fill="#76ff03" opacity="0.5"/>
+    <rect x="42" y="135" width="12" height="20" fill="#76ff03" opacity="0.5"/>
+    <rect x="59" y="135" width="12" height="20" fill="#76ff03" opacity="0.5"/>
+    <rect x="80" y="135" width="12" height="20" fill="#76ff03" opacity="0.5"/>
+    <rect x="97" y="135" width="12" height="20" fill="#76ff03" opacity="0.5"/>
+    <rect x="114" y="135" width="12" height="20" fill="#76ff03" opacity="0.5"/>
+    <rect x="131" y="135" width="12" height="20" fill="#76ff03" opacity="0.5"/>
+    <rect x="148" y="135" width="12" height="20" fill="#76ff03" opacity="0.5"/>
+    <rect x="165" y="135" width="12" height="20" fill="#76ff03" opacity="0.5"/>
+  </g>
+  <text x="100" y="185" text-anchor="middle" fill="#76ff03" font-size="14" font-family="monospace" filter="url(#glow)">POWER</text>
+</svg>

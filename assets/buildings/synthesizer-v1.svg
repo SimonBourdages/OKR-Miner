@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+    <feFlood flood-color="#ff4444" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter></defs>
+  <rect width="200" height="200" fill="#0a0a14"/>
+  <rect x="70" y="40" width="60" height="45" rx="6" fill="#1a0a0a" stroke="#ff4444" stroke-width="2" filter="url(#glow)"/>
+  <circle cx="88" cy="58" r="6" fill="#ff4444" opacity="0.8"><animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/></circle>
+  <circle cx="112" cy="58" r="6" fill="#ff4444" opacity="0.8"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/></circle>
+  <rect x="88" y="70" width="24" height="4" rx="2" fill="#ff4444" opacity="0.4"/>
+  <rect x="80" y="85" width="40" height="50" rx="4" fill="#1a0a0a" stroke="#ff4444" stroke-width="1.5" filter="url(#glow)"/>
+  <circle cx="100" cy="105" r="10" fill="#ff4444" opacity="0.3"><animate attributeName="r" values="10;13;10" dur="1.5s" repeatCount="indefinite"/></circle>
+  <circle cx="100" cy="105" r="4" fill="#fff" opacity="0.6"/>
+  <rect x="60" y="95" width="20" height="8" rx="3" fill="rgb(102,27,27)" stroke="#ff4444" stroke-width="1"/>
+  <rect x="120" y="95" width="20" height="8" rx="3" fill="rgb(102,27,27)" stroke="#ff4444" stroke-width="1"/>
+  <rect x="55" y="103" width="8" height="20" rx="2" fill="#ff4444" opacity="0.5"/>
+  <rect x="137" y="103" width="8" height="20" rx="2" fill="#ff4444" opacity="0.5"/>
+  <rect x="82" y="135" width="14" height="30" rx="2" fill="rgb(102,27,27)" stroke="#ff4444" stroke-width="1"/>
+  <rect x="104" y="135" width="14" height="30" rx="2" fill="rgb(102,27,27)" stroke="#ff4444" stroke-width="1"/>
+  <rect x="78" y="165" width="22" height="8" rx="3" fill="#ff4444" opacity="0.4"/>
+  <rect x="100" y="165" width="22" height="8" rx="3" fill="#ff4444" opacity="0.4"/>
+  <text x="100" y="192" text-anchor="middle" fill="#ff4444" font-size="10" font-family="monospace" opacity="0.7">AI UNIT</text>
+</svg>

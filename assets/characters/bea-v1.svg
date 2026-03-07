@@ -1,0 +1,76 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Filter for main blue glow (Bea's signature color) -->
+    <filter id="neonBlueGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"></feGaussianBlur>
+      <feFlood flood-color="#4a90e2" flood-opacity="1" result="color"></feFlood>
+      <feComposite in="color" in2="blur" operator="in" result="glow"></feComposite>
+      <feMerge>
+        <feMergeNode in="glow"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+    <!-- Filter for cyan tool glow (holographic tools) -->
+    <filter id="neonCyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"></feGaussianBlur>
+      <feFlood flood-color="#00bcd4" flood-opacity="1" result="color"></feFlood>
+      <feComposite in="color" in2="blur" operator="in" result="glow"></feComposite>
+      <feMerge>
+        <feMergeNode in="glow"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+    <!-- Filter for green detail glow (minor tech accents) -->
+    <filter id="neonGreenGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"></feGaussianBlur>
+      <feFlood flood-color="#00ff88" flood-opacity="1" result="color"></feFlood>
+      <feComposite in="color" in2="blur" operator="in" result="glow"></feComposite>
+      <feMerge>
+        <feMergeNode in="glow"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="200" height="200" fill="#0a0a14"></rect>
+
+  <!-- Bea's Silhouette (dark base, blends with background for minimalist effect) -->
+  <path d="M 100 30 L 120 50 L 120 70 L 135 85 L 135 120 L 100 155 L 65 120 L 65 85 L 80 70 L 80 50 Z" fill="#0a0a14"></path>
+  <!-- Bea's Glowing Outline -->
+  <path d="M 100 30 L 120 50 L 120 70 L 135 85 L 135 120 L 100 155 L 65 120 L 65 85 L 80 70 L 80 50 Z" fill="none" stroke="#4a90e2" stroke-width="3" filter="url(#neonBlueGlow)"></path>
+
+  <!-- Bea's Inner Details -->
+  <!-- Visor -->
+  <rect x="78" y="70" width="44" height="6" rx="1" fill="#4a90e2" filter="url(#neonBlueGlow)"></rect>
+  <!-- High collar/Neck detail -->
+  <path d="M 70 100 L 130 100 L 120 85 L 80 85 Z" fill="none" stroke="#4a90e2" stroke-width="2" filter="url(#neonBlueGlow)"></path>
+  <path d="M 75 105 L 125 105" stroke="#4a90e2" stroke-width="2" filter="url(#neonBlueGlow)"></path>
+  <!-- Shoulder accents -->
+  <path d="M 65 120 L 55 125 L 65 130 L 70 125 Z" fill="none" stroke="#4a90e2" stroke-width="1.5" filter="url(#neonBlueGlow)"></path>
+  <path d="M 135 120 L 145 125 L 135 130 L 130 125 Z" fill="none" stroke="#4a90e2" stroke-width="1.5" filter="url(#neonBlueGlow)"></path>
+  <!-- Face/Hair subtle lines -->
+  <path d="M 100 40 L 90 50" fill="none" stroke="#4a90e2" stroke-width="1" filter="url(#neonBlueGlow)" opacity="0.5"></path>
+  <path d="M 100 40 L 110 50" fill="none" stroke="#4a90e2" stroke-width="1" filter="url(#neonBlueGlow)" opacity="0.5"></path>
+
+  <!-- Holographic Tools (Cyan) -->
+  <!-- Gear, slightly rotated and positioned -->
+  <g transform="translate(30 75) rotate(-25)">
+    <path d="M 0 0 L 10 0 L 12 4 L 15 0 L 25 0 L 22 4 L 25 8 L 15 8 L 12 12 L 10 8 L 0 8 L 3 4 Z" fill="none" stroke="#00bcd4" stroke-width="2" filter="url(#neonCyanGlow)"></path>
+  </g>
+  <!-- Wrench, rotated and positioned -->
+  <g transform="translate(155 45) rotate(20)">
+    <path d="M 0 0 L 15 0 A 4 4 0 0 1 15 8 L 0 8 L 0 16 L -8 16 L -8 0 Z" fill="none" stroke="#00bcd4" stroke-width="2" filter="url(#neonCyanGlow)"></path>
+  </g>
+  <!-- Circuit board fragment, rotated and positioned -->
+  <g transform="translate(135 130) rotate(-35)">
+    <path d="M 0 0 L 20 0 L 25 4 L 20 8 L 0 8 L -5 4 Z" fill="none" stroke="#00bcd4" stroke-width="2" filter="url(#neonCyanGlow)"></path>
+    <rect x="4" y="2" width="10" height="2" fill="#00bcd4" filter="url(#neonCyanGlow)"></rect>
+    <rect x="14" y="5" width="2" height="2" fill="#00bcd4" filter="url(#neonCyanGlow)"></rect>
+  </g>
+
+  <!-- Smaller floating tech elements (Green) -->
+  <circle cx="50" cy="115" r="2" fill="#00ff88" filter="url(#neonGreenGlow)"></circle>
+  <rect x="160" y="95" width="8" height="2" rx="0.5" fill="#00ff88" filter="url(#neonGreenGlow)"></rect>
+  <path d="M 40 45 L 45 50 L 40 55 Z" fill="none" stroke="#00ff88" stroke-width="1.5" filter="url(#neonGreenGlow)"></path>
+</svg>

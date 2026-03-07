@@ -1,0 +1,58 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background -->
+  <rect width="200" height="200" fill="#0a0a14"/>
+
+  <!-- SVG Filters for Neon Glow Effect -->
+  <defs>
+    <filter id="neonGlowGold" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur"/>
+      <feComponentTransfer in="blur" result="glowColor">
+        <feFuncR type="linear" slope="2" intercept="0"/>
+        <feFuncG type="linear" slope="1.5" intercept="0"/>
+        <feFuncB type="linear" slope="0.5" intercept="0"/>
+        <feFuncA type="linear" slope="2.5" intercept="0"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="glowColor"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Jrod Character Portrait - Heavy Pixel Art Style -->
+  <g id="jrod_pixel_art">
+    
+    <!-- Halo/Crown of Light - using blocky paths with neon glow -->
+    <path d="M84,32 h32 v4 h-32z M72,36 h56 v4 h-56z M64,40 h72 v4 h-72z M60,44 h80 v4 h-80z M56,48 h88 v4 h-88z M56,52 h88 v4 h-88z M60,56 h80 v4 h-80z M64,60 h72 v4 h-72z M72,64 h56 v4 h-56z M84,68 h32 v4 h-32z"
+          fill="#ffd700" filter="url(#neonGlowGold)"/>
+
+    <!-- Head - Main Gold Blocky Shape -->
+    <path d="M76,72 h48 v4 h-48z M68,76 h64 v4 h-64z M64,80 h72 v4 h-72z M60,84 h80 v4 h-80z M60,88 h80 v4 h-80z M60,92 h80 v4 h-80z M64,96 h72 v4 h-72z M68,100 h64 v4 h-64z M76,104 h48 v4 h-48z"
+          fill="#ffd700"/>
+    
+    <!-- Eyes - Glowing Gold Pixels -->
+    <rect x="76" y="88" width="4" height="4" fill="#ffd700" filter="url(#neonGlowGold)"/>
+    <rect x="120" y="88" width="4" height="4" fill="#ffd700" filter="url(#neonGlowGold)"/>
+    
+    <!-- Mouth/Face Detail - Darker pixel block -->
+    <rect x="96" y="100" width="8" height="4" fill="#665500"/>
+
+    <!-- Armor - Shoulder Pads and Collar -->
+    <!-- Collar -->
+    <path d="M60,108 h80 v4 h-80z M56,112 h88 v4 h-88z M52,116 h96 v4 h-96z M52,120 h96 v4 h-96z"
+          fill="#ffd700"/>
+    
+    <!-- Shoulder Pads - Wider and imposing -->
+    <path d="M40,124 h120 v4 h-120z M36,128 h128 v4 h-128z M32,132 h136 v4 h-136z M28,136 h144 v4 h-144z M28,140 h144 v4 h-144z M32,144 h136 v4 h-136z M36,148 h128 v4 h-128z M40,152 h120 v4 h-120z"
+          fill="#ffd700"/>
+
+    <!-- Chest plate detail - central block in a slightly darker gold for contrast -->
+    <path d="M72,128 h56 v4 h-56z M68,132 h64 v4 h-64z M64,136 h72 v4 h-72z M60,140 h80 v4 h-80z M60,144 h80 v4 h-80z M60,148 h80 v4 h-80z M64,152 h72 v4 h-72z M68,156 h64 v4 h-64z M72,160 h56 v4 h-56z"
+          fill="#ccaa00"/>
+
+    <!-- Subtle shading on shoulder edges -->
+    <path d="M40,124 h4 v4 h-4z M40,128 h4 v4 h-4z M40,132 h4 v4 h-4z M40,136 h4 v4 h-4z M40,140 h4 v4 h-4z M40,144 h4 v4 h-4z M40,148 h4 v4 h-4z M40,152 h4 v4 h-4z" fill="#ccaa00"/>
+    <path d="M156,124 h4 v4 h-4z M156,128 h4 v4 h-4z M156,132 h4 v4 h-4z M156,136 h4 v4 h-4z M156,140 h4 v4 h-4z M156,144 h4 v4 h-4z M156,148 h4 v4 h-4z M156,152 h4 v4 h-4z" fill="#ccaa00"/>
+
+  </g>
+</svg>

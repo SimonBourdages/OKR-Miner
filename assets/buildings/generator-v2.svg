@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+    <feFlood flood-color="#ff9800" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter><pattern id="fg" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none" stroke="#ff9800" stroke-width="0.15" opacity="0.1"/></pattern></defs>
+  <rect width="200" height="200" fill="#060614"/><rect width="200" height="200" fill="url(#fg)"/>
+  <rect x="35" y="55" width="130" height="95" rx="4" fill="none" stroke="#ff9800" stroke-width="1" stroke-dasharray="4,2"/>
+  <rect x="40" y="50" width="120" height="12" fill="none" stroke="#ff9800" stroke-width="0.8"/>
+  <circle cx="100" cy="100" r="25" fill="none" stroke="#ff9800" stroke-width="1" stroke-dasharray="6,3"/>
+  <text x="100" y="107" text-anchor="middle" fill="#ff9800" font-size="20" font-family="serif">$</text>
+  <line x1="40" y1="135" x2="160" y2="135" stroke="#ff9800" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <text x="50" y="145" fill="#ff9800" font-size="6" font-family="monospace" opacity="0.5">OUTPUT: +15 $/s</text>
+  <text x="15" y="15" fill="#ff9800" font-size="7" font-family="monospace" opacity="0.4">VAULT-SCHEMA</text>
+  <rect x="5" y="5" width="190" height="190" fill="none" stroke="#ff9800" stroke-width="0.5" opacity="0.3"/>
+</svg>

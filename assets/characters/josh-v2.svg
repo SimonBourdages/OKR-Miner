@@ -1,0 +1,102 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Dark Background -->
+    <rect width="200" height="200" fill="#0a0a14"/>
+
+    <!-- SVG Filters for Neon Glow Effects -->
+    <defs>
+        <!-- Intense Neon Glow -->
+        <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur1"/>
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur2"/>
+            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur3"/>
+            <feMerge result="glow">
+                <feMergeNode in="blur3"/>
+                <feMergeNode in="blur2"/>
+                <feMergeNode in="blur1"/>
+                <feMergeNode in="SourceGraphic"/> <!-- Original graphic on top for sharpness -->
+            </feMerge>
+        </filter>
+        <!-- Subtle Dim Glow for less prominent elements or fills -->
+        <filter id="dimGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.8" result="blur1"/>
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur2"/>
+            <feMerge result="glow">
+                <feMergeNode in="blur2"/>
+                <feMergeNode in="blur1"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <!-- Character: Josh - Tech Lead (Blueprint Style) -->
+    <!-- Group for primary character blueprint elements, applying the main neon glow -->
+    <g filter="url(#neonGlow)" stroke="#00bcd4" stroke-width="1.5">
+        <!-- Main Head Outline -->
+        <path d="M 100 30 C 130 30 140 60 140 90 C 140 120 130 135 100 135 C 70 135 60 120 60 90 C 60 60 70 30 100 30 Z" fill="none"/>
+
+        <!-- High-tech Visor (main focal point) -->
+        <!-- Subtle transparent fill for the visor glass -->
+        <path d="M 70 80 H 130 L 125 90 H 75 L 70 80 Z" fill="#00bcd4" fill-opacity="0.08" stroke="none"/>
+        <!-- Glowing outline for the visor -->
+        <path d="M 70 80 H 130 L 125 90 H 75 L 70 80 Z" fill="none" stroke="#00bcd4" stroke-width="2.5"/>
+
+        <!-- Visor internal details / display elements -->
+        <line x1="75" y1="84" x2="125" y2="84" stroke-width="1"/>
+        <line x1="85" y1="80" x2="80" y2="90" stroke-width="0.7"/>
+        <line x1="115" y1="80" x2="120" y2="90" stroke-width="0.7"/>
+        <circle cx="80" cy="85" r="1.5" stroke-width="0.7"/>
+        <circle cx="120" cy="85" r="1.5" stroke-width="0.7"/>
+
+        <!-- Neck and High Collar Outline -->
+        <path d="M 85 135 L 80 160 H 120 L 115 135 Z" fill="none"/>
+        <line x1="80" y1="140" x2="70" y2="170"/>
+        <line x1="120" y1="140" x2="130" y2="170"/>
+
+        <!-- Shoulder Lines and Upper Torso -->
+        <path d="M 60 170 Q 75 160 100 160 Q 125 160 140 170" fill="none"/>
+        <line x1="70" y1="170" x2="60" y2="180" stroke-width="1"/>
+        <line x1="130" y1="170" x2="140" y2="180" stroke-width="1"/>
+
+        <!-- Abstract Blueprint Facial Details -->
+        <line x1="90" y1="60" x2="110" y2="60" stroke-width="0.8"/>
+        <path d="M 95 65 Q 100 70 105 65" fill="none" stroke-width="0.8"/>
+        <path d="M 90 105 Q 100 110 110 105" fill="none" stroke-width="0.8"/>
+
+        <!-- Peripheral Circuit/Schematic Elements -->
+        <path d="M 50 80 L 40 80 L 40 90 L 50 90" fill="none" stroke-width="0.7"/>
+        <path d="M 150 80 L 160 80 L 160 90 L 150 90" fill="none" stroke-width="0.7"/>
+        <line x1="50" y1="85" x2="60" y2="85" stroke-width="0.7"/>
+        <line x1="140" y1="85" x2="150" y2="85" stroke-width="0.7"/>
+
+        <!-- Data Points / Nodes (subtly filled and glowing) -->
+        <rect x="35" y="75" width="2" height="2" stroke="none" fill="#00bcd4" filter="url(#dimGlow)"/>
+        <rect x="163" y="75" width="2" height="2" stroke="none" fill="#00bcd4" filter="url(#dimGlow)"/>
+        <circle cx="100" cy="20" r="2" stroke-width="0.7"/>
+        <circle cx="100" cy="145" r="2" stroke-width="0.7"/>
+    </g>
+
+    <!-- Subtle Background Blueprint Grid Lines -->
+    <g stroke="#00bcd4" stroke-opacity="0.2" stroke-width="0.5" filter="url(#dimGlow)">
+        <!-- Vertical grid lines -->
+        <line x1="20" y1="0" x2="20" y2="200"/>
+        <line x1="40" y1="0" x2="40" y2="200"/>
+        <line x1="60" y1="0" x2="60" y2="200"/>
+        <line x1="80" y1="0" x2="80" y2="200"/>
+        <line x1="100" y1="0" x2="100" y2="200"/>
+        <line x1="120" y1="0" x2="120" y2="200"/>
+        <line x1="140" y1="0" x2="140" y2="200"/>
+        <line x1="160" y1="0" x2="160" y2="200"/>
+        <line x1="180" y1="0" x2="180" y2="200"/>
+        <!-- Horizontal grid lines -->
+        <line x1="0" y1="20" x2="200" y2="20"/>
+        <line x1="0" y1="40" x2="200" y2="40"/>
+        <line x1="0" y1="60" x2="200" y2="60"/>
+        <line x1="0" y1="80" x2="200" y2="80"/>
+        <line x1="0" y1="100" x2="200" y2="100"/>
+        <line x1="0" y1="120" x2="200" y2="120"/>
+        <line x1="0" y1="140" x2="200" y2="140"/>
+        <line x1="0" y1="160" x2="200" y2="160"/>
+        <line x1="0" y1="180" x2="200" y2="180"/>
+    </g>
+
+</svg>

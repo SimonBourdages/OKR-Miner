@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+    <feFlood flood-color="#4488ff" flood-opacity="0.6" result="color"/>
+    <feComposite in="color" in2="blur" operator="in" result="glow"/>
+    <feMerge><feMergeNode in="glow"/><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter></defs>
+  <rect width="200" height="200" fill="#080810"/>
+  <g filter="url(#glow)">
+    <rect x="60" y="40" width="80" height="50" fill="#4488ff" opacity="0.15"/>
+    <rect x="60" y="40" width="80" height="50" fill="none" stroke="#4488ff" stroke-width="3"/>
+    <rect x="70" y="50" width="20" height="5" fill="#4488ff"/><rect x="70" y="58" width="40" height="3" fill="#4488ff" opacity="0.6"/>
+    <rect x="70" y="64" width="30" height="3" fill="#4488ff" opacity="0.4"/><rect x="70" y="70" width="50" height="3" fill="#4488ff" opacity="0.3"/>
+  </g>
+  <rect x="90" y="90" width="20" height="15" fill="#4488ff" opacity="0.4"/>
+  <rect x="60" y="105" width="80" height="10" fill="#4488ff" opacity="0.3"/>
+  <rect x="55" y="115" width="90" height="50" fill="#4488ff" opacity="0.12"/>
+  <rect x="55" y="115" width="90" height="50" fill="none" stroke="#4488ff" stroke-width="2"/>
+  <g fill="#4488ff" opacity="0.35">
+    <rect x="65" y="125" width="10" height="8"/><rect x="80" y="125" width="10" height="8"/>
+    <rect x="95" y="125" width="10" height="8"/><rect x="110" y="125" width="10" height="8"/>
+    <rect x="65" y="138" width="10" height="8"/><rect x="80" y="138" width="10" height="8"/>
+    <rect x="95" y="138" width="10" height="8"/><rect x="110" y="138" width="10" height="8"/>
+    <rect x="80" y="151" width="40" height="8"/>
+  </g>
+  <text x="100" y="188" text-anchor="middle" fill="#4488ff" font-size="14" font-family="monospace" filter="url(#glow)">WORK</text>
+</svg>

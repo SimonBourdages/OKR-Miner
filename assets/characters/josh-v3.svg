@@ -1,0 +1,115 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Neon Glow Filter for Cyan (#00bcd4) -->
+    <filter id="neon-glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1" />
+      <feColorMatrix in="blur1" type="matrix" values="0 0 0 0 0    
+                                                      0 0 0 0 0.737  
+                                                      0 0 0 0 0.831  
+                                                      0 0 0 1 0      " result="coloredBlur1" />
+
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur2" />
+      <feColorMatrix in="blur2" type="matrix" values="0 0 0 0 0    
+                                                      0 0 0 0 0.50   
+                                                      0 0 0 0 0.55   
+                                                      0 0 0 1 0      " result="coloredBlur2" />
+
+      <feMerge>
+        <feMergeNode in="coloredBlur2" />
+        <feMergeNode in="coloredBlur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Subtle Glow for less intense elements, still cyan-themed -->
+    <filter id="subtle-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.05 
+                                                    0 0 0 0 0.80 
+                                                    0 0 0 0 0.85 
+                                                    0 0 0 1 0    " result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Gradients for uniform and visor effects -->
+    <linearGradient id="uniform-top-light" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3a3a4e"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+
+    <linearGradient id="uniform-dark-base" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0a0a14"/>
+    </linearGradient>
+
+    <linearGradient id="visor-glass-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(0,188,212,0.7)"/>
+      <stop offset="100%" stop-color="rgba(0,188,212,0.3)"/>
+    </linearGradient>
+
+    <linearGradient id="visor-reflection-bright" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.8)"/>
+      <stop offset="50%" stop-color="rgba(0,188,212,0.5)"/>
+      <stop offset="100%" stop-color="rgba(0,188,212,0)"/>
+    </linearGradient>
+
+    <radialGradient id="chest-core-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+        <stop offset="0%" stop-color="#aaffff"/>
+        <stop offset="100%" stop-color="#00bcd4"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Dark Background -->
+  <rect x="0" y="0" width="200" height="200" fill="#0a0a14"/>
+
+  <!-- Character: Josh - Dynamic, Comic/Manga Angled Portrait -->
+
+  <!-- Main Uniform Body - angled to imply dynamic pose -->
+  <path d="M 20 180 C 40 150, 80 140, 100 140 C 120 140, 160 150, 180 180 L 180 200 L 20 200 Z"
+        fill="url(#uniform-dark-base)" />
+
+  <!-- Left Shoulder/Chest Plate (from viewer's perspective) -->
+  <path d="M 30 150 Q 50 130, 80 130 L 85 145 Q 60 155, 35 155 Z"
+        fill="url(#uniform-top-light)" />
+  <path d="M 35 155 L 37 160 L 80 150 L 78 145 Z" fill="#00bcd4" opacity="0.4" filter="url(#subtle-glow)"/> <!-- Edge highlight -->
+
+  <!-- Right Shoulder/Chest Plate -->
+  <path d="M 170 150 Q 150 130, 120 130 L 115 145 Q 140 155, 165 155 Z"
+        fill="url(#uniform-top-light)" />
+  <path d="M 165 155 L 163 160 L 120 150 L 122 145 Z" fill="#00bcd4" opacity="0.4" filter="url(#subtle-glow)"/> <!-- Edge highlight -->
+
+  <!-- Neck and High Collar (slightly angled) -->
+  <path d="M 90 130 Q 100 115, 110 130 Z" fill="#1a1a2e" stroke="#00bcd4" stroke-width="2" filter="url(#subtle-glow)"/>
+
+  <!-- Head Base (dark, stylized, tilted) -->
+  <path d="M 80 115 C 70 95, 85 70, 105 70 C 125 70, 130 95, 120 115 Z"
+        fill="#2a2a3e" />
+
+  <!-- Visor Frame - prominent and sharp, signature cyan with heavy glow -->
+  <path d="M 70 80 Q 90 70, 130 80 L 130 95 Q 90 105, 70 95 Z"
+        fill="#00bcd4" filter="url(#neon-glow-cyan)" />
+
+  <!-- Visor Glass (slightly transparent, gradient for depth) -->
+  <path d="M 72 82 Q 90 73, 128 82 L 128 93 Q 90 102, 72 93 Z"
+        fill="url(#visor-glass-gradient)" />
+
+  <!-- Visor Highlights / Reflections (sharp, comic style for dramatic lighting) -->
+  <path d="M 75 83 L 85 80 L 95 85 L 85 88 Z" fill="url(#visor-reflection-bright)" opacity="0.9"/>
+  <path d="M 100 82 L 110 79 L 120 84 L 110 87 Z" fill="url(#visor-reflection-bright)" opacity="0.9"/>
+
+  <!-- Jawline contour / shadow (for definition below visor) -->
+  <path d="M 75 110 C 85 115, 115 115, 125 110 L 115 118 L 85 118 Z"
+        fill="#1a1a2e" opacity="0.6" />
+
+  <!-- Central Chest Core / Tech Detail with heavy glow -->
+  <circle cx="100" cy="150" r="12" fill="#00bcd4" filter="url(#neon-glow-cyan)" />
+  <circle cx="100" cy="150" r="6" fill="url(#chest-core-gradient)" />
+
+  <!-- Additional tech lines on uniform for detail and dynamic highlights -->
+  <path d="M 60 160 L 80 155 L 82 165 L 62 170 Z" fill="#00bcd4" opacity="0.6" filter="url(#subtle-glow)"/>
+  <path d="M 140 160 L 120 155 L 118 165 L 138 170 Z" fill="#00bcd4" opacity="0.6" filter="url(#subtle-glow)"/>
+  <path d="M 95 140 L 105 140 L 105 145 L 95 145 Z" fill="#aaffff" filter="url(#subtle-glow)"/> <!-- Small central light -->
+</svg>
