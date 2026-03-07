@@ -1111,6 +1111,19 @@
         </div>
     </div>
 
+    <div id="recruitSiteDialog" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);z-index:600;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;">
+            <h2 style="color:#00ff88;font-size:28px;text-shadow:0 0 15px #00ff88;margin-bottom:8px;">📋 RECRUITMENT STRATEGY</h2>
+            <p style="color:#ccc;font-size:15px;margin-bottom:24px;max-width:460px;text-align:center;">Your team is growing! Pick a platform to boost your recruitment pipeline.</p>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;">
+                <button onclick="game.chooseRecruitSite('linkedin')" style="background:rgba(0,119,181,0.25);border:2px solid #0077b5;border-radius:12px;padding:18px 24px;color:#4db8e8;cursor:pointer;font-family:inherit;font-size:15px;min-width:160px;"><strong>LinkedIn</strong><br><span style="font-size:11px;color:#aaa;">Professional network</span></button>
+                <button onclick="game.chooseRecruitSite('indeed')" style="background:rgba(0,100,255,0.15);border:2px solid #4488ff;border-radius:12px;padding:18px 24px;color:#88ccff;cursor:pointer;font-family:inherit;font-size:15px;min-width:160px;"><strong>Indeed</strong><br><span style="font-size:11px;color:#aaa;">Job board giant</span></button>
+                <button onclick="game.chooseRecruitSite('glassdoor')" style="background:rgba(0,100,255,0.15);border:2px solid #4488ff;border-radius:12px;padding:18px 24px;color:#88ccff;cursor:pointer;font-family:inherit;font-size:15px;min-width:160px;"><strong>Glassdoor</strong><br><span style="font-size:11px;color:#aaa;">Reviews & jobs</span></button>
+                <button onclick="game.chooseRecruitSite('monster')" style="background:rgba(0,100,255,0.15);border:2px solid #4488ff;border-radius:12px;padding:18px 24px;color:#88ccff;cursor:pointer;font-family:inherit;font-size:15px;min-width:160px;"><strong>Monster</strong><br><span style="font-size:11px;color:#aaa;">Classic hiring</span></button>
+            </div>
+        </div>
+    </div>
+
     <div id="aiConfrontDialog" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.95);z-index:600;">
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;">
             <h2 style="color:#f44;font-size:36px;text-shadow:0 0 20px #f44;margin-bottom:10px;">🤖 WHY DO WE NEED LEADERSHIP?</h2>
@@ -2287,6 +2300,7 @@
                 aiChoice: null,
                 aiOrganize: null,
                 aiConfrontDone: false,
+                recruitSiteChosen: false,
                 gpuEnabled: false,
                 eventsEnabled: false,
                 upgradesEnabled: false,
@@ -2529,6 +2543,7 @@
                 aiChoice: null,
                 aiOrganize: null,
                 aiConfrontDone: false,
+                recruitSiteChosen: false,
                 gpuEnabled: false,
                 eventsEnabled: false,
                 upgradesEnabled: false,
@@ -2591,6 +2606,7 @@
                     if (!this.state.aiChoice) this.state.aiChoice = null;
                     if (this.state.aiOrganize === undefined) this.state.aiOrganize = null;
                     if (this.state.aiConfrontDone === undefined) this.state.aiConfrontDone = false;
+            if (this.state.recruitSiteChosen === undefined) this.state.recruitSiteChosen = false;
                     if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
                     if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
                     if (this.state.upgradesEnabled === undefined) this.state.upgradesEnabled = false;
@@ -2712,6 +2728,7 @@
             if (!this.state.aiChoice) this.state.aiChoice = null;
             if (this.state.aiOrganize === undefined) this.state.aiOrganize = null;
             if (this.state.aiConfrontDone === undefined) this.state.aiConfrontDone = false;
+            if (this.state.recruitSiteChosen === undefined) this.state.recruitSiteChosen = false;
             if (this.state.gpuEnabled === undefined) this.state.gpuEnabled = false;
             if (this.state.eventsEnabled === undefined) this.state.eventsEnabled = false;
             if (this.state.upgradesEnabled === undefined) this.state.upgradesEnabled = false;
@@ -4020,6 +4037,12 @@
                         this.logMessage('📊', 'Detailed View Enabled', 'Building stats now visible. Toggle off in Menu.', 'info');
                     }
 
+                    // Objective 2: recruitment website choice
+                    if (i === 1 && !this.state.recruitSiteChosen) {
+                        this.running = false;
+                        document.getElementById('recruitSiteDialog').style.display = 'block';
+                    }
+
                     // Special: AI Confrontation at milestone 10 (index 9)
                     if (i === 9 && !this.state.aiConfrontDone) {
                         this.running = false;
@@ -4100,6 +4123,38 @@
             } else {
                 this.showBanner({ icon: '❌', text: 'AI REQUEST DENIED', desc: 'Manual building control retained. This cannot be undone.', color: '#f88', type: 'negative', timer: 10 });
                 this.logMessage('❌', 'AI Organization Denied', 'You chose to keep manual control permanently.', 'info');
+            }
+            this.saveGame(true);
+        };
+
+        // =========================================================
+        // RECRUITMENT SITE CHOICE (Milestone 2)
+        // =========================================================
+
+        OKRFarmingGame.prototype.chooseRecruitSite = function(site) {
+            document.getElementById('recruitSiteDialog').style.display = 'none';
+            this.state.recruitSiteChosen = site;
+            this.running = true;
+            this.lastTick = performance.now();
+
+            if (site === 'linkedin') {
+                // LinkedIn: bonus 4 recruiters
+                var cx = this.canvas.width / 2;
+                var cy = this.canvas.height / 2;
+                var playR = getPlayableRadius(this.state);
+                for (var ri = 0; ri < 4; ri++) {
+                    var angle = (Math.PI * 2 / 4) * ri + Math.PI / 4;
+                    var dist = Math.min(playR * 0.5, 200);
+                    var rx = cx + Math.cos(angle) * dist;
+                    var ry = cy + Math.sin(angle) * dist;
+                    this.nodes.push({ type: 'collector', x: rx, y: ry, age: 0, lastProduce: 0, level: 1, hp: 100, maxHp: 100, damageFlash: 0, spawnTime: Date.now() });
+                    this.spawnParticles(rx, ry, '#4caf50', 8);
+                }
+                this.showBanner({ icon: '💼', text: 'LINKEDIN BOOST!', desc: '+4 Recruiters deployed! Professional network advantage.', color: '#0077b5', type: 'milestone', timer: 10 });
+                this.logMessage('💼', 'LinkedIn chosen', '+4 bonus Recruiters deployed from professional network.', 'positive');
+            } else {
+                this.showBanner({ icon: '📋', text: site.charAt(0).toUpperCase() + site.slice(1) + ' Selected', desc: 'Recruitment platform active. Keep building!', color: '#4488ff', type: 'info', timer: 8 });
+                this.logMessage('📋', site.charAt(0).toUpperCase() + site.slice(1) + ' chosen', 'Recruitment platform registered.', 'info');
             }
             this.saveGame(true);
         };
@@ -7971,6 +8026,8 @@
             if (aiConfDlg) aiConfDlg.style.display = 'none';
             var tttDlg = document.getElementById('ticTacToeOverlay');
             if (tttDlg) tttDlg.style.display = 'none';
+            var recruitDlg = document.getElementById('recruitSiteDialog');
+            if (recruitDlg) recruitDlg.style.display = 'none';
             this.hideUpgradeUnlockVideo();
             this.hideAiTakeoverVideo();
             this.hideCompetitorIntroVideo();

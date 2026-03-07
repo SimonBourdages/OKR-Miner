@@ -152,8 +152,8 @@
         if (activeTheme && activeTheme.bonus === 'el') elGain *= activeTheme.bonusMult;
 
         if (state.gpuEnabled && totalTflopsRequired > totalTflopsGenerated) {
-            var tflopsRatio = totalTflopsGenerated / Math.max(1, totalTflopsRequired);
-            okrGain -= aiBaseOkrForGpuCalc * (1 - tflopsRatio) * mult;
+            // Not enough TFLOPS: halt ALL KR production
+            okrGain = 0;
         }
 
         var fundingCap = null;
