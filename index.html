@@ -3043,11 +3043,24 @@
             }
 
             var inAIEcon = this.state.aiChoice === 'equal' && this.state.gpuEnabled;
-            var currency = inAIEcon ? this.state.currencies.el : this.state.currencies.ac;
             var currencyName = inAIEcon ? '$' : 'HC';
 
+            // Finances can be bought with KR if out of $ (emergency fallback)
+            var useKRForFinances = inAIEcon && type === 'generator' && this.state.currencies.el < b.cost && this.state.totalOKRs >= b.cost;
+            var currency;
+            if (useKRForFinances) {
+                currency = this.state.totalOKRs;
+                currencyName = 'KR';
+            } else {
+                currency = inAIEcon ? this.state.currencies.el : this.state.currencies.ac;
+            }
+
             if (currency < b.cost) {
-                this.addFloatingText(x, y, 'Not enough ' + currencyName + '!', '#f44');
+                if (inAIEcon && type === 'generator') {
+                    this.addFloatingText(x, y, 'Need ' + b.cost + ' $ or KR!', '#f44');
+                } else {
+                    this.addFloatingText(x, y, 'Not enough ' + currencyName + '!', '#f44');
+                }
                 this.playSound('click');
                 return;
             }
@@ -3059,7 +3072,10 @@
                 return;
             }
 
-            if (inAIEcon) {
+            if (useKRForFinances) {
+                this.state.totalOKRs -= b.cost;
+                this.addFloatingText(x, y - 20, '-' + b.cost + ' KR (emergency)', '#f0f');
+            } else if (inAIEcon) {
                 this.state.currencies.el -= b.cost;
             } else {
                 this.state.currencies.ac -= b.cost;
