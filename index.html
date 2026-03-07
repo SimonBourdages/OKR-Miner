@@ -953,9 +953,9 @@
         <button onclick="game.showLoadCode()">📋 LOAD CODE</button>
         <button onclick="game.clearSave()">CLEAR SAVE</button>
         <div style="margin-top:10px;display:flex;gap:6px;justify-content:center;">
-            <button onclick="game.switchLanguage('en')" id="langBtnEn" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">🇬🇧 EN</button>
-            <button onclick="game.switchLanguage('fr')" id="langBtnFr" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">🇫🇷 FR</button>
-            <button onclick="game.switchLanguage('fr_qc')" id="langBtnFrQc" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">🍁 QC</button>
+            <button onclick="game.switchLanguage('en')" id="langBtnEn" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">English</button>
+            <button onclick="game.switchLanguage('fr')" id="langBtnFr" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">Français</button>
+            <button onclick="game.switchLanguage('fr_qc')" id="langBtnFrQc" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">Québécois</button>
         </div>
         <div id="versionTag" style="margin-top:16px;color:#666;font-size:10px;letter-spacing:1px;cursor:pointer;" onclick="game._versionTaps=(game._versionTaps||0)+1;if(game._versionTaps>=2){game._versionTaps=0;document.getElementById('debugMenu').style.display=document.getElementById('debugMenu').style.display==='none'?'block':'none';}clearTimeout(game._versionTapTimer);game._versionTapTimer=setTimeout(function(){game._versionTaps=0;},800);"></div>
         <div id="debugMenu" style="display:none;margin-top:10px;">
