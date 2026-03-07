@@ -907,40 +907,40 @@
 
     <div id="ui" style="display:none;">
         <div class="stat-row">
-            <span class="stat-label">Objective Review</span>
+            <span class="stat-label" id="labelObjectiveReview">Objective Review</span>
             <span class="stat-value" id="milestoneCount">1</span>
         </div>
         <div class="stat-row">
-            <span class="stat-label">Key Results</span>
+            <span class="stat-label" id="labelKeyResults">Key Results</span>
             <span class="stat-value"><span id="okrCount">0</span> → <span id="nextMilestone">50</span></span>
         </div>
         <div id="progressBarContainer">
             <div id="progressBar"></div>
         </div>
         <div id="hcRow" class="stat-row">
-            <span class="stat-label">HC</span>
+            <span class="stat-label" id="labelHC">HC</span>
             <span class="stat-value" id="currencyDisplay">101</span>
         </div>
         <div id="elRow" class="stat-row" style="display:none;">
-            <span class="stat-label">$</span>
+            <span class="stat-label" id="labelFunding">$</span>
             <span class="stat-value" style="color:#ffd700;"><span id="elDisplay">0</span><span id="elCapDisplay" style="color:#999;"></span></span>
         </div>
         <div id="tflopsRow" class="stat-row" style="display:none;">
-            <span class="stat-label">TFLOPS</span>
+            <span class="stat-label" id="labelTflops">TFLOPS</span>
             <span class="stat-value" style="color:#76ff03;"><span id="tflopsDisplay">0</span> / <span id="tflopsRequired" style="color:#999;">0</span></span>
         </div>
-        <div style="margin-top:6px;border-top:1px solid #234;padding-top:4px;cursor:pointer;color:#888;font-size:10px;text-align:center;" onclick="var r=document.getElementById('ratesSection');r.style.display=r.style.display==='none'?'block':'none';">▼ Rates</div>
+        <div id="ratesToggle" style="margin-top:6px;border-top:1px solid #234;padding-top:4px;cursor:pointer;color:#888;font-size:10px;text-align:center;" onclick="var r=document.getElementById('ratesSection');r.style.display=r.style.display==='none'?'block':'none';">▼ Rates</div>
         <div id="ratesSection" style="display:none;">
             <div class="stat-row">
-                <span class="stat-label">KR/s</span>
+                <span class="stat-label" id="labelKRs">KR/s</span>
                 <span class="stat-value" id="okrRate" style="color:#0f0;">0</span>
             </div>
             <div id="hcRateRow" class="stat-row">
-                <span class="stat-label">HC/s</span>
+                <span class="stat-label" id="labelHCs">HC/s</span>
                 <span class="stat-value" id="acRate" style="color:#ff0;">0</span>
             </div>
             <div id="elRateRow" class="stat-row" style="display:none;">
-                <span class="stat-label">$/s</span>
+                <span class="stat-label" id="labelFundingPerSec">$/s</span>
                 <span class="stat-value" id="elRate" style="color:#ff9800;">0</span>
             </div>
         </div>
@@ -949,8 +949,8 @@
     <button id="menuToggleBtn" onclick="document.getElementById('controls').classList.toggle('open'); this.style.display='none';">☰ Menu</button>
     <div id="controls">
         <button onclick="document.getElementById('controls').classList.remove('open'); document.getElementById('menuToggleBtn').style.display='block';" style="background:rgba(255,60,60,0.2);border-color:#f66;color:#f66;">✕</button>
-        <button onclick="game.saveGame()">💾 Save</button>
-        <button onclick="game.saveAndQuit()">🚪 Quit</button>
+        <button id="saveBtn" onclick="game.saveGame()">💾 Save</button>
+        <button id="quitBtn" onclick="game.saveAndQuit()">🚪 Quit</button>
         <button id="soundToggleBtn" onclick="game.cycleSoundMode()">🔊 All Sound</button>
         <button onclick="game.showAchievements()">🏆</button>
         <button onclick="game.showLog()">📜</button>
@@ -965,13 +965,13 @@
     <div id="repairBotPanel" style="display:none;"></div>
 
     <div id="menu">
-        <h1>OKR MINER</h1>
-        <button onclick="game.newGame()">NEW GAME</button>
-        <button onclick="game.continueGame()">CONTINUE</button>
-        <button onclick="game.showAchievements()">🏆 ACHIEVEMENTS</button>
+        <h1 id="menuTitle">OKR MINER</h1>
+        <button id="newGameBtn" onclick="game.newGame()">NEW GAME</button>
+        <button id="continueBtn" onclick="game.continueGame()">CONTINUE</button>
+        <button id="achievementsBtn" onclick="game.showAchievements()">🏆 ACHIEVEMENTS</button>
         <button id="infiniteModeBtn" onclick="game.startInfiniteMode()" style="display:none;">♾️ INFINITE MODE</button>
-        <button onclick="game.showLoadCode()">📋 LOAD CODE</button>
-        <button onclick="game.clearSave()">CLEAR SAVE</button>
+        <button id="loadCodeBtn" onclick="game.showLoadCode()">📋 LOAD CODE</button>
+        <button id="clearSaveBtn" onclick="game.clearSave()">CLEAR SAVE</button>
         <div style="margin-top:10px;display:flex;gap:6px;justify-content:center;">
             <button onclick="game.switchLanguage('en')" id="langBtnEn" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">English</button>
             <button onclick="game.switchLanguage('fr')" id="langBtnFr" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">Français</button>
@@ -1082,17 +1082,17 @@
     <div class="hint-text" id="hintText"></div>
 
     <div id="victoryScreen">
-        <h1>🏆 CONGRATULATIONS! 🏆</h1>
-        <div class="vic-sub">All executives have reviewed every OKR.<br>The business is thriving. You did it!</div>
-        <div style="color:#ffd700;font-size:18px;margin:20px 0;">🌟 All Objective Reviews Complete 🌟</div>
+        <h1 id="victoryTitle">🏆 CONGRATULATIONS! 🏆</h1>
+        <div class="vic-sub" id="victorySubtitle">All executives have reviewed every OKR.<br>The business is thriving. You did it!</div>
+        <div id="victoryAllReviews" style="color:#ffd700;font-size:18px;margin:20px 0;">🌟 All Objective Reviews Complete 🌟</div>
         <div class="endings">
             <div class="ending-btn" onclick="game.continueAfterVictory()">
-                <h3>▶ Keep Playing</h3>
-                <p>Continue building your empire.</p>
+                <h3 id="victoryKeepPlaying">▶ Keep Playing</h3>
+                <p id="victoryKeepPlayingDesc">Continue building your empire.</p>
             </div>
             <div class="ending-btn" onclick="game.saveAndQuit()">
-                <h3>💾 Save & Return</h3>
-                <p>Save your progress and return to menu.</p>
+                <h3 id="victorySaveReturn">💾 Save & Return</h3>
+                <p id="victorySaveReturnDesc">Save your progress and return to menu.</p>
             </div>
         </div>
     </div>
@@ -1217,7 +1217,7 @@
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
             <h1 id="gameOverTitle" style="color:#ff0000;font-size:72px;font-weight:bold;text-shadow:0 0 30px #f00,0 0 60px #f00;">GAME OVER</h1>
             <p id="gameOverMsg" style="color:#666;font-size:16px;margin-top:20px;max-width:500px;text-align:center;">The machines have won. Perhaps equality was the answer.</p>
-            <button onclick="game.showMenu()" style="margin-top:40px;background:#333;border:1px solid #666;color:#fff;padding:12px 30px;font-family:inherit;font-size:16px;cursor:pointer;border-radius:6px;">Return to Menu</button>
+            <button id="gameOverReturnBtn" onclick="game.showMenu()" style="margin-top:40px;background:#333;border:1px solid #666;color:#fff;padding:12px 30px;font-family:inherit;font-size:16px;cursor:pointer;border-radius:6px;">Return to Menu</button>
         </div>
     </div>
 
@@ -1355,6 +1355,12 @@
             bank:        { name: 'Investment',         cost: 300,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,   color: '#ffd700', desc: '2% $ interest/s', symbol: '', metrics: ['ac'], interestRate: 0.02 },
             repairbot:   { name: 'IT Support',  cost: 200,  acPerSec: 0,   okrPerSec: 0,   elCost: 2,  color: '#00e5ff', desc: 'Heals AI buildings',  symbol: '', metrics: ['hp'], repairRate: 15 },
             gpu:         { name: 'GPU',         cost: 500,  acPerSec: 0,   okrPerSec: 0,   elCost: 0,  color: '#76ff03', desc: '+5 TFLOPS',  symbol: '', metrics: ['gpu'] }
+        };
+
+        var BUILDING_I18N_MAP = {
+            collector: 'recruiter', processor: 'employee', multiplier: 'networkHub',
+            synthesizer: 'ai', generator: 'finances', bank: 'investment',
+            repairbot: 'itSupport', gpu: 'gpu'
         };
 
         // Metric icons as small inline SVGs (16x16)
@@ -1903,6 +1909,7 @@
             this.updateInfiniteModeVisibility();
             this.trackNewPlayer();
             this.renderMenuBackground();
+            this.updateAllUIText();
         }
 
         // =========================================================
@@ -2148,6 +2155,9 @@
             allTypes.forEach(function(type) {
                 if (self.state && self.state.unlockedBuildings && self.state.unlockedBuildings.indexOf(type) === -1) return;
                 var b = BUILDINGS[type];
+                var i18nKey = BUILDING_I18N_MAP[type] || type;
+                var displayName = GameI18n.t('building.' + i18nKey + '.name');
+                var displayDesc = GameI18n.t('building.' + i18nKey + '.desc');
                 var btn = document.createElement('div');
                 btn.className = 'building-btn' + (type === self.selectedBuilding ? ' selected' : '');
                 btn.setAttribute('data-type', type);
@@ -2155,9 +2165,9 @@
                 var inAI = self.state && self.state.aiChoice === 'equal' && self.state.gpuEnabled;
                 var costUnit = inAI ? '$' : 'HC';
                 btn.innerHTML =
-                    '<div class="b-header"><span class="b-dot" style="background:' + b.color + '"></span><span class="b-name">' + b.name + '</span></div>' +
+                    '<div class="b-header"><span class="b-dot" style="background:' + b.color + '"></span><span class="b-name">' + displayName + '</span></div>' +
                     '<div class="b-cost">' + b.cost + ' ' + costUnit + '</div>' +
-                    '<div class="b-effect">' + b.desc + '</div>' +
+                    '<div class="b-effect">' + displayDesc + '</div>' +
                     (type === 'repairbot' ? '<div style="color:#0ff;font-size:9px;">🔧 x<span class="pizza-count">' + self.repairBots.length + '</span></div>' : '') +
                     '<div class="b-preview" id="preview-' + type + '"></div>';
                 if (type === 'repairbot') {
@@ -7647,14 +7657,82 @@
                 var el = document.getElementById(id);
                 if (el) el.style.background = langs[i] === lang ? 'rgba(0,255,136,0.3)' : '';
             }
-            // Update visible menu text
-            var menuEl = document.getElementById('menu');
-            if (menuEl) {
-                var h1 = menuEl.querySelector('h1');
-                if (h1) h1.textContent = GameI18n.t('menu.title');
-            }
+            this.updateAllUIText();
             this.logMessage('🌐', 'Language changed', GameI18n.t('lang.' + lang), 'info');
             this.rebuildBuildingButtons();
+        };
+
+        OKRFarmingGame.prototype.updateAllUIText = function() {
+            var t = GameI18n.t.bind(GameI18n);
+
+            // Menu
+            var el;
+            el = document.getElementById('menuTitle');
+            if (el) el.textContent = t('menu.title');
+            el = document.getElementById('newGameBtn');
+            if (el) el.textContent = t('menu.newGame');
+            el = document.getElementById('continueBtn');
+            if (el) el.textContent = t('menu.continue');
+            el = document.getElementById('achievementsBtn');
+            if (el) el.textContent = t('menu.achievements');
+            el = document.getElementById('infiniteModeBtn');
+            if (el) el.textContent = t('menu.infiniteMode');
+            el = document.getElementById('loadCodeBtn');
+            if (el) el.textContent = t('menu.loadCode');
+            el = document.getElementById('clearSaveBtn');
+            if (el) el.textContent = t('menu.clearSave');
+
+            // Stats panel
+            el = document.getElementById('labelObjectiveReview');
+            if (el) el.textContent = t('stats.objectiveReview');
+            el = document.getElementById('labelKeyResults');
+            if (el) el.textContent = t('stats.keyResults');
+            el = document.getElementById('labelHC');
+            if (el) el.textContent = t('stats.hc');
+            el = document.getElementById('labelFunding');
+            if (el) el.textContent = t('stats.funding');
+            el = document.getElementById('labelTflops');
+            if (el) el.textContent = t('stats.tflops');
+            el = document.getElementById('ratesToggle');
+            if (el) el.textContent = t('stats.rates');
+            el = document.getElementById('labelKRs');
+            if (el) el.textContent = t('stats.krPerSec');
+            el = document.getElementById('labelHCs');
+            if (el) el.textContent = t('stats.hcPerSec');
+            el = document.getElementById('labelFundingPerSec');
+            if (el) el.textContent = t('stats.fundingPerSec');
+
+            // In-game controls
+            el = document.getElementById('saveBtn');
+            if (el) el.textContent = t('controls.save');
+            el = document.getElementById('quitBtn');
+            if (el) el.textContent = t('controls.quit');
+            el = document.getElementById('detailToggleBtn');
+            if (el) el.textContent = this.detailedView ? t('controls.detailsOn') : t('controls.detailsOff');
+
+            // First placement banner
+            el = document.getElementById('firstPlaceBanner');
+            if (el) el.innerHTML = t('msg.firstPlace');
+
+            // Game over screen
+            el = document.getElementById('gameOverReturnBtn');
+            if (el) el.textContent = t('gameover.returnMenu');
+
+            // Victory screen
+            el = document.getElementById('victoryTitle');
+            if (el) el.textContent = t('victory.title');
+            el = document.getElementById('victorySubtitle');
+            if (el) el.innerHTML = t('victory.subtitle');
+            el = document.getElementById('victoryAllReviews');
+            if (el) el.textContent = t('victory.allReviewsComplete');
+            el = document.getElementById('victoryKeepPlaying');
+            if (el) el.textContent = t('victory.keepPlaying');
+            el = document.getElementById('victoryKeepPlayingDesc');
+            if (el) el.textContent = t('victory.keepPlayingDesc');
+            el = document.getElementById('victorySaveReturn');
+            if (el) el.textContent = t('victory.saveReturn');
+            el = document.getElementById('victorySaveReturnDesc');
+            if (el) el.textContent = t('victory.saveReturnDesc');
         };
 
         // =========================================================

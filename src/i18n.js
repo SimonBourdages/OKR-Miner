@@ -198,6 +198,10 @@
             'misc.competitorDefeated': 'Competitor defeated!',
             'misc.combo': 'COMBO x{count}!',
 
+            // Tutorial / first placement
+            'msg.firstPlace': 'Click inside the circle to place your first <strong>Recruiter</strong>!',
+            'victory.allReviewsComplete': '🌟 All Objective Reviews Complete 🌟',
+
             // Language names
             'lang.en': 'English',
             'lang.fr': 'Français',
@@ -389,6 +393,10 @@
             'misc.competitorDefeated': 'Concurrent vaincu !',
             'misc.combo': 'COMBO x{count} !',
 
+            // Tutorial / first placement
+            'msg.firstPlace': 'Cliquez dans le cercle pour placer votre premier <strong>Recruteur</strong> !',
+            'victory.allReviewsComplete': '🌟 Toutes les Revues d\'Objectifs Complétées 🌟',
+
             // Language names
             'lang.en': 'English',
             'lang.fr': 'Français',
@@ -579,6 +587,10 @@
             'misc.saveFailed': 'La sauvegarde a planté !',
             'misc.competitorDefeated': 'Compétiteur battu !',
             'misc.combo': 'COMBO x{count} !',
+
+            // Tutorial / first placement
+            'msg.firstPlace': 'Clique dans le cercle pour placer ton premier <strong>Recruteur</strong> !',
+            'victory.allReviewsComplete': '🌟 Toutes les Revues d\'Objectifs Complétées 🌟',
 
             // Language names
             'lang.en': 'English',
