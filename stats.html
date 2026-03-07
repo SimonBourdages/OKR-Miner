@@ -531,6 +531,11 @@
                             html += '<p style="color:#8cf;font-size:12px;margin-top:8px;">📧 ' + details.contact + '</p>';
                         }
                         html += '<div style="color:#555;font-size:11px;margin-top:8px;">Game state: Milestone ' + (bug.milestones || bug.Milestones || '?') + ' · KRs: ' + formatNumber(Number(bug.totalOKRs || bug.TotalOKRs || 0)) + ' · Buildings: ' + (bug.buildingsPlaced || bug.BuildingsPlaced || '?') + ' · v' + (bug.version || bug.Version || '?') + '</div>';
+                        html += '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">';
+                        html += '<button onclick="checkDuplicate(this,' + j + ')" data-title="' + encodeURIComponent(details.title || '') + '" data-desc="' + encodeURIComponent(details.description || '') + '" data-type="' + (bType || 'bug') + '" style="background:rgba(100,181,246,0.2);color:#64b5f6;border:1px solid #64b5f6;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">🔍 Check Duplicates</button>';
+                        html += '<button onclick="sendToGitHub(this)" data-title="' + encodeURIComponent(details.title || '') + '" data-desc="' + encodeURIComponent(details.description || '') + '" data-type="' + (bType || 'bug') + '" data-contact="' + encodeURIComponent(details.contact || '') + '" data-state="Milestone ' + (bug.milestones || bug.Milestones || '?') + ' · KRs: ' + formatNumber(Number(bug.totalOKRs || bug.TotalOKRs || 0)) + '" style="background:rgba(255,152,0,0.2);color:#ff9800;border:1px solid #ff9800;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">📤 Send to GitHub</button>';
+                        html += '</div>';
+                        html += '<div class="dup-results" id="dup-' + j + '" style="margin-top:8px;"></div>';
                         html += '</div>';
                     }
                     html += '</div>';
@@ -540,6 +545,60 @@
                 .catch(function(err) {
                     panel.innerHTML = '<div class="empty-state"><h2>Failed to Load</h2><p>' + err.message + '</p></div>';
                 });
+        }
+
+        function checkDuplicate(btn, idx) {
+            var title = decodeURIComponent(btn.getAttribute('data-title'));
+            var container = document.getElementById('dup-' + idx);
+            container.innerHTML = '<span style="color:#aaa;font-size:12px;">Searching GitHub issues...</span>';
+
+            // Search open+closed issues for similar title
+            var query = encodeURIComponent(title + ' repo:SimonBourdages/OKR-Miner');
+            fetch('https://api.github.com/search/issues?q=' + query + '&per_page=5')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var items = data.items || [];
+                    if (items.length === 0) {
+                        container.innerHTML = '<span style="color:#69f0ae;font-size:12px;">✅ No duplicates found — safe to submit!</span>';
+                        return;
+                    }
+                    var html = '<div style="font-size:12px;color:#ff9800;margin-bottom:4px;">⚠️ Possible duplicates found:</div>';
+                    for (var i = 0; i < items.length; i++) {
+                        var issue = items[i];
+                        var stateColor = issue.state === 'open' ? '#4caf50' : '#f44';
+                        html += '<a href="' + issue.html_url + '" target="_blank" style="display:block;color:#8cf;font-size:12px;text-decoration:none;padding:3px 0;border-bottom:1px solid #1a1a2e;">';
+                        html += '<span style="color:' + stateColor + ';">[' + issue.state + ']</span> #' + issue.number + ' ' + issue.title;
+                        html += '</a>';
+                    }
+                    container.innerHTML = html;
+                })
+                .catch(function(err) {
+                    container.innerHTML = '<span style="color:#f44;font-size:12px;">❌ GitHub search failed: ' + err.message + '</span>';
+                });
+        }
+
+        function sendToGitHub(btn) {
+            var title = decodeURIComponent(btn.getAttribute('data-title'));
+            var desc = decodeURIComponent(btn.getAttribute('data-desc'));
+            var bType = btn.getAttribute('data-type') || 'bug';
+            var contact = decodeURIComponent(btn.getAttribute('data-contact') || '');
+            var state = btn.getAttribute('data-state') || '';
+
+            var typeEmoji = bType === 'bug' ? '🐛' : bType === 'feature' ? '💡' : '✨';
+            var typeLabel = bType === 'bug' ? 'Bug Report' : bType === 'feature' ? 'Feature Request' : 'Improvement';
+            var issueTitle = typeEmoji + ' [' + typeLabel + '] ' + title;
+
+            var body = '## ' + typeLabel + '\n\n';
+            body += '### Description\n' + desc + '\n\n';
+            body += '### Game State\n```\n' + state + '\n```\n\n';
+            if (contact) body += '### Contact\n' + contact + '\n\n';
+            body += '---\n_Submitted via analytics dashboard from SharePoint telemetry_';
+
+            var labels = bType === 'bug' ? 'bug' : 'enhancement';
+            var url = 'https://github.com/SimonBourdages/OKR-Miner/issues/new?title=' + encodeURIComponent(issueTitle)
+                + '&body=' + encodeURIComponent(body)
+                + '&labels=' + encodeURIComponent(labels);
+            window.open(url, '_blank');
         }
 
         function loadConfig() {
