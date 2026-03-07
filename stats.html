@@ -156,12 +156,14 @@
         <div class="tab active" onclick="switchTab('local')">📱 Local Stats</div>
         <div class="tab" onclick="switchTab('cloud')">☁️ SharePoint Data</div>
         <div class="tab" onclick="switchTab('players')">👥 New Players</div>
+        <div class="tab" onclick="switchTab('bugs')">🐛 Bug Reports</div>
         <div class="tab" onclick="switchTab('config')">⚙️ Settings</div>
     </div>
     <div class="content">
         <div id="panel-local" class="active"></div>
         <div id="panel-cloud"></div>
         <div id="panel-players"></div>
+        <div id="panel-bugs"></div>
         <div id="panel-config">
             <div class="config-section">
                 <h3>SharePoint GET Endpoint</h3>
@@ -201,11 +203,13 @@
             document.getElementById('panel-local').classList.remove('active');
             document.getElementById('panel-cloud').classList.remove('active');
             document.getElementById('panel-players').classList.remove('active');
+            document.getElementById('panel-bugs').classList.remove('active');
             document.getElementById('panel-config').classList.remove('active');
             if (name === 'local') { tabs[0].classList.add('active'); document.getElementById('panel-local').classList.add('active'); renderLocal(); }
             if (name === 'cloud') { tabs[1].classList.add('active'); document.getElementById('panel-cloud').classList.add('active'); loadCloud(); }
             if (name === 'players') { tabs[2].classList.add('active'); document.getElementById('panel-players').classList.add('active'); loadPlayers(); }
-            if (name === 'config') { tabs[3].classList.add('active'); document.getElementById('panel-config').classList.add('active'); loadConfig(); }
+            if (name === 'bugs') { tabs[3].classList.add('active'); document.getElementById('panel-bugs').classList.add('active'); loadBugs(); }
+            if (name === 'config') { tabs[4].classList.add('active'); document.getElementById('panel-config').classList.add('active'); loadConfig(); }
         }
 
         function formatNumber(n) {
@@ -457,6 +461,79 @@
                     } else {
                         html += '<div class="empty-state"><h2>No Players Yet</h2><p>Share the game link and watch players appear here!</p></div>';
                     }
+
+                    panel.innerHTML = html;
+                })
+                .catch(function(err) {
+                    panel.innerHTML = '<div class="empty-state"><h2>Failed to Load</h2><p>' + err.message + '</p></div>';
+                });
+        }
+
+        function loadBugs() {
+            var panel = document.getElementById('panel-bugs');
+            var endpoint = localStorage.getItem(GET_ENDPOINT_KEY) || DEFAULT_GET_ENDPOINT;
+            panel.innerHTML = '<div class="empty-state"><h2>Loading...</h2><p>Fetching bug reports from SharePoint...</p></div>';
+            fetch(endpoint)
+                .then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function(data) {
+                    var items = Array.isArray(data) ? data : (data.value || data.items || [data]);
+
+                    var bugs = [];
+                    for (var i = 0; i < items.length; i++) {
+                        var mode = items[i].mode || items[i].Mode || '';
+                        if (mode === 'bug_report') {
+                            bugs.push(items[i]);
+                        }
+                    }
+
+                    if (bugs.length === 0) {
+                        panel.innerHTML = '<div class="empty-state"><h2>No Bug Reports</h2><p>No bug reports submitted yet. Use the 🐛 button in-game to submit one.</p></div>';
+                        return;
+                    }
+
+                    var html = '<h2 style="color:#ff9800;margin-bottom:20px;">🐛 Bug Reports <span class="source-badge" style="background:#e65100;color:#ffcc80;">CLOUD</span></h2>';
+                    html += '<div class="card-grid">';
+                    html += card(bugs.length, 'Total Reports');
+                    var bugCount = 0;
+                    var featureCount = 0;
+                    var improveCount = 0;
+                    for (var c = 0; c < bugs.length; c++) {
+                        var bTheme = bugs[c].theme || bugs[c].Theme || '';
+                        if (bTheme === 'bug') bugCount++;
+                        else if (bTheme === 'feature') featureCount++;
+                        else improveCount++;
+                    }
+                    html += card(bugCount, 'Bugs');
+                    html += card(featureCount, 'Features');
+                    html += card(improveCount, 'Improvements');
+                    html += '</div>';
+
+                    html += '<div style="margin-top:20px;">';
+                    for (var j = bugs.length - 1; j >= 0; j--) {
+                        var bug = bugs[j];
+                        var details = {};
+                        try { details = JSON.parse(bug.buildingTypes || bug.BuildingTypes || '{}'); } catch(e) {}
+                        var bType = bug.theme || bug.Theme || 'bug';
+                        var typeColor = bType === 'bug' ? '#f44' : bType === 'feature' ? '#4caf50' : '#2196f3';
+                        var typeLabel = bType === 'bug' ? '🐛 Bug' : bType === 'feature' ? '💡 Feature' : '✨ Improvement';
+
+                        html += '<div style="background:rgba(255,152,0,0.06);border:1px solid rgba(255,152,0,0.2);border-radius:10px;padding:16px;margin-bottom:12px;">';
+                        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+                        html += '<span style="color:' + typeColor + ';font-weight:bold;font-size:14px;">' + typeLabel + '</span>';
+                        html += '<span style="color:#666;font-size:11px;">' + (bug.browser || bug.Browser || '') + ' · ' + (bug.screen || bug.Screen || '') + '</span>';
+                        html += '</div>';
+                        html += '<h3 style="color:#fff;font-size:16px;margin-bottom:6px;">' + (details.title || 'Untitled') + '</h3>';
+                        html += '<p style="color:#bbb;font-size:13px;line-height:1.6;white-space:pre-wrap;">' + (details.description || 'No description') + '</p>';
+                        if (details.contact) {
+                            html += '<p style="color:#8cf;font-size:12px;margin-top:8px;">📧 ' + details.contact + '</p>';
+                        }
+                        html += '<div style="color:#555;font-size:11px;margin-top:8px;">Game state: Milestone ' + (bug.milestones || bug.Milestones || '?') + ' · KRs: ' + formatNumber(Number(bug.totalOKRs || bug.TotalOKRs || 0)) + ' · Buildings: ' + (bug.buildingsPlaced || bug.BuildingsPlaced || '?') + ' · v' + (bug.version || bug.Version || '?') + '</div>';
+                        html += '</div>';
+                    }
+                    html += '</div>';
 
                     panel.innerHTML = html;
                 })
