@@ -2927,6 +2927,20 @@
             var b = BUILDINGS[type];
             var newNodeRadius = getNodeHitRadius(1);
 
+            // Network Hub cap: max 4× current objective review level
+            if (type === 'multiplier') {
+                var hubCap = (this.state.unlockedMilestones ? this.state.unlockedMilestones.length : 1) * 4;
+                var hubCount = 0;
+                for (var hi = 0; hi < this.nodes.length; hi++) {
+                    if (this.nodes[hi].type === 'multiplier') hubCount++;
+                }
+                if (hubCount >= hubCap) {
+                    this.addFloatingText(x, y, 'Hub limit! Max ' + hubCap + ' (4× Review level)', '#f84');
+                    this.playSound('click');
+                    return;
+                }
+            }
+
             // Reserve dynamic space around upgraded buildings so hitboxes fully cover visuals
             for (var i = 0; i < this.nodes.length; i++) {
                 var existing = this.nodes[i];
