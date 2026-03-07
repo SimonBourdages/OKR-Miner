@@ -1305,7 +1305,8 @@
             'merge':        { icon: '🔄', name: 'Fusion!', desc: 'Merged two same-type buildings into a Legendary Lv.4' },
             'phished':      { icon: '🎣', name: 'Phished!', desc: 'Your Leadership clicked a phishing link. Instant game over.' },
             'ai-takeover-loss': { icon: '🤖', name: 'Taken Over', desc: 'Lose the robot war after choosing Humans First' },
-            'vpn':              { icon: '🔒', name: 'VPN Enabled', desc: 'Network Hub secured your connections. Packet loss reduced.' }
+            'vpn':              { icon: '🔒', name: 'VPN Enabled', desc: 'Network Hub secured your connections. Packet loss reduced.' },
+            'bankruptcy':       { icon: '💸', name: 'Burned It All', desc: 'Reached -$1B in debt. Faster than any AI startup.' }
         };
 
         var BG_IMAGES = {
@@ -3248,9 +3249,22 @@
             }
             if (this.state.electricityEnabled) {
                 this.state.currencies.el += (elGain - elDrain) * dt;
-                if (this.state.currencies.el < 0) this.state.currencies.el = 0;
+                // Allow negative $ (debt) — no floor clamp
                 if (effectiveFundingCap !== null && this.state.currencies.el > effectiveFundingCap) {
                     this.state.currencies.el = effectiveFundingCap;
+                }
+                // Bankruptcy: -1B $ = game over
+                if (this.state.currencies.el <= -1e9 && !this._bankruptcyTriggered) {
+                    this._bankruptcyTriggered = true;
+                    this.unlock('bankruptcy');
+                    this.running = false;
+                    this.logMessage('💸', 'BANKRUPTCY', 'You burned through $1B in debt. Game over.', 'negative');
+                    var self = this;
+                    setTimeout(function() {
+                        document.getElementById('gameOverTitle').textContent = 'BANKRUPT';
+                        document.getElementById('gameOverMsg').textContent = 'You burned money quicker than an AI startup ever could. -$1,000,000,000 in debt. Impressive, actually.';
+                        document.getElementById('gameOverScreen').style.display = 'flex';
+                    }, 500);
                 }
             }
             this._fundingCap = effectiveFundingCap;
