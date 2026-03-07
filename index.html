@@ -912,6 +912,11 @@
         <button id="infiniteModeBtn" onclick="game.startInfiniteMode()" style="display:none;">♾️ INFINITE MODE</button>
         <button onclick="game.showLoadCode()">📋 LOAD CODE</button>
         <button onclick="game.clearSave()">CLEAR SAVE</button>
+        <div style="margin-top:10px;display:flex;gap:6px;justify-content:center;">
+            <button onclick="game.switchLanguage('en')" id="langBtnEn" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">🇬🇧 EN</button>
+            <button onclick="game.switchLanguage('fr')" id="langBtnFr" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">🇫🇷 FR</button>
+            <button onclick="game.switchLanguage('fr_qc')" id="langBtnFrQc" style="padding:6px 12px;font-size:11px;min-width:auto;min-height:auto;">🍁 QC</button>
+        </div>
         <div id="versionTag" style="margin-top:16px;color:#666;font-size:10px;letter-spacing:1px;cursor:pointer;" onclick="game._versionTaps=(game._versionTaps||0)+1;if(game._versionTaps>=2){game._versionTaps=0;document.getElementById('debugMenu').style.display=document.getElementById('debugMenu').style.display==='none'?'block':'none';}clearTimeout(game._versionTapTimer);game._versionTapTimer=setTimeout(function(){game._versionTaps=0;},800);"></div>
         <div id="debugMenu" style="display:none;margin-top:10px;">
             <button onclick="game.showDebugStartDialog()" style="background:rgba(255,255,0,0.1);color:#ff0;border-color:#ff0;font-size:14px;padding:8px 20px;">🧪 DEBUG MODE</button>
@@ -1157,6 +1162,7 @@
     </div>
 
     <script src="./src/game-logic.js"></script>
+    <script src="./src/i18n.js"></script>
     <script>
     (function() {
         'use strict';
@@ -7535,8 +7541,27 @@
         OKRFarmingGame.prototype.toggleDetailedView = function() {
             this.detailedView = !this.detailedView;
             var btn = document.getElementById('detailToggleBtn');
-            if (btn) btn.textContent = this.detailedView ? '📊 Details: ON' : '📊 Details: OFF';
+            if (btn) btn.textContent = this.detailedView ? GameI18n.t('controls.detailsOn') : GameI18n.t('controls.detailsOff');
             if (btn) btn.style.background = this.detailedView ? 'rgba(0,255,136,0.3)' : '';
+        };
+
+        OKRFarmingGame.prototype.switchLanguage = function(lang) {
+            GameI18n.setLang(lang);
+            // Highlight active button
+            var langs = ['en', 'fr', 'fr_qc'];
+            for (var i = 0; i < langs.length; i++) {
+                var id = 'langBtn' + langs[i].charAt(0).toUpperCase() + langs[i].slice(1).replace('_', '');
+                var el = document.getElementById(id);
+                if (el) el.style.background = langs[i] === lang ? 'rgba(0,255,136,0.3)' : '';
+            }
+            // Update visible menu text
+            var menuEl = document.getElementById('menu');
+            if (menuEl) {
+                var h1 = menuEl.querySelector('h1');
+                if (h1) h1.textContent = GameI18n.t('menu.title');
+            }
+            this.logMessage('🌐', 'Language changed', GameI18n.t('lang.' + lang), 'info');
+            this.rebuildBuildingButtons();
         };
 
         // =========================================================
