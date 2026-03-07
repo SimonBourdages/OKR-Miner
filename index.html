@@ -3973,6 +3973,17 @@
                     var unlockResult = GameLogic.applyMilestoneUnlock(this.state, m);
                     if (unlockResult.eventsEnabledNow) this.eventTimer = 10 + Math.random() * 15;
 
+                    // When themes unlock, switch to a random theme
+                    if (m.enableThemes) {
+                        var themeKeys = [];
+                        for (var tk in THEMES) { if (THEMES.hasOwnProperty(tk) && tk !== this.state.activeTheme) themeKeys.push(tk); }
+                        if (themeKeys.length > 0) {
+                            var randomTheme = themeKeys[Math.floor(Math.random() * themeKeys.length)];
+                            this.state.activeTheme = randomTheme;
+                            this.logMessage('🎨', 'Theme Changed', 'Switched to ' + THEMES[randomTheme].name + ' — ' + THEMES[randomTheme].bonusDesc, 'info');
+                        }
+                    }
+
                     // Rebuild building buttons to show newly unlocked ones
                     this.rebuildBuildingButtons();
 
