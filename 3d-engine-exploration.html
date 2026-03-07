@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OKR Miner — 3D Engine Exploration</title>
+<style>
+/* ─── Reset & Base ─── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a1a;
+  --bg-card: #111128;
+  --bg-card-hover: #161640;
+  --accent: #00ff88;
+  --accent-dim: #00cc6a;
+  --accent-glow: rgba(0,255,136,0.15);
+  --text: #e0e0f0;
+  --text-dim: #8888aa;
+  --border: #222244;
+  --star-1: #ffcc00;
+  --star-0: #333355;
+  --pro: #00ff88;
+  --con: #ff4466;
+  --tag-bg: rgba(0,255,136,0.12);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── Starfield Background ─── */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 15% 55%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 45% 90%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 25% 35%, rgba(0,255,136,0.3), transparent),
+    radial-gradient(2px 2px at 65% 60%, rgba(100,150,255,0.3), transparent),
+    radial-gradient(1px 1px at 5% 85%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 35% 15%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 85% 55%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 42% 72%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 78% 28%, rgba(255,255,255,0.5), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Layout ─── */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ─── Header ─── */
+.header {
+  text-align: center;
+  padding: 3rem 0 2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+}
+
+.header-icon {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), #66bbff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.subtitle-badge {
+  display: inline-block;
+  background: var(--tag-bg);
+  color: var(--accent);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  border: 1px solid rgba(0,255,136,0.2);
+  margin-top: 1rem;
+}
+
+/* ─── Section Headings ─── */
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.section-title .icon { font-size: 1.5rem; }
+
+.section-desc {
+  color: var(--text-dim);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+/* ─── Comparison Table ─── */
+.table-section { margin-bottom: 3.5rem; }
+
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.comp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 800px;
+}
+
+.comp-table thead { background: rgba(0,255,136,0.06); }
+
+.comp-table th {
+  padding: 1rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--accent);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.comp-table td {
+  padding: 0.85rem 0.8rem;
+  border-bottom: 1px solid rgba(34,34,68,0.6);
+  vertical-align: middle;
+}
+
+.comp-table tbody tr:hover { background: rgba(0,255,136,0.03); }
+
+.comp-table .engine-name {
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.table-stars { color: var(--star-1); letter-spacing: 1px; }
+.table-stars .empty { color: var(--star-0); }
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-green { background: rgba(0,255,136,0.15); color: var(--accent); }
+.badge-blue { background: rgba(100,150,255,0.15); color: #88aaff; }
+.badge-purple { background: rgba(180,100,255,0.15); color: #bb88ff; }
+.badge-orange { background: rgba(255,170,50,0.15); color: #ffaa44; }
+.badge-pink { background: rgba(255,100,150,0.15); color: #ff88aa; }
+.badge-cyan { background: rgba(0,200,220,0.15); color: #44ddee; }
+.badge-yellow { background: rgba(255,220,50,0.15); color: #eedd44; }
+
+.community-bar {
+  display: inline-block;
+  width: 60px;
+  height: 8px;
+  background: var(--star-0);
+  border-radius: 4px;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.community-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+}
+
+/* ─── Engine Cards ─── */
+.engines-grid { margin-bottom: 3.5rem; }
+
+.engine-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.engine-card:hover {
+  border-color: rgba(0,255,136,0.3);
+  box-shadow: 0 4px 30px rgba(0,255,136,0.06);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  flex-shrink: 0;
+}
+
+.card-title-area { flex: 1; min-width: 200px; }
+.card-title-area h3 { font-size: 1.4rem; color: #fff; margin-bottom: 0.15rem; }
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.card-meta .stars { color: var(--star-1); }
+.card-meta .stars .empty { color: var(--star-0); }
+
+.card-description {
+  color: var(--text);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.card-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.pros-list, .cons-list {
+  list-style: none;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.pros-list li, .cons-list li {
+  padding: 0.35rem 0;
+  padding-left: 1.4rem;
+  position: relative;
+}
+
+.pros-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--pro);
+  font-weight: 700;
+}
+
+.cons-list li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: var(--con);
+  font-weight: 700;
+}
+
+.list-heading {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.list-heading.pro-heading { color: var(--pro); }
+.list-heading.con-heading { color: var(--con); }
+
+/* ─── Demo Containers ─── */
+.demo-area {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.demo-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+}
+
+.demo-canvas-wrap {
+  width: 100%;
+  height: 220px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #060612;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.demo-canvas-wrap canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.demo-hint {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.3);
+  pointer-events: none;
+}
+
+/* CSS 3D Demo */
+.css-demo-wrap {
+  width: 100%;
+  height: 220px;
+  border-radius: 10px;
+  background: #060612;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 600px;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.css-demo-wrap:active { cursor: grabbing; }
+
+.css-cube {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.css-cube .face {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+  backface-visibility: visible;
+}
+
+.css-cube .front  { transform: translateZ(40px); }
+.css-cube .back   { transform: rotateY(180deg) translateZ(40px); }
+.css-cube .left   { transform: rotateY(-90deg) translateZ(40px); }
+.css-cube .right  { transform: rotateY(90deg) translateZ(40px); }
+.css-cube .top    { transform: rotateX(90deg) translateZ(40px); }
+.css-cube .bottom { transform: rotateX(-90deg) translateZ(40px); }
+
+@keyframes rotateCube {
+  0%   { transform: rotateX(-20deg) rotateY(0deg); }
+  100% { transform: rotateX(-20deg) rotateY(360deg); }
+}
+
+.css-demo-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.css-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  animation: drift linear infinite;
+}
+
+@keyframes drift {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-220px) translateX(30px); opacity: 0; }
+}
+
+/* ─── Card Footer ─── */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.visit-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0,255,136,0.3);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.visit-link:hover {
+  background: rgba(0,255,136,0.1);
+  box-shadow: 0 0 12px rgba(0,255,136,0.15);
+}
+
+.best-for-tag {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.best-for-tag strong {
+  color: var(--accent);
+}
+
+/* ─── Recommendation Section ─── */
+.recommendation {
+  background: linear-gradient(135deg, rgba(0,255,136,0.06), rgba(100,150,255,0.04));
+  border: 2px solid rgba(0,255,136,0.25);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.recommendation::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0,255,136,0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.rec-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.rec-header h2 {
+  font-size: 1.6rem;
+  color: var(--accent);
+}
+
+.rec-pick {
+  font-size: 1.3rem;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.rec-body { font-size: 0.95rem; line-height: 1.8; color: var(--text); position: relative; }
+.rec-body p { margin-bottom: 1rem; }
+
+.rec-runner-up {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0,255,136,0.15);
+}
+
+.rec-runner-up h4 {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+}
+
+/* ─── Footer ─── */
+.page-footer {
+  text-align: center;
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.page-footer .footer-brand {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .container { padding: 1rem; }
+  .header h1 { font-size: 1.6rem; }
+  .card-columns { grid-template-columns: 1fr; }
+  .engine-card { padding: 1.2rem; }
+  .recommendation { padding: 1.5rem; }
+  .section-title { font-size: 1.3rem; }
+  .card-header { gap: 0.7rem; }
+  .card-icon { width: 44px; height: 44px; font-size: 1.3rem; }
+  .comp-table { font-size: 0.8rem; }
+}
+
+@media (max-width: 480px) {
+  .header h1 { font-size: 1.3rem; }
+  .card-footer { flex-direction: column; align-items: flex-start; }
+}
+
+/* ─── Nav Bar ─── */
+.nav-bar {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.nav-bar a {
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 0.35rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.nav-bar a:hover {
+  color: var(--accent);
+  border-color: rgba(0,255,136,0.25);
+  background: rgba(0,255,136,0.05);
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #333355; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #444466; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="header">
+    <span class="header-icon">🚀</span>
+    <h1>3D Engine Exploration</h1>
+    <p>Evaluating browser-based 3D engines for converting OKR Miner from 2D Canvas to an immersive 3D space-building experience</p>
+    <span class="subtitle-badge">⛏️ OKR Miner &middot; Research Document</span>
+  </header>
+
+  <!-- ═══ NAV ═══ -->
+  <nav class="nav-bar">
+    <a href="#comparison">📊 Comparison</a>
+    <a href="#threejs">Three.js</a>
+    <a href="#babylonjs">Babylon.js</a>
+    <a href="#playcanvas">PlayCanvas</a>
+    <a href="#aframe">A-Frame</a>
+    <a href="#phaser3d">Phaser 3D</a>
+    <a href="#r3f">React Three Fiber</a>
+    <a href="#pixi3d">Pixi3D</a>
+    <a href="#recommendation">🏆 Recommendation</a>
+  </nav>
+
+  <!-- ═══ COMPARISON TABLE ═══ -->
+  <section class="table-section" id="comparison">
+    <h2 class="section-title"><span class="icon">📊</span> Engine Comparison Matrix</h2>
+    <p class="section-desc">Side-by-side overview of all evaluated engines against OKR Miner's requirements</p>
+    <div class="table-wrap">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Engine</th>
+            <th>Type</th>
+            <th>Difficulty</th>
+            <th>Community</th>
+            <th>Mobile</th>
+            <th>Migration</th>
+            <th>Best For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="engine-name">🔺 Three.js</td>
+            <td>Library</td>
+            <td><span class="table-stars">★★★<span class="empty">★★</span></span></td>
+            <td><span class="community-bar"><span class="community-bar-fill" style="width:95%;background:#00ff88"></span></span> 95k⭐</td>
+            <td><span class="badge badge-green">Great</span></td>
+            <td><span class="badge badge-green">Easy</span></td>
+            <td><span class="badge badge-green">Full Control</span></td>
+          </tr>
+          <tr>
+            <td class="engine-name">🏛️ Babylon.js</td>
+            <td>Engine</td>
+            <td><span class="table-stars">★★★<span class="empty">★★</span></span></td>
+            <td><span class="community-bar"><span class="community-bar-fill" style="width:72%;background:#6688ff"></span></span> 22k⭐</td>
+            <td><span class="badge badge-green">Great</span></td>
+            <td><span class="badge badge-green">Easy</span></td>
+            <td><span class="badge badge-blue">Full Engine</span></td>
+          </tr>
+          <tr>
+            <td class="engine-name">🎮 PlayCanvas</td>
+            <td>Engine + Editor</td>
+            <td><span class="table-stars">★★<span class="empty">★★★</span></span></td>
+            <td><span class="community-bar"><span class="community-bar-fill" style="width:55%;background:#ff8844"></span></span> 9k⭐</td>
+            <td><span class="badge badge-green">Great</span></td>
+            <td><span class="badge badge-orange">Medium</span></td>
+            <td><span class="badge badge-orange">Visual Editor</span></td>
+          </tr>
+          <tr>
+            <td class="engine-name">🥽 A-Frame</td>
+            <td>Framework</td>
+            <td><span class="table-stars">★★<span class="empty">★★★</span></span></td>
+            <td><span class="community-bar"><span class="community-bar-fill" style="width:60%;background:#ff44aa"></span></span> 16k⭐</td>
+            <td><span class="badge badge-orange">Good</span></td>
+            <td><span class="badge badge-pink">Hard</span></td>
+            <td><span class="badge badge-pink">VR/AR</span></td>
+          </tr>
+          <tr>
+            <td class="engine-name">🎯 Phaser 3D</td>
+            <td>Plugin</td>
+            <td><span class="table-stars">★★★★<span class="empty">★</span></span></td>
+            <td><span class="community-bar"><span class="community-bar-fill" style="width:30%;background:#eedd44"></span></span> Limited</td>
+            <td><span class="badge badge-orange">Good</span></td>
+            <td><span class="badge badge-pink">Hard</span></td>
+            <td><span class="badge badge-yellow">2D-First</span></td>
+          </tr>
+          <tr>
+            <td class="engine-name">⚛️ React Three Fiber</td>
+            <td>Wrapper</td>
+            <td><span class="table-stars">★★★<span class="empty">★★</span></span></td>
+            <td><span class="community-bar"><span class="community-bar-fill" style="width:70%;background:#44ddee"></span></span> 26k⭐</td>
+            <td><span class="badge badge-green">Great</span></td>
+            <td><span class="badge badge-pink">Hard</span></td>
+            <td><span class="badge badge-cyan">React Apps</span></td>
+          </tr>
+          <tr>
+            <td class="engine-name">🧊 Pixi3D</td>
+            <td>Extension</td>
+            <td><span class="table-stars">★★<span class="empty">★★★</span></span></td>
+            <td><span class="community-bar"><span class="community-bar-fill" style="width:15%;background:#bb88ff"></span></span> 700⭐</td>
+            <td><span class="badge badge-green">Great</span></td>
+            <td><span class="badge badge-green">Easy</span></td>
+            <td><span class="badge badge-purple">2D→3D Bridge</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══ ENGINE CARDS ═══ -->
+  <div class="engines-grid">
+
+    <!-- ── 1. THREE.JS ── -->
+    <article class="engine-card" id="threejs">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#1a1a2e,#0a3d2a);border:2px solid #00ff88;">🔺</div>
+        <div class="card-title-area">
+          <h3>Three.js</h3>
+          <div class="card-meta">
+            <span class="stars">★★★<span class="empty">★★</span></span>
+            <span>Difficulty: Moderate</span>
+            <span>&middot;</span>
+            <span>95k+ GitHub Stars</span>
+          </div>
+        </div>
+        <span class="badge badge-green">⭐ Top Pick</span>
+      </div>
+      <p class="card-description">
+        Three.js is the most widely adopted WebGL library, providing a powerful yet flexible abstraction over raw WebGL. It offers a massive ecosystem of examples, loaders, post-processing effects, and community plugins. For OKR Miner, Three.js gives you direct control over the scene graph, camera systems, and rendering pipeline while maintaining a relatively gentle learning curve. Its imperative API maps naturally to the game's existing JavaScript architecture, making migration incremental rather than all-or-nothing.
+      </p>
+      <div class="card-columns">
+        <div>
+          <div class="list-heading pro-heading">✓ Pros</div>
+          <ul class="pros-list">
+            <li>Largest community &amp; ecosystem in WebGL</li>
+            <li>Imperative JS API — easy migration from Canvas code</li>
+            <li>Excellent particle systems (Points, Sprites, custom shaders)</li>
+            <li>OrbitControls for camera orbit/zoom built-in</li>
+            <li>Massive library of examples and tutorials</li>
+            <li>Lightweight — include only what you need</li>
+            <li>No build step required, works from CDN</li>
+          </ul>
+        </div>
+        <div>
+          <div class="list-heading con-heading">✗ Cons</div>
+          <ul class="cons-list">
+            <li>Not a game engine — no physics, audio, or ECS built-in</li>
+            <li>UI overlay system must be built manually (HTML/CSS)</li>
+            <li>Breaking changes between major versions</li>
+            <li>Performance tuning requires WebGL knowledge</li>
+            <li>No visual editor — all code-based</li>
+          </ul>
+        </div>
+      </div>
+      <div class="demo-area">
+        <div class="demo-label">🎮 Interactive Demo — Rotating Space Station</div>
+        <div class="demo-canvas-wrap" id="threejs-demo">
+          <span class="demo-hint">click &amp; drag to orbit · scroll to zoom</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="https://threejs.org/" target="_blank" rel="noopener" class="visit-link">🔗 threejs.org</a>
+        <span class="best-for-tag">Best for: <strong>Full creative control with minimal framework overhead</strong></span>
+      </div>
+    </article>
+
+    <!-- ── 2. BABYLON.JS ── -->
+    <article class="engine-card" id="babylonjs">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#1a1a2e,#1a2a4a);border:2px solid #6688ff;">🏛️</div>
+        <div class="card-title-area">
+          <h3>Babylon.js</h3>
+          <div class="card-meta">
+            <span class="stars">★★★<span class="empty">★★</span></span>
+            <span>Difficulty: Moderate</span>
+            <span>&middot;</span>
+            <span>22k+ GitHub Stars</span>
+          </div>
+        </div>
+        <span class="badge badge-blue">🏢 Microsoft-backed</span>
+      </div>
+      <p class="card-description">
+        Babylon.js is a comprehensive 3D engine maintained by Microsoft, offering batteries-included features like physics (Ammo.js/Havok), a built-in GUI system, particle effects, and an online playground/editor. For OKR Miner, its integrated GUI module eliminates the need to build UI overlays from scratch, and its particle system is production-ready. The TypeScript-first approach provides excellent autocomplete and documentation, though it works perfectly with plain JavaScript too.
+      </p>
+      <div class="card-columns">
+        <div>
+          <div class="list-heading pro-heading">✓ Pros</div>
+          <ul class="pros-list">
+            <li>Full engine with physics, GUI, particles, audio</li>
+            <li>Built-in GUI overlay system (perfect for game HUD)</li>
+            <li>Online Playground for rapid prototyping</li>
+            <li>Excellent TypeScript support &amp; documentation</li>
+            <li>Inspector/debugger built into the engine</li>
+            <li>Active Microsoft-funded development</li>
+            <li>ArcRotateCamera ideal for space games</li>
+          </ul>
+        </div>
+        <div>
+          <div class="list-heading con-heading">✗ Cons</div>
+          <ul class="cons-list">
+            <li>Larger bundle size (~800KB+ min)</li>
+            <li>Steeper initial learning curve than Three.js</li>
+            <li>Smaller community ecosystem than Three.js</li>
+            <li>Can feel "heavy" for simpler projects</li>
+            <li>Less third-party content/tutorials available</li>
+          </ul>
+        </div>
+      </div>
+      <div class="demo-area">
+        <div class="demo-label">🎮 Interactive Demo — CSS 3D Engine Visualization</div>
+        <div class="css-demo-wrap" id="babylon-demo-wrap">
+          <div class="css-demo-particles" id="babylon-particles"></div>
+          <div class="css-cube" id="babylon-cube" style="animation: rotateCube 6s linear infinite;">
+            <div class="face front" style="background:rgba(100,136,255,0.25);">BJS</div>
+            <div class="face back" style="background:rgba(100,136,255,0.15);">GUI</div>
+            <div class="face left" style="background:rgba(100,136,255,0.2);">PBR</div>
+            <div class="face right" style="background:rgba(100,136,255,0.2);">XR</div>
+            <div class="face top" style="background:rgba(100,136,255,0.15);">⚡</div>
+            <div class="face bottom" style="background:rgba(100,136,255,0.15);">🏛️</div>
+          </div>
+          <span class="demo-hint">hover to pause rotation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="https://www.babylonjs.com/" target="_blank" rel="noopener" class="visit-link">🔗 babylonjs.com</a>
+        <span class="best-for-tag">Best for: <strong>Full-featured engine with built-in game tooling</strong></span>
+      </div>
+    </article>
+
+    <!-- ── 3. PLAYCANVAS ── -->
+    <article class="engine-card" id="playcanvas">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#1a1a2e,#3a2010);border:2px solid #ff8844;">🎮</div>
+        <div class="card-title-area">
+          <h3>PlayCanvas</h3>
+          <div class="card-meta">
+            <span class="stars">★★<span class="empty">★★★</span></span>
+            <span>Difficulty: Easy</span>
+            <span>&middot;</span>
+            <span>9k+ GitHub Stars</span>
+          </div>
+        </div>
+        <span class="badge badge-orange">☁️ Cloud Editor</span>
+      </div>
+      <p class="card-description">
+        PlayCanvas is an open-source game engine with a powerful cloud-based visual editor, making it the closest thing to Unity for the web. Its entity-component system is well-suited for game objects like buildings and asteroids. For OKR Miner, the visual editor would accelerate scene building and asset placement. However, migration from a single-file Canvas game to PlayCanvas's project structure represents a significant architectural shift, and the cloud editor dependency may not suit all workflows.
+      </p>
+      <div class="card-columns">
+        <div>
+          <div class="list-heading pro-heading">✓ Pros</div>
+          <ul class="pros-list">
+            <li>Visual editor — drag-and-drop scene building</li>
+            <li>Entity-Component system (game-oriented)</li>
+            <li>Excellent mobile performance optimizations</li>
+            <li>Built-in asset pipeline and model viewer</li>
+            <li>Real-time collaboration in editor</li>
+            <li>Small runtime (~300KB gzipped)</li>
+          </ul>
+        </div>
+        <div>
+          <div class="list-heading con-heading">✗ Cons</div>
+          <ul class="cons-list">
+            <li>Cloud editor can feel restrictive</li>
+            <li>Significant architectural restructuring needed</li>
+            <li>Smaller plugin/extension ecosystem</li>
+            <li>Free tier has project limitations</li>
+            <li>Less suitable for single-file deployments</li>
+          </ul>
+        </div>
+      </div>
+      <div class="demo-area">
+        <div class="demo-label">🎮 Interactive Demo — CSS 3D Engine Visualization</div>
+        <div class="css-demo-wrap" id="playcanvas-demo-wrap">
+          <div class="css-demo-particles" id="playcanvas-particles"></div>
+          <div class="css-cube" id="playcanvas-cube" style="animation: rotateCube 5s linear infinite;">
+            <div class="face front" style="background:rgba(255,136,68,0.25);">PC</div>
+            <div class="face back" style="background:rgba(255,136,68,0.15);">ECS</div>
+            <div class="face left" style="background:rgba(255,136,68,0.2);">☁️</div>
+            <div class="face right" style="background:rgba(255,136,68,0.2);">3D</div>
+            <div class="face top" style="background:rgba(255,136,68,0.15);">🎮</div>
+            <div class="face bottom" style="background:rgba(255,136,68,0.15);">⚡</div>
+          </div>
+          <span class="demo-hint">hover to pause rotation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="https://playcanvas.com/" target="_blank" rel="noopener" class="visit-link">🔗 playcanvas.com</a>
+        <span class="best-for-tag">Best for: <strong>Teams wanting a visual editor workflow</strong></span>
+      </div>
+    </article>
+
+    <!-- ── 4. A-FRAME ── -->
+    <article class="engine-card" id="aframe">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#1a1a2e,#3a1030);border:2px solid #ff44aa;">🥽</div>
+        <div class="card-title-area">
+          <h3>A-Frame</h3>
+          <div class="card-meta">
+            <span class="stars">★★<span class="empty">★★★</span></span>
+            <span>Difficulty: Easy</span>
+            <span>&middot;</span>
+            <span>16k+ GitHub Stars</span>
+          </div>
+        </div>
+        <span class="badge badge-pink">🌐 Mozilla / VR-first</span>
+      </div>
+      <p class="card-description">
+        A-Frame is a web framework for building VR and 3D experiences using HTML-like custom elements, built on top of Three.js. Its declarative approach makes it incredibly easy to prototype 3D scenes — you can create a spinning box with just a few HTML tags. However, A-Frame is primarily designed for VR/AR experiences rather than traditional games. For OKR Miner, the declarative paradigm would require rethinking the game loop, and performance-intensive features like particle systems require dropping down to raw Three.js anyway.
+      </p>
+      <div class="card-columns">
+        <div>
+          <div class="list-heading pro-heading">✓ Pros</div>
+          <ul class="pros-list">
+            <li>Incredibly easy to get started (HTML-based)</li>
+            <li>Built on Three.js — can access raw Three when needed</li>
+            <li>Large component ecosystem (registry)</li>
+            <li>Great for VR/AR if future plans include that</li>
+            <li>Visual inspector available (Ctrl+Alt+I)</li>
+          </ul>
+        </div>
+        <div>
+          <div class="list-heading con-heading">✗ Cons</div>
+          <ul class="cons-list">
+            <li>Declarative model awkward for game loops</li>
+            <li>Performance overhead from entity-component DOM sync</li>
+            <li>VR-first design — traditional games are secondary</li>
+            <li>Complex game logic requires custom components</li>
+            <li>Particle systems need raw Three.js workarounds</li>
+            <li>Development has slowed considerably</li>
+          </ul>
+        </div>
+      </div>
+      <div class="demo-area">
+        <div class="demo-label">🎮 Interactive Demo — CSS 3D Engine Visualization</div>
+        <div class="css-demo-wrap" id="aframe-demo-wrap">
+          <div class="css-demo-particles" id="aframe-particles"></div>
+          <div class="css-cube" id="aframe-cube" style="animation: rotateCube 7s linear infinite;">
+            <div class="face front" style="background:rgba(255,68,170,0.25);">A-F</div>
+            <div class="face back" style="background:rgba(255,68,170,0.15);">VR</div>
+            <div class="face left" style="background:rgba(255,68,170,0.2);">HTML</div>
+            <div class="face right" style="background:rgba(255,68,170,0.2);">AR</div>
+            <div class="face top" style="background:rgba(255,68,170,0.15);">🥽</div>
+            <div class="face bottom" style="background:rgba(255,68,170,0.15);">🌐</div>
+          </div>
+          <span class="demo-hint">hover to pause rotation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="https://aframe.io/" target="_blank" rel="noopener" class="visit-link">🔗 aframe.io</a>
+        <span class="best-for-tag">Best for: <strong>VR/AR experiences and rapid prototyping</strong></span>
+      </div>
+    </article>
+
+    <!-- ── 5. PHASER 3D ── -->
+    <article class="engine-card" id="phaser3d">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#1a1a2e,#2a2a10);border:2px solid #eedd44;">🎯</div>
+        <div class="card-title-area">
+          <h3>Phaser 3D / Extensions</h3>
+          <div class="card-meta">
+            <span class="stars">★★★★<span class="empty">★</span></span>
+            <span>Difficulty: Hard</span>
+            <span>&middot;</span>
+            <span>Limited 3D ecosystem</span>
+          </div>
+        </div>
+        <span class="badge badge-yellow">⚠️ Experimental</span>
+      </div>
+      <p class="card-description">
+        Phaser is the most popular 2D HTML5 game framework, and there have been community efforts to add 3D capabilities through plugins and extensions. Phaser 3 supports custom pipelines and WebGL rendering, which theoretically allows 3D integration. However, Phaser was fundamentally designed for 2D, and its 3D support remains experimental and limited. For OKR Miner, sticking with Phaser would mean fighting against the framework's core design rather than leveraging it. The 3D plugins lack features like proper camera systems, lighting, and model loading.
+      </p>
+      <div class="card-columns">
+        <div>
+          <div class="list-heading pro-heading">✓ Pros</div>
+          <ul class="pros-list">
+            <li>Familiar if already using Phaser for 2D</li>
+            <li>Excellent 2D game loop and scene management</li>
+            <li>Strong community for 2D game development</li>
+            <li>Could do 2.5D with perspective tricks</li>
+          </ul>
+        </div>
+        <div>
+          <div class="list-heading con-heading">✗ Cons</div>
+          <ul class="cons-list">
+            <li>3D support is experimental/community-driven</li>
+            <li>No proper 3D scene graph or camera system</li>
+            <li>No built-in model loading (glTF, OBJ)</li>
+            <li>Particle effects limited to 2D planes</li>
+            <li>Would require custom WebGL shader work</li>
+            <li>Not a viable path for true 3D conversion</li>
+          </ul>
+        </div>
+      </div>
+      <div class="demo-area">
+        <div class="demo-label">🎮 Interactive Demo — CSS 3D Engine Visualization</div>
+        <div class="css-demo-wrap" id="phaser-demo-wrap">
+          <div class="css-demo-particles" id="phaser-particles"></div>
+          <div class="css-cube" id="phaser-cube" style="animation: rotateCube 8s linear infinite;">
+            <div class="face front" style="background:rgba(238,221,68,0.25);">PH3</div>
+            <div class="face back" style="background:rgba(238,221,68,0.15);">2D+</div>
+            <div class="face left" style="background:rgba(238,221,68,0.2);">2.5D</div>
+            <div class="face right" style="background:rgba(238,221,68,0.2);">WGL</div>
+            <div class="face top" style="background:rgba(238,221,68,0.15);">🎯</div>
+            <div class="face bottom" style="background:rgba(238,221,68,0.15);">⚠️</div>
+          </div>
+          <span class="demo-hint">hover to pause rotation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="https://phaser.io/" target="_blank" rel="noopener" class="visit-link">🔗 phaser.io</a>
+        <span class="best-for-tag">Best for: <strong>2D games wanting minor 3D flair (2.5D)</strong></span>
+      </div>
+    </article>
+
+    <!-- ── 6. REACT THREE FIBER ── -->
+    <article class="engine-card" id="r3f">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#1a1a2e,#0a2a3a);border:2px solid #44ddee;">⚛️</div>
+        <div class="card-title-area">
+          <h3>React Three Fiber (R3F)</h3>
+          <div class="card-meta">
+            <span class="stars">★★★<span class="empty">★★</span></span>
+            <span>Difficulty: Moderate</span>
+            <span>&middot;</span>
+            <span>26k+ GitHub Stars</span>
+          </div>
+        </div>
+        <span class="badge badge-cyan">⚛️ React Ecosystem</span>
+      </div>
+      <p class="card-description">
+        React Three Fiber is a React renderer for Three.js that lets you build 3D scenes using JSX components. Combined with its companion libraries (drei for helpers, rapier for physics, postprocessing for effects), it creates a powerful declarative 3D development experience. However, for OKR Miner — a ~9000-line vanilla JS game — adopting R3F means not just learning Three.js but also restructuring the entire application around React's component model and state management. This is a framework migration on top of a 2D→3D migration.
+      </p>
+      <div class="card-columns">
+        <div>
+          <div class="list-heading pro-heading">✓ Pros</div>
+          <ul class="pros-list">
+            <li>Declarative 3D with React component model</li>
+            <li>Rich ecosystem: drei, rapier, postprocessing</li>
+            <li>Excellent for UI-heavy 3D applications</li>
+            <li>Hot module reloading for fast iteration</li>
+            <li>Strong TypeScript support</li>
+            <li>Growing rapidly with modern web dev trends</li>
+          </ul>
+        </div>
+        <div>
+          <div class="list-heading con-heading">✗ Cons</div>
+          <ul class="cons-list">
+            <li>Requires React — total rewrite of OKR Miner</li>
+            <li>Build tooling required (Vite/Webpack)</li>
+            <li>Not a single-file deployment anymore</li>
+            <li>React overhead in game loop performance</li>
+            <li>Overkill if not already using React</li>
+            <li>Debugging spans React + Three.js layers</li>
+          </ul>
+        </div>
+      </div>
+      <div class="demo-area">
+        <div class="demo-label">🎮 Interactive Demo — CSS 3D Engine Visualization</div>
+        <div class="css-demo-wrap" id="r3f-demo-wrap">
+          <div class="css-demo-particles" id="r3f-particles"></div>
+          <div class="css-cube" id="r3f-cube" style="animation: rotateCube 5.5s linear infinite;">
+            <div class="face front" style="background:rgba(68,221,238,0.25);">R3F</div>
+            <div class="face back" style="background:rgba(68,221,238,0.15);">JSX</div>
+            <div class="face left" style="background:rgba(68,221,238,0.2);">drei</div>
+            <div class="face right" style="background:rgba(68,221,238,0.2);">⚛️</div>
+            <div class="face top" style="background:rgba(68,221,238,0.15);">🎨</div>
+            <div class="face bottom" style="background:rgba(68,221,238,0.15);">📦</div>
+          </div>
+          <span class="demo-hint">hover to pause rotation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="https://docs.pmnd.rs/react-three-fiber" target="_blank" rel="noopener" class="visit-link">🔗 R3F Docs</a>
+        <span class="best-for-tag">Best for: <strong>React developers building 3D web applications</strong></span>
+      </div>
+    </article>
+
+    <!-- ── 7. PIXI3D ── -->
+    <article class="engine-card" id="pixi3d">
+      <div class="card-header">
+        <div class="card-icon" style="background:linear-gradient(135deg,#1a1a2e,#2a1a3a);border:2px solid #bb88ff;">🧊</div>
+        <div class="card-title-area">
+          <h3>Pixi3D</h3>
+          <div class="card-meta">
+            <span class="stars">★★<span class="empty">★★★</span></span>
+            <span>Difficulty: Easy</span>
+            <span>&middot;</span>
+            <span>~700 GitHub Stars</span>
+          </div>
+        </div>
+        <span class="badge badge-purple">🌉 2D→3D Bridge</span>
+      </div>
+      <p class="card-description">
+        Pixi3D extends the popular PixiJS 2D renderer with 3D capabilities, allowing developers to mix 2D and 3D content in the same scene. This "bridge" approach is uniquely interesting for OKR Miner because it would allow a gradual migration — keeping existing 2D UI and effects while adding 3D buildings and environments. However, Pixi3D has a very small community, limited documentation, and lacks many features that dedicated 3D engines provide (advanced lighting, skeletal animation, post-processing).
+      </p>
+      <div class="card-columns">
+        <div>
+          <div class="list-heading pro-heading">✓ Pros</div>
+          <ul class="pros-list">
+            <li>Mix 2D and 3D in the same scene seamlessly</li>
+            <li>Gradual migration possible (add 3D incrementally)</li>
+            <li>Familiar PixiJS API if already using Pixi</li>
+            <li>Lightweight — only adds what you need</li>
+            <li>Good for 2.5D or hybrid approaches</li>
+          </ul>
+        </div>
+        <div>
+          <div class="list-heading con-heading">✗ Cons</div>
+          <ul class="cons-list">
+            <li>Very small community (~700 stars)</li>
+            <li>Limited documentation and tutorials</li>
+            <li>No built-in camera controls (orbit/zoom)</li>
+            <li>Basic lighting model (no advanced PBR)</li>
+            <li>No particle system for 3D space</li>
+            <li>Risk of project abandonment</li>
+            <li>Not suitable for fully immersive 3D scenes</li>
+          </ul>
+        </div>
+      </div>
+      <div class="demo-area">
+        <div class="demo-label">🎮 Interactive Demo — CSS 3D Engine Visualization</div>
+        <div class="css-demo-wrap" id="pixi3d-demo-wrap">
+          <div class="css-demo-particles" id="pixi3d-particles"></div>
+          <div class="css-cube" id="pixi3d-cube" style="animation: rotateCube 6.5s linear infinite;">
+            <div class="face front" style="background:rgba(187,136,255,0.25);">P3D</div>
+            <div class="face back" style="background:rgba(187,136,255,0.15);">Pixi</div>
+            <div class="face left" style="background:rgba(187,136,255,0.2);">2D</div>
+            <div class="face right" style="background:rgba(187,136,255,0.2);">3D</div>
+            <div class="face top" style="background:rgba(187,136,255,0.15);">🧊</div>
+            <div class="face bottom" style="background:rgba(187,136,255,0.15);">🌉</div>
+          </div>
+          <span class="demo-hint">hover to pause rotation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="https://pixi3d.org/" target="_blank" rel="noopener" class="visit-link">🔗 pixi3d.org</a>
+        <span class="best-for-tag">Best for: <strong>Gradual 2D→3D migration with hybrid rendering</strong></span>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- ═══ RECOMMENDATION ═══ -->
+  <section class="recommendation" id="recommendation">
+    <div class="rec-header">
+      <span style="font-size:2rem;">🏆</span>
+      <h2>Recommendation</h2>
+    </div>
+    <div class="rec-pick">Top Pick: Three.js — with Babylon.js as a strong runner-up</div>
+    <div class="rec-body">
+      <p>
+        For converting OKR Miner from a 2D Canvas game to 3D, <strong style="color:var(--accent);">Three.js</strong> is the recommended engine. Here's why it wins for this specific project:
+      </p>
+      <p>
+        <strong>1. Migration Path:</strong> OKR Miner is a ~9,000 line vanilla JavaScript file. Three.js's imperative API maps directly to this architecture — you can incrementally replace Canvas draw calls with Three.js scene objects without restructuring the entire codebase. No build tools, no framework adoption, no architectural revolution required.
+      </p>
+      <p>
+        <strong>2. Feature Match:</strong> Every feature OKR Miner needs has a proven Three.js solution. OrbitControls handles camera orbit/zoom, THREE.Points creates efficient particle systems for asteroid belts, and HTML/CSS overlays provide game UI. The space-theme aesthetic maps naturally to Three.js's skybox and lighting capabilities.
+      </p>
+      <p>
+        <strong>3. Community &amp; Resources:</strong> With 95k+ GitHub stars and thousands of examples, any problem you encounter has likely been solved. The CDN deployment model preserves OKR Miner's single-file architecture — just add a script tag.
+      </p>
+      <p>
+        <strong>4. Single-File Friendly:</strong> Three.js can be loaded from a CDN and used in a single HTML file, preserving OKR Miner's current deployment model while adding full 3D capabilities.
+      </p>
+
+      <div class="rec-runner-up">
+        <h4>Runner-Up: Babylon.js</h4>
+        <p>
+          If OKR Miner needs built-in GUI overlays, physics, or an integrated debugger, Babylon.js is the better choice. Its ArcRotateCamera, GUI module, and particle system are production-ready without plugins. The trade-off is a larger bundle size (~800KB) and a smaller community. Consider Babylon.js if the project scope expands to need physics-based gameplay or a complex in-game UI system.
+        </p>
+      </div>
+      <div class="rec-runner-up">
+        <h4>Honorable Mention: Pixi3D</h4>
+        <p>
+          If the goal is a more modest "2.5D" upgrade rather than full 3D, Pixi3D offers the gentlest migration path by allowing 2D and 3D content to coexist. However, its small community and limited feature set make it risky for a long-term investment.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="page-footer">
+    <span class="footer-brand">OKR Miner</span> — 3D Engine Exploration &middot; 2026
+  </footer>
+
+</div>
+
+<!-- ═══ THREE.JS CDN ═══ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+// ─────────────────────────────────────────────────
+// THREE.JS INTERACTIVE DEMO — ROTATING SPACE STATION
+// ─────────────────────────────────────────────────
+(function () {
+  'use strict';
+
+  var container = document.getElementById('threejs-demo');
+  if (!container || typeof THREE === 'undefined') return;
+
+  var width = container.clientWidth;
+  var height = container.clientHeight;
+
+  // Scene
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x060612);
+
+  // Camera
+  var camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+  camera.position.set(4, 3, 5);
+  camera.lookAt(0, 0, 0);
+
+  // Renderer
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.insertBefore(renderer.domElement, container.firstChild);
+
+  // Lighting
+  var ambientLight = new THREE.AmbientLight(0x334466, 0.6);
+  scene.add(ambientLight);
+
+  var pointLight = new THREE.PointLight(0x00ff88, 1.5, 20);
+  pointLight.position.set(3, 4, 3);
+  scene.add(pointLight);
+
+  var pointLight2 = new THREE.PointLight(0x4488ff, 0.8, 15);
+  pointLight2.position.set(-3, -2, 2);
+  scene.add(pointLight2);
+
+  // Materials
+  var hullMat = new THREE.MeshPhongMaterial({
+    color: 0x445566,
+    emissive: 0x112233,
+    shininess: 60,
+    flatShading: true
+  });
+
+  var accentMat = new THREE.MeshPhongMaterial({
+    color: 0x00ff88,
+    emissive: 0x00aa55,
+    shininess: 80
+  });
+
+  var panelMat = new THREE.MeshPhongMaterial({
+    color: 0x2244aa,
+    emissive: 0x112266,
+    shininess: 40,
+    flatShading: true
+  });
+
+  // Space station group
+  var station = new THREE.Group();
+
+  // Central hub — octahedron
+  var hub = new THREE.Mesh(new THREE.OctahedronGeometry(0.8, 0), hullMat);
+  station.add(hub);
+
+  // Ring
+  var ring = new THREE.Mesh(
+    new THREE.TorusGeometry(1.8, 0.12, 8, 24),
+    accentMat
+  );
+  ring.rotation.x = Math.PI / 2;
+  station.add(ring);
+
+  // Spokes
+  var spokeMat = new THREE.MeshPhongMaterial({ color: 0x556677, emissive: 0x111122 });
+  var i, spoke;
+  for (i = 0; i < 4; i++) {
+    spoke = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.04, 0.04, 1.8, 6),
+      spokeMat
+    );
+    spoke.rotation.z = Math.PI / 2;
+    spoke.rotation.y = (Math.PI / 4) * (2 * i);
+    spoke.position.set(
+      Math.cos((Math.PI / 2) * i) * 0.9,
+      0,
+      Math.sin((Math.PI / 2) * i) * 0.9
+    );
+    station.add(spoke);
+  }
+
+  // Solar panels
+  var panelGeo = new THREE.BoxGeometry(1.2, 0.04, 0.5);
+  var panel1 = new THREE.Mesh(panelGeo, panelMat);
+  panel1.position.set(2.2, 0, 0);
+  station.add(panel1);
+
+  var panel2 = new THREE.Mesh(panelGeo, panelMat);
+  panel2.position.set(-2.2, 0, 0);
+  station.add(panel2);
+
+  // Antenna
+  var antenna = new THREE.Mesh(
+    new THREE.ConeGeometry(0.15, 0.6, 6),
+    accentMat
+  );
+  antenna.position.set(0, 1.2, 0);
+  station.add(antenna);
+
+  // Antenna dish
+  var dish = new THREE.Mesh(
+    new THREE.SphereGeometry(0.2, 8, 4, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.MeshPhongMaterial({ color: 0x889999, side: THREE.DoubleSide })
+  );
+  dish.position.set(0, 1.0, 0);
+  dish.rotation.x = Math.PI;
+  station.add(dish);
+
+  scene.add(station);
+
+  // Starfield particles
+  var starsGeo = new THREE.BufferGeometry();
+  var starPositions = [];
+  for (i = 0; i < 400; i++) {
+    starPositions.push(
+      (Math.random() - 0.5) * 40,
+      (Math.random() - 0.5) * 40,
+      (Math.random() - 0.5) * 40
+    );
+  }
+  starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
+  var starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.08, sizeAttenuation: true });
+  scene.add(new THREE.Points(starsGeo, starsMat));
+
+  // Orbit particles (asteroid belt)
+  var beltGeo = new THREE.BufferGeometry();
+  var beltPositions = [];
+  for (i = 0; i < 100; i++) {
+    var angle = Math.random() * Math.PI * 2;
+    var radius = 2.8 + (Math.random() - 0.5) * 0.6;
+    beltPositions.push(
+      Math.cos(angle) * radius,
+      (Math.random() - 0.5) * 0.3,
+      Math.sin(angle) * radius
+    );
+  }
+  beltGeo.setAttribute('position', new THREE.Float32BufferAttribute(beltPositions, 3));
+  var beltMat = new THREE.PointsMaterial({ color: 0x00ff88, size: 0.06, sizeAttenuation: true, transparent: true, opacity: 0.6 });
+  var beltPoints = new THREE.Points(beltGeo, beltMat);
+  scene.add(beltPoints);
+
+  // Mouse interaction for orbit
+  var isDragging = false;
+  var prevMouse = { x: 0, y: 0 };
+  var spherical = { theta: 0.8, phi: 1.0, radius: 7 };
+
+  function updateCamera() {
+    camera.position.x = spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
+    camera.position.y = spherical.radius * Math.cos(spherical.phi);
+    camera.position.z = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
+    camera.lookAt(0, 0, 0);
+  }
+
+  updateCamera();
+
+  container.addEventListener('mousedown', function (e) {
+    isDragging = true;
+    prevMouse.x = e.clientX;
+    prevMouse.y = e.clientY;
+  });
+
+  document.addEventListener('mousemove', function (e) {
+    if (!isDragging) return;
+    var dx = e.clientX - prevMouse.x;
+    var dy = e.clientY - prevMouse.y;
+    spherical.theta -= dx * 0.005;
+    spherical.phi = Math.max(0.3, Math.min(2.8, spherical.phi + dy * 0.005));
+    prevMouse.x = e.clientX;
+    prevMouse.y = e.clientY;
+    updateCamera();
+  });
+
+  document.addEventListener('mouseup', function () {
+    isDragging = false;
+  });
+
+  container.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    spherical.radius = Math.max(3, Math.min(15, spherical.radius + e.deltaY * 0.01));
+    updateCamera();
+  }, { passive: false });
+
+  // Touch support
+  container.addEventListener('touchstart', function (e) {
+    if (e.touches.length === 1) {
+      isDragging = true;
+      prevMouse.x = e.touches[0].clientX;
+      prevMouse.y = e.touches[0].clientY;
+    }
+  });
+
+  container.addEventListener('touchmove', function (e) {
+    if (!isDragging || e.touches.length !== 1) return;
+    e.preventDefault();
+    var dx = e.touches[0].clientX - prevMouse.x;
+    var dy = e.touches[0].clientY - prevMouse.y;
+    spherical.theta -= dx * 0.005;
+    spherical.phi = Math.max(0.3, Math.min(2.8, spherical.phi + dy * 0.005));
+    prevMouse.x = e.touches[0].clientX;
+    prevMouse.y = e.touches[0].clientY;
+    updateCamera();
+  }, { passive: false });
+
+  container.addEventListener('touchend', function () {
+    isDragging = false;
+  });
+
+  // Animation
+  var clock = new THREE.Clock();
+
+  function animate() {
+    requestAnimationFrame(animate);
+    var t = clock.getElapsedTime();
+
+    // Rotate station slowly when not dragging
+    if (!isDragging) {
+      spherical.theta += 0.002;
+      updateCamera();
+    }
+
+    // Spin the ring
+    ring.rotation.z = t * 0.3;
+
+    // Bob the antenna
+    antenna.position.y = 1.2 + Math.sin(t * 2) * 0.05;
+
+    // Rotate asteroid belt
+    beltPoints.rotation.y = t * 0.1;
+
+    // Pulse the accent light
+    pointLight.intensity = 1.2 + Math.sin(t * 1.5) * 0.3;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // Handle resize
+  var resizeTimeout;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function () {
+      var w = container.clientWidth;
+      var h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }, 200);
+  });
+})();
+
+// ─────────────────────────────────────────────────
+// CSS 3D DEMOS — PARTICLE GENERATION & HOVER PAUSE
+// ─────────────────────────────────────────────────
+(function () {
+  'use strict';
+
+  // Config for each CSS demo
+  var demos = [
+    { wrap: 'babylon-demo-wrap', cube: 'babylon-cube', particles: 'babylon-particles', color: '100,136,255' },
+    { wrap: 'playcanvas-demo-wrap', cube: 'playcanvas-cube', particles: 'playcanvas-particles', color: '255,136,68' },
+    { wrap: 'aframe-demo-wrap', cube: 'aframe-cube', particles: 'aframe-particles', color: '255,68,170' },
+    { wrap: 'phaser-demo-wrap', cube: 'phaser-cube', particles: 'phaser-particles', color: '238,221,68' },
+    { wrap: 'r3f-demo-wrap', cube: 'r3f-cube', particles: 'r3f-particles', color: '68,221,238' },
+    { wrap: 'pixi3d-demo-wrap', cube: 'pixi3d-cube', particles: 'pixi3d-particles', color: '187,136,255' }
+  ];
+
+  var i, j, demo, container, cube, particlesEl, particle;
+
+  for (i = 0; i < demos.length; i++) {
+    demo = demos[i];
+    container = document.getElementById(demo.wrap);
+    cube = document.getElementById(demo.cube);
+    particlesEl = document.getElementById(demo.particles);
+
+    if (!container || !cube || !particlesEl) continue;
+
+    // Generate floating particles
+    for (j = 0; j < 12; j++) {
+      particle = document.createElement('div');
+      particle.className = 'css-particle';
+      particle.style.left = (Math.random() * 100) + '%';
+      particle.style.bottom = '-5px';
+      particle.style.background = 'rgba(' + demo.color + ',' + (0.3 + Math.random() * 0.4) + ')';
+      particle.style.animationDuration = (3 + Math.random() * 4) + 's';
+      particle.style.animationDelay = (Math.random() * 5) + 's';
+      particle.style.width = (1 + Math.random() * 2) + 'px';
+      particle.style.height = particle.style.width;
+      particlesEl.appendChild(particle);
+    }
+
+    // Hover to pause animation
+    (function (cubeEl) {
+      var wrapEl = cubeEl.parentElement;
+      wrapEl.addEventListener('mouseenter', function () {
+        cubeEl.style.animationPlayState = 'paused';
+      });
+      wrapEl.addEventListener('mouseleave', function () {
+        cubeEl.style.animationPlayState = 'running';
+      });
+    })(cube);
+
+    // Mouse tilt interaction
+    (function (cubeEl, wrapEl) {
+      var isHovered = false;
+      var baseTransform = '';
+
+      wrapEl.addEventListener('mouseenter', function () { isHovered = true; });
+      wrapEl.addEventListener('mouseleave', function () {
+        isHovered = false;
+        cubeEl.style.animationPlayState = 'running';
+      });
+
+      wrapEl.addEventListener('mousemove', function (e) {
+        if (!isHovered) return;
+        var rect = wrapEl.getBoundingClientRect();
+        var x = ((e.clientX - rect.left) / rect.width - 0.5) * 60;
+        var y = ((e.clientY - rect.top) / rect.height - 0.5) * -60;
+        cubeEl.style.animationPlayState = 'paused';
+        cubeEl.style.transform = 'rotateX(' + y + 'deg) rotateY(' + x + 'deg)';
+      });
+
+      wrapEl.addEventListener('mouseleave', function () {
+        cubeEl.style.transform = '';
+        cubeEl.style.animationPlayState = 'running';
+      });
+    })(cube, container);
+  }
+})();
+</script>
+
+</body>
+</html>
