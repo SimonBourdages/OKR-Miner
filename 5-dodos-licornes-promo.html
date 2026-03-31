@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5 Dodos pour tout savoir : Les Licornes — Page Promotionnelle</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            color: #3a2d5e;
+            background: #fdf6ff;
+            overflow-x: hidden;
+        }
+
+        /* ===== SPARKLE KEYFRAMES ===== */
+        @keyframes float { 0%,100%{ transform: translateY(0) rotate(0deg); } 50%{ transform: translateY(-18px) rotate(8deg); } }
+        @keyframes sparkle { 0%,100%{ opacity:.2; transform: scale(.6); } 50%{ opacity:1; transform: scale(1.2); } }
+        @keyframes slideUp { from { opacity:0; transform: translateY(40px); } to { opacity:1; transform: translateY(0); } }
+        @keyframes gradientShift { 0%{ background-position: 0% 50%; } 50%{ background-position: 100% 50%; } 100%{ background-position: 0% 50%; } }
+        @keyframes rainbowGlow { 0%{ text-shadow: 0 0 20px #ff9ff3; } 25%{ text-shadow: 0 0 20px #a29bfe; } 50%{ text-shadow: 0 0 20px #55efc4; } 75%{ text-shadow: 0 0 20px #fdcb6e; } 100%{ text-shadow: 0 0 20px #ff9ff3; } }
+        @keyframes pulse { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.05); } }
+        @keyframes bounceIn { 0%{ opacity:0; transform: scale(.3); } 50%{ transform: scale(1.05); } 70%{ transform: scale(.95); } 100%{ opacity:1; transform: scale(1); } }
+        @keyframes starTwinkle { 0%,100%{ opacity:0; } 50%{ opacity:1; } }
+        @keyframes driftLeft { from { transform: translateX(100vw) rotate(0deg); } to { transform: translateX(-100px) rotate(360deg); } }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(-45deg, #fdf2ff, #e8d5f5, #d5e8fc, #fce4ec, #e0f7fa, #f3e5f5);
+            background-size: 400% 400%;
+            animation: gradientShift 12s ease infinite;
+            padding: 2rem;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(2px 2px at 20% 30%, #c084fc, transparent),
+                radial-gradient(2px 2px at 40% 70%, #f9a8d4, transparent),
+                radial-gradient(2px 2px at 60% 20%, #93c5fd, transparent),
+                radial-gradient(2px 2px at 80% 60%, #fcd34d, transparent),
+                radial-gradient(3px 3px at 10% 80%, #a78bfa, transparent),
+                radial-gradient(2px 2px at 90% 40%, #f472b6, transparent),
+                radial-gradient(2px 2px at 50% 90%, #67e8f9, transparent),
+                radial-gradient(3px 3px at 30% 50%, #d8b4fe, transparent);
+            animation: sparkle 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        /* ===== FLOATING PARTICLES ===== */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5rem;
+            animation: driftLeft linear infinite;
+            opacity: 0.5;
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #c084fc, #f9a8d4);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            animation: bounceIn 0.8s ease-out;
+        }
+        .hero-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.15;
+            animation: rainbowGlow 4s ease infinite, slideUp 1s ease-out;
+            margin-bottom: 0.5rem;
+        }
+        .hero-title .accent { color: #a855f7; }
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: #7c5cbf;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            animation: slideUp 1s ease-out 0.2s both;
+        }
+        .hero-tagline {
+            font-size: clamp(0.95rem, 2vw, 1.15rem);
+            color: #9b7fc7;
+            max-width: 550px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            animation: slideUp 1s ease-out 0.4s both;
+        }
+
+        /* ===== BOOK CARD ===== */
+        .book-card {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(168,85,247,0.15), 0 0 0 1px rgba(168,85,247,0.08);
+            animation: slideUp 1s ease-out 0.5s both;
+            position: relative;
+            overflow: hidden;
+        }
+        .book-card::after {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, #c084fc, #f9a8d4, #fcd34d, #67e8f9, #a78bfa);
+        }
+        .book-cover-img {
+            width: 220px;
+            margin: 0 auto 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(168,85,247,0.25), 0 2px 8px rgba(0,0,0,0.1);
+            animation: float 4s ease-in-out infinite;
+            display: block;
+            object-fit: cover;
+        }
+        .book-meta { text-align: left; }
+        .book-meta-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(168,85,247,0.08);
+            font-size: 0.9rem;
+        }
+        .book-meta-row:last-child { border: none; }
+        .book-meta-label { color: #9b7fc7; font-weight: 500; }
+        .book-meta-value { font-weight: 600; color: #5b21b6; }
+
+        /* ===== CTA BUTTONS ===== */
+        .cta-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1.5rem; }
+        .cta-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+        .cta-primary {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: white;
+            box-shadow: 0 4px 20px rgba(168,85,247,0.4);
+        }
+        .cta-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 30px rgba(168,85,247,0.5); }
+        .cta-secondary {
+            background: white;
+            color: #7c3aed;
+            border: 2px solid #c084fc;
+        }
+        .cta-secondary:hover { background: #f5f0ff; transform: translateY(-2px); }
+
+        /* ===== SECTIONS ===== */
+        section { padding: 5rem 1.5rem; }
+        .section-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #5b21b6;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: #8b5cf6;
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.7;
+        }
+
+        /* ===== CONCEPT (5 DODOS) ===== */
+        .concept-section { background: white; }
+        .dodos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .dodo-card {
+            background: linear-gradient(135deg, #fdf2ff, #fce7f3);
+            border-radius: 20px;
+            padding: 1.8rem 1.2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(168,85,247,0.08);
+        }
+        .dodo-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(168,85,247,0.12); }
+        .dodo-emoji { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+        .dodo-night {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #7c3aed;
+            margin-bottom: 0.4rem;
+        }
+        .dodo-topic { font-size: 0.85rem; color: #9b7fc7; line-height: 1.5; }
+
+        /* ===== FEATURES ===== */
+        .features-section {
+            background: linear-gradient(180deg, #fdf6ff 0%, #f5f0ff 100%);
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(168,85,247,0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(168,85,247,0.06);
+        }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(168,85,247,0.12); }
+        .feature-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+        .feature-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #5b21b6;
+            margin-bottom: 0.5rem;
+        }
+        .feature-desc { font-size: 0.9rem; color: #7c5cbf; line-height: 1.6; }
+
+        /* ===== QUESTIONS PREVIEW ===== */
+        .questions-section { background: white; }
+        .questions-list {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+        .question-item {
+            background: linear-gradient(135deg, #fdf2ff, #ede9fe);
+            border-radius: 16px;
+            padding: 1.3rem 1.8rem;
+            display: flex; align-items: center; gap: 1rem;
+            transition: transform 0.3s ease;
+            cursor: default;
+        }
+        .question-item:hover { transform: translateX(6px); }
+        .question-icon { font-size: 1.6rem; flex-shrink: 0; }
+        .question-text {
+            font-size: 1rem;
+            color: #5b21b6;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        /* ===== AUTHORS ===== */
+        .authors-section { background: linear-gradient(180deg, #f5f0ff, #fdf6ff); }
+        .authors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .author-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(168,85,247,0.06);
+            transition: transform 0.3s ease;
+        }
+        .author-card:hover { transform: translateY(-4px); }
+        .author-avatar {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem;
+        }
+        .avatar-writer { background: linear-gradient(135deg, #c084fc, #a855f7); }
+        .avatar-illustrator { background: linear-gradient(135deg, #f9a8d4, #ec4899); }
+        .author-name {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #5b21b6;
+            margin-bottom: 0.3rem;
+        }
+        .author-role {
+            font-size: 0.85rem;
+            color: #a78bfa;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+        .author-bio { font-size: 0.9rem; color: #7c5cbf; line-height: 1.7; }
+
+        /* ===== COLLECTION ===== */
+        .collection-section { background: white; }
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .collection-item {
+            background: linear-gradient(135deg, #fdf2ff, #e0e7ff);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .collection-item:hover { transform: scale(1.03); }
+        .collection-emoji { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
+        .collection-name {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            color: #5b21b6;
+            font-size: 0.95rem;
+        }
+        .collection-author { font-size: 0.8rem; color: #8b5cf6; margin-top: 0.25rem; }
+
+        /* ===== BUY CTA ===== */
+        .buy-section {
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            color: white;
+            text-align: center;
+            padding: 5rem 1.5rem;
+        }
+        .buy-section .section-title { color: white; }
+        .buy-section .section-subtitle { color: rgba(255,255,255,0.85); }
+        .buy-links {
+            display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;
+            margin-top: 2rem;
+        }
+        .buy-link {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.8rem 1.6rem;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .buy-link:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #1e1040;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            font-size: 0.85rem;
+        }
+        .footer a { color: #c084fc; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .footer-brand {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== NAV ===== */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 0.8rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+        .nav.scrolled {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 2px 20px rgba(168,85,247,0.1);
+        }
+        .nav-logo {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #7c3aed;
+            text-decoration: none;
+        }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #5b21b6;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #a855f7; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero { padding: 6rem 1.5rem 3rem; }
+            section { padding: 3.5rem 1rem; }
+            .book-card { padding: 1.8rem; }
+            .cta-group { flex-direction: column; align-items: center; }
+        }
+
+        /* ===== SCROLL REVEAL UTILITY ===== */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        /* ───── Floating Particle Component ───── */
+        function Particle({ emoji, style }) {
+            return <span className="particle" style={style}>{emoji}</span>;
+        }
+
+        /* ───── Scroll Reveal Hook ───── */
+        function useReveal() {
+            const ref = useRef();
+            useEffect(() => {
+                const obs = new IntersectionObserver(
+                    ([entry]) => { if (entry.isIntersecting) entry.target.classList.add('visible'); },
+                    { threshold: 0.15 }
+                );
+                if (ref.current) obs.observe(ref.current);
+                return () => obs.disconnect();
+            }, []);
+            return ref;
+        }
+
+        function RevealDiv({ children, className = '', style = {} }) {
+            const ref = useReveal();
+            return <div ref={ref} className={`reveal ${className}`} style={style}>{children}</div>;
+        }
+
+        /* ───── Nav ───── */
+        function Nav() {
+            const [scrolled, setScrolled] = useState(false);
+            useEffect(() => {
+                const onScroll = () => setScrolled(window.scrollY > 60);
+                window.addEventListener('scroll', onScroll);
+                return () => window.removeEventListener('scroll', onScroll);
+            }, []);
+            return (
+                <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
+                    <a href="#" className="nav-logo">🦄 5 Dodos</a>
+                    <div className="nav-links">
+                        <a href="#concept">Le concept</a>
+                        <a href="#features">Pourquoi ce livre</a>
+                        <a href="#questions">Aperçu</a>
+                        <a href="#authors">Créateurs</a>
+                        <a href="#buy">Acheter</a>
+                    </div>
+                </nav>
+            );
+        }
+
+        /* ───── Hero Section ───── */
+        function Hero() {
+            const particles = ['✨','🌈','⭐','💜','🌸','💫','🪄','🎀'];
+            return (
+                <section className="hero">
+                    {particles.map((p, i) => (
+                        <Particle key={i} emoji={p} style={{
+                            top: `${10 + Math.random() * 70}%`,
+                            fontSize: `${1 + Math.random() * 1.5}rem`,
+                            animationDuration: `${8 + Math.random() * 12}s`,
+                            animationDelay: `${Math.random() * 8}s`,
+                        }} />
+                    ))}
+
+                    <span className="hero-badge">✨ Nouveau — Collection 5 Dodos</span>
+
+                    <h1 className="hero-title">
+                        5 Dodos pour tout savoir<br/>
+                        <span className="accent">Les Licornes 🦄</span>
+                    </h1>
+
+                    <p className="hero-subtitle">
+                        8 pages par soir pour devenir pro des licornes en une semaine !
+                    </p>
+
+                    <p className="hero-tagline">
+                        Un vrai-faux documentaire hilarant qui transporte les enfants
+                        dans l'univers magique et farfelu des licornes — une aventure
+                        à lire en famille, un dodo à la fois.
+                    </p>
+
+                    <div className="book-card">
+                        <img
+                            className="book-cover-img"
+                            src="https://editionslabagnole.groupelivre.com/cdn/shop/files/gr_9782897149123.jpg?v=1740657864"
+                            alt="Couverture du livre 5 dodos pour tout savoir : les licornes"
+                        />
+                        <div className="book-meta">
+                            <div className="book-meta-row">
+                                <span className="book-meta-label">Auteure</span>
+                                <span className="book-meta-value">Margot Boudreau</span>
+                            </div>
+                            <div className="book-meta-row">
+                                <span className="book-meta-label">Illustratrice</span>
+                                <span className="book-meta-value">Laurence Dechassey</span>
+                            </div>
+                            <div className="book-meta-row">
+                                <span className="book-meta-label">Éditeur</span>
+                                <span className="book-meta-value">Éd. de la Bagnole</span>
+                            </div>
+                            <div className="book-meta-row">
+                                <span className="book-meta-label">Pages</span>
+                                <span className="book-meta-value">48 pages</span>
+                            </div>
+                            <div className="book-meta-row">
+                                <span className="book-meta-label">Âge</span>
+                                <span className="book-meta-value">3 ans et +</span>
+                            </div>
+                            <div className="book-meta-row">
+                                <span className="book-meta-label">ISBN</span>
+                                <span className="book-meta-value">978-2-89714-912-3</span>
+                            </div>
+                        </div>
+                        <div className="cta-group">
+                            <a href="#buy" className="cta-btn cta-primary">🛒 Acheter maintenant</a>
+                            <a href="#concept" className="cta-btn cta-secondary">En savoir plus</a>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        /* ───── Concept Section ───── */
+        function ConceptSection() {
+            const dodos = [
+                { emoji: '🌙', night: 'Dodo 1', topic: 'Premiers mystères : d\'où viennent les licornes ?' },
+                { emoji: '⭐', night: 'Dodo 2', topic: 'Anatomie féerique : corne, crinière et sabots magiques' },
+                { emoji: '🌈', night: 'Dodo 3', topic: 'Vie quotidienne : que mangent-elles ?' },
+                { emoji: '💎', night: 'Dodo 4', topic: 'Pouvoirs secrets et légendes insolites' },
+                { emoji: '🦄', night: 'Dodo 5', topic: 'Quiz final : es-tu un·e expert·e des licornes ?' },
+            ];
+            return (
+                <section className="concept-section" id="concept">
+                    <RevealDiv>
+                        <h2 className="section-title">🌙 Le concept « 5 Dodos »</h2>
+                        <p className="section-subtitle">
+                            Chaque soir, 8 pages de découvertes rigolotes.
+                            En 5 nuits, votre enfant devient un·e véritable expert·e des licornes !
+                        </p>
+                    </RevealDiv>
+                    <div className="dodos-grid">
+                        {dodos.map((d, i) => (
+                            <RevealDiv key={i} style={{ transitionDelay: `${i * 0.1}s` }}>
+                                <div className="dodo-card">
+                                    <span className="dodo-emoji">{d.emoji}</span>
+                                    <div className="dodo-night">{d.night}</div>
+                                    <div className="dodo-topic">{d.topic}</div>
+                                </div>
+                            </RevealDiv>
+                        ))}
+                    </div>
+                </section>
+            );
+        }
+
+        /* ───── Features Section ───── */
+        function FeaturesSection() {
+            const features = [
+                {
+                    icon: '😂',
+                    title: 'Humour garanti',
+                    desc: 'Un vrai-faux documentaire plein de questions absurdes et de réponses hilarantes qui feront rire petits et grands.'
+                },
+                {
+                    icon: '🎨',
+                    title: 'Illustrations magnifiques',
+                    desc: 'Les dessins expressifs et colorés de Laurence Dechassey donnent vie à un univers féerique irrésistible.'
+                },
+                {
+                    icon: '📖',
+                    title: 'Rituel du soir parfait',
+                    desc: 'Format idéal pour la lecture du soir : 8 pages par nuit, ni trop court, ni trop long — juste parfait avant le dodo !'
+                },
+                {
+                    icon: '🧠',
+                    title: 'Apprendre en s\'amusant',
+                    desc: 'Stimule la curiosité et l\'imagination avec un mélange de faits loufoques et de contenu éducatif ludique.'
+                },
+                {
+                    icon: '👨‍👩‍👧',
+                    title: 'Lecture en famille',
+                    desc: 'Conçu pour être partagé : les parents s\'amusent autant que les enfants avec ce livre plein de surprises.'
+                },
+                {
+                    icon: '🏆',
+                    title: 'Qualité québécoise',
+                    desc: 'Publié par les Éditions de la Bagnole, une maison d\'édition réputée pour l\'excellence de sa littérature jeunesse.'
+                }
+            ];
+            return (
+                <section className="features-section" id="features">
+                    <RevealDiv>
+                        <h2 className="section-title">✨ Pourquoi ce livre ?</h2>
+                        <p className="section-subtitle">
+                            Un livre unique qui allie humour, beauté et apprentissage
+                            pour enchanter les soirées de vos enfants.
+                        </p>
+                    </RevealDiv>
+                    <div className="features-grid">
+                        {features.map((f, i) => (
+                            <RevealDiv key={i} style={{ transitionDelay: `${i * 0.08}s` }}>
+                                <div className="feature-card">
+                                    <span className="feature-icon">{f.icon}</span>
+                                    <h3 className="feature-title">{f.title}</h3>
+                                    <p className="feature-desc">{f.desc}</p>
+                                </div>
+                            </RevealDiv>
+                        ))}
+                    </div>
+                </section>
+            );
+        }
+
+        /* ───── Questions Preview ───── */
+        function QuestionsSection() {
+            const questions = [
+                { icon: '🗣️', text: 'Comment s\'appelle le cri de la licorne ?' },
+                { icon: '🪺', text: 'Pourquoi ne voit-on jamais leurs nids ?' },
+                { icon: '🥚', text: 'Les œufs de licorne sont-ils tous pareils ?' },
+                { icon: '🌈', text: 'De quelle couleur est la bave de licorne ?' },
+                { icon: '🍕', text: 'Quel est le plat préféré des licornes ?' },
+                { icon: '🧭', text: 'Où se cache la dernière licorne sauvage ?' },
+            ];
+            return (
+                <section className="questions-section" id="questions">
+                    <RevealDiv>
+                        <h2 className="section-title">🤔 Aperçu des questions</h2>
+                        <p className="section-subtitle">
+                            Voici un avant-goût des questions délicieusement absurdes
+                            qui attendent vos petits curieux…
+                        </p>
+                    </RevealDiv>
+                    <div className="questions-list">
+                        {questions.map((q, i) => (
+                            <RevealDiv key={i} style={{ transitionDelay: `${i * 0.08}s` }}>
+                                <div className="question-item">
+                                    <span className="question-icon">{q.icon}</span>
+                                    <span className="question-text">« {q.text} »</span>
+                                </div>
+                            </RevealDiv>
+                        ))}
+                    </div>
+                </section>
+            );
+        }
+
+        /* ───── Authors Section ───── */
+        function AuthorsSection() {
+            return (
+                <section className="authors-section" id="authors">
+                    <RevealDiv>
+                        <h2 className="section-title">👩‍🎨 Les créatrices</h2>
+                        <p className="section-subtitle">
+                            Un duo de talent québécois pour un livre inoubliable.
+                        </p>
+                    </RevealDiv>
+                    <div className="authors-grid">
+                        <RevealDiv>
+                            <div className="author-card">
+                                <div className="author-avatar avatar-writer">✍️</div>
+                                <h3 className="author-name">Margot Boudreau</h3>
+                                <div className="author-role">Auteure</div>
+                                <p className="author-bio">
+                                    Née en Outaouais et établie dans les Laurentides, Margot est rédactrice
+                                    de formation et collaboratrice de magazines jeunesse comme
+                                    <em> Les Débrouillards</em> et <em>Curium</em>. Sa plume créative
+                                    transforme les sujets les plus farfelus en aventures captivantes
+                                    pour les jeunes lecteurs.
+                                </p>
+                            </div>
+                        </RevealDiv>
+                        <RevealDiv style={{ transitionDelay: '0.15s' }}>
+                            <div className="author-card">
+                                <div className="author-avatar avatar-illustrator">🎨</div>
+                                <h3 className="author-name">Laurence Dechassey</h3>
+                                <div className="author-role">Illustratrice</div>
+                                <p className="author-bio">
+                                    Née à Besançon en France et installée à Montréal, Laurence est diplômée
+                                    en dessin d'animation. Finaliste du Prix Espiègle 2021, elle donne vie
+                                    à des personnages expressifs et colorés qui enchantent les enfants depuis
+                                    plus de 15 ans.
+                                </p>
+                            </div>
+                        </RevealDiv>
+                    </div>
+                </section>
+            );
+        }
+
+        /* ───── Collection Section ───── */
+        function CollectionSection() {
+            return (
+                <section className="collection-section" id="collection">
+                    <RevealDiv>
+                        <h2 className="section-title">📚 La collection</h2>
+                        <p className="section-subtitle">
+                            Découvrez aussi les autres titres de la série
+                            « 5 Dodos pour tout savoir ».
+                        </p>
+                    </RevealDiv>
+                    <div className="collection-grid">
+                        <RevealDiv>
+                            <div className="collection-item" style={{ border: '2px solid #c084fc' }}>
+                                <span className="collection-emoji">🦄</span>
+                                <div className="collection-name">Les Licornes</div>
+                                <div className="collection-author">Margot Boudreau</div>
+                            </div>
+                        </RevealDiv>
+                        <RevealDiv style={{ transitionDelay: '0.1s' }}>
+                            <div className="collection-item">
+                                <span className="collection-emoji">🐉</span>
+                                <div className="collection-name">Les Dragons</div>
+                                <div className="collection-author">Francis Desharnais</div>
+                            </div>
+                        </RevealDiv>
+                        <RevealDiv style={{ transitionDelay: '0.2s' }}>
+                            <div className="collection-item">
+                                <span className="collection-emoji">🧚</span>
+                                <div className="collection-name">Les Fées</div>
+                                <div className="collection-author">Margot Boudreau</div>
+                            </div>
+                        </RevealDiv>
+                    </div>
+                </section>
+            );
+        }
+
+        /* ───── Buy CTA Section ───── */
+        function BuySection() {
+            const stores = [
+                { name: 'Amazon.ca', emoji: '📦', url: 'https://www.amazon.ca/dodos-pour-tout-savoir-licornes/dp/2897149124' },
+                { name: 'Archambault', emoji: '🏪', url: 'https://www.archambault.ca/livres/5-dodos-pour-tout-savoir-les-licornes/margot-boudreau-laurence-dechassey/9782897149123/' },
+                { name: 'Renaud-Bray', emoji: '📖', url: 'https://www.renaud-bray.com/Livres_Produit.aspx?id=4324453' },
+                { name: 'Les Libraires', emoji: '📚', url: 'https://www.leslibraires.ca/livres/5-dodos-pour-tout-savoir-les-margot-boudreau-9782897149123.html' },
+                { name: 'Indigo', emoji: '🛍️', url: 'https://www.indigo.ca/en-ca/5-dodos-pour-tout-savoir-les-licornes/9782897149123.html' },
+            ];
+            return (
+                <section className="buy-section" id="buy">
+                    <RevealDiv>
+                        <h2 className="section-title">🛒 Procurez-vous le livre</h2>
+                        <p className="section-subtitle">
+                            Disponible en librairie et en ligne.
+                            <br />ISBN : 978-2-89714-912-3 • 48 pages • 21,7 × 28,7 cm
+                        </p>
+                    </RevealDiv>
+                    <RevealDiv style={{ transitionDelay: '0.2s' }}>
+                        <div className="buy-links">
+                            {stores.map((s, i) => (
+                                <a key={i} href={s.url} className="buy-link" target="_blank" rel="noopener noreferrer">
+                                    <span>{s.emoji}</span> {s.name}
+                                </a>
+                            ))}
+                        </div>
+                    </RevealDiv>
+                </section>
+            );
+        }
+
+        /* ───── Footer ───── */
+        function Footer() {
+            return (
+                <footer className="footer">
+                    <div className="footer-brand">🦄 5 Dodos pour tout savoir : Les Licornes</div>
+                    <p>
+                        © 2025 <a href="https://www.editionsdelabagnole.com" target="_blank" rel="noopener noreferrer">
+                        Éditions de la Bagnole</a> — Groupe Librex, Montréal
+                    </p>
+                    <p style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>
+                        Page promotionnelle • Tous droits réservés
+                    </p>
+                </footer>
+            );
+        }
+
+        /* ───── App ───── */
+        function App() {
+            return (
+                <>
+                    <Nav />
+                    <Hero />
+                    <ConceptSection />
+                    <FeaturesSection />
+                    <QuestionsSection />
+                    <AuthorsSection />
+                    <CollectionSection />
+                    <BuySection />
+                    <Footer />
+                </>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
